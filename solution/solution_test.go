@@ -844,3 +844,25 @@ func TestFindFarmland(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestGetMoneyAmount(t *testing.T) {
+	type input struct {
+		n 	int
+	}
+	inputs := []input{
+		{10},
+		{1},
+		{2},
+	}
+	expected_outputs := []int{
+		16,
+		0,
+		1,
+	}
+
+	f := func(i input) int {
+		return getMoneyAmount(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

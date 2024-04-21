@@ -1274,15 +1274,15 @@ func checkValidString(s string) bool {
 
 	// Base cases
 	for i := 0; i < len(s); i++ {
-		if (s[i] == '*') {
+		if s[i] == '*' {
 			least_unmatched_left[i][i] = 0
 			least_unmatched_right[i][i] = 0
 			most_unmatched_left[i][i] = 1
 			most_unmatched_right[i][i] = 1
-		} else if (s[i] == '(') {
+		} else if s[i] == '(' {
 			least_unmatched_left[i][i] = 1
 			most_unmatched_left[i][i] = 1
-		} else if (s[i] == ')') {
+		} else if s[i] == ')' {
 			least_unmatched_right[i][i] = 1
 			most_unmatched_right[i][i] = 1
 		}
@@ -1305,10 +1305,10 @@ func checkValidString(s string) bool {
 					// We CANNOT have an additional unmatched left '('
 					most_unmatched_left[start][end] = most_unmatched_left[start+1][end]
 				}
-				least_unmatched_right[start][end] = max(least_unmatched_right[start+1][end] - 1, 0)
+				least_unmatched_right[start][end] = max(least_unmatched_right[start+1][end]-1, 0)
 			} else if s[start] == '(' {
-				least_unmatched_right[start][end] = max(least_unmatched_right[start+1][end] - 1, 0)
-				most_unmatched_right[start][end] = max(most_unmatched_right[start+1][end] - 1, 0)
+				least_unmatched_right[start][end] = max(least_unmatched_right[start+1][end]-1, 0)
+				most_unmatched_right[start][end] = max(most_unmatched_right[start+1][end]-1, 0)
 				if least_unmatched_right[start+1][end] == 0 {
 					// Then we have CAN have an additional unmatched left
 					most_unmatched_left[start][end] = most_unmatched_left[start+1][end] + 1
@@ -1357,8 +1357,8 @@ func countDigitOne(n int) int {
 	sub_problems := make([]int, num_digits)
 	sub_problems[0] = 0
 	// Now we build up
-	for i:=1; i<len(sub_problems); i++ {
-		sub_problems[i] = 10 * sub_problems[i-1] + int(math.Pow(10, float64(i-1)))
+	for i := 1; i < len(sub_problems); i++ {
+		sub_problems[i] = 10*sub_problems[i-1] + int(math.Pow(10, float64(i-1)))
 	}
 
 	// Now we need to parse through our number
@@ -1403,7 +1403,7 @@ func coinChange(coins []int, amount int) int {
 	})
 
 	sols := make([][]int, len(coins))
-	for i:=0; i<len(coins); i++{
+	for i := 0; i < len(coins); i++ {
 		sols[i] = make([]int, amount+1)
 	}
 
@@ -1418,7 +1418,7 @@ func topDownCoinChange(coins []int, rightIdx int, amount int, sols [][]int) int 
 		// We need to solve this problem
 		// We are allowed to pick coins from 0 up to rightIdx
 		best := math.MaxInt
-		for i:=0; i<=rightIdx; i++ {
+		for i := 0; i <= rightIdx; i++ {
 			value := coins[i]
 			if value == amount {
 				best = 1
@@ -1426,15 +1426,15 @@ func topDownCoinChange(coins []int, rightIdx int, amount int, sols [][]int) int 
 			} else if value < amount {
 				if (amount - value) >= value {
 					// We could still re-use this coin
-					subsol := topDownCoinChange(coins, i, amount - value, sols)
+					subsol := topDownCoinChange(coins, i, amount-value, sols)
 					if subsol != -1 {
-						best = min(best, 1 + subsol)
+						best = min(best, 1+subsol)
 					}
 				} else if i > 0 {
 					// We will not be able to re-use this coin
-					subsol := topDownCoinChange(coins, i, amount - value, sols)
+					subsol := topDownCoinChange(coins, i, amount-value, sols)
 					if subsol != -1 {
-						best = min(best, 1 + subsol)
+						best = min(best, 1+subsol)
 					}
 				}
 			}
@@ -1463,7 +1463,7 @@ https://leetcode.com/problems/maximum-value-of-k-coins-from-piles/description/
 */
 func maxValueOfCoins(piles [][]int, k int) int {
 	sols := make([][]int, len(piles))
-	for i:=0; i<len(sols); i++ {
+	for i := 0; i < len(sols); i++ {
 		sols[i] = make([]int, k+1)
 	}
 	return topDownMaxValueOfCoins(sols, piles, 0, k)
@@ -1482,11 +1482,11 @@ func topDownMaxValueOfCoins(sols [][]int, piles [][]int, start int, coins_to_pic
 		// We have not yet solved this problem
 		total := 0
 		// First try not picking ANY coins from this pile
-		record := topDownMaxValueOfCoins(sols, piles, start + 1, coins_to_pick)
+		record := topDownMaxValueOfCoins(sols, piles, start+1, coins_to_pick)
 		// Now try picking all possible amounts of coins from this pile
-		for i:=1; i<=min(len(piles[start]), coins_to_pick); i++ {
+		for i := 1; i <= min(len(piles[start]), coins_to_pick); i++ {
 			total += piles[start][i-1]
-			record = max(record, total + topDownMaxValueOfCoins(sols, piles, start+1, coins_to_pick-i))
+			record = max(record, total+topDownMaxValueOfCoins(sols, piles, start+1, coins_to_pick-i))
 		}
 		sols[start][coins_to_pick] = record
 		return sols[start][coins_to_pick]
@@ -1509,12 +1509,12 @@ https://leetcode.com/problems/find-the-shortest-superstring/solutions/194932/tra
 func shortestSuperstring(words []string) string {
 	nodes := len(words)
 	graph := make([][]int, nodes)
-	for i:=0; i<len(graph); i++ {
+	for i := 0; i < len(graph); i++ {
 		graph[i] = make([]int, nodes)
 	}
 
-	for i:=0; i<len(graph); i++ {
-		for j:=0; j<len(graph); j++ {
+	for i := 0; i < len(graph); i++ {
+		for j := 0; j < len(graph); j++ {
 			if j != i {
 				graph[i][j] = findExtensionLength(words[i], words[j])
 			}
@@ -1522,26 +1522,26 @@ func shortestSuperstring(words []string) string {
 	}
 
 	sols := make([][]*sol, nodes)
-	for i:=0; i<nodes; i++ {
+	for i := 0; i < nodes; i++ {
 		sols[i] = make([]*sol, int(math.Pow(2, float64(nodes))))
-		for j:=0; j<len(sols[i]); j++ {
+		for j := 0; j < len(sols[i]); j++ {
 			sols[i][j] = nil
 		}
 	}
 
-	subset := int(math.Pow(2, float64(nodes)))-1
+	subset := int(math.Pow(2, float64(nodes))) - 1
 	record := math.MaxInt
 	best_path := []int{}
-	for i:=0; i<nodes; i++ {
+	for i := 0; i < nodes; i++ {
 		sol := bestPath(words, sols, graph, subset, i)
-		best, path  := sol.cost, sol.path
-		if record > best + len(words[i]) {
+		best, path := sol.cost, sol.path
+		if record > best+len(words[i]) {
 			best_path = path
 			record = best + len(words[i])
 		}
 	}
 	joined := words[best_path[0]]
-	for i:=0; i<len(best_path) - 1; i++ {
+	for i := 0; i < len(best_path)-1; i++ {
 		next_word := words[best_path[i+1]]
 		joined += next_word[len(next_word)-graph[best_path[i]][best_path[i+1]]:]
 	}
@@ -1552,8 +1552,8 @@ func shortestSuperstring(words []string) string {
 This structure will be useful for the TSP
 */
 type sol struct {
-	path 	[]int
-	cost 	int
+	path []int
+	cost int
 }
 
 /*
@@ -1583,11 +1583,11 @@ func bestPath(words []string, sols [][]*sol, graph [][]int, subset int, start in
 		path := []int{}
 		best := math.MaxInt
 		new_subset := subset ^ (int(math.Pow(2, float64(start))))
-		for i:=0; i<len(sols); i++ {
-			if (int(math.Pow(2, float64(i)))) & new_subset != 0 { // automatically excludes the start due to XOR with subset yielding new_subset
+		for i := 0; i < len(sols); i++ {
+			if (int(math.Pow(2, float64(i))))&new_subset != 0 { // automatically excludes the start due to XOR with subset yielding new_subset
 				// This is a node to explore
 				sub_sol_ptr := bestPath(words, sols, graph, new_subset, i)
-				if (*sub_sol_ptr).cost + graph[start][i] < best {
+				if (*sub_sol_ptr).cost+graph[start][i] < best {
 					// Don't forget to add the additional connection
 					best = sub_sol_ptr.cost + graph[start][i]
 					path = sub_sol_ptr.path
@@ -1624,10 +1624,10 @@ func largestDivisibleSubset(nums []int) []int {
 		return nums[i] < nums[j]
 	})
 
-    sols := make([][]int, len(nums))
+	sols := make([][]int, len(nums))
 
 	best := []int{}
-	for i:=0; i<len(nums); i++ {
+	for i := 0; i < len(nums); i++ {
 		largest_include_i := topDownLargestDivisibleSubset(sols, i, nums)
 		if len(best) < len(largest_include_i) {
 			best = largest_include_i
@@ -1644,12 +1644,12 @@ func topDownLargestDivisibleSubset(sols [][]int, start int, nums []int) []int {
 	if len(sols[start]) > 0 { // Have solved the problem already
 		return sols[start]
 	} else { // Need to solve the problem
-		if start == len(nums) - 1 {
+		if start == len(nums)-1 {
 			sols[start] = []int{nums[start]}
 		} else {
 			best := []int{nums[start]}
-			for j:=start+1; j<len(nums); j++ {
-				if nums[j] % nums[start] == 0 {
+			for j := start + 1; j < len(nums); j++ {
+				if nums[j]%nums[start] == 0 {
 					include_j := topDownLargestDivisibleSubset(sols, j, nums)
 					if len(best) < (len(include_j) + 1) {
 						best = append([]int{nums[start]}, include_j...)
@@ -1685,7 +1685,7 @@ func minimumOneBitOperations(n int) int {
 	} else {
 		// Find the next 1
 		new_n := n ^ (1 << left_most_bit_posn) // Mask out left-most 1
-		return (1 << (left_most_bit_posn+1)) - 1 - minimumOneBitOperations(new_n)
+		return (1 << (left_most_bit_posn + 1)) - 1 - minimumOneBitOperations(new_n)
 	}
 }
 
@@ -1716,7 +1716,7 @@ func minOperations(nums []int) int {
 	// Surely ALL duplicates will have to change
 	duplicates := 0
 	uniques := []int{nums[0]}
-	for i:=1; i<len(nums); i++ {
+	for i := 1; i < len(nums); i++ {
 		if nums[i] == nums[i-1] {
 			duplicates++
 		} else {
@@ -1725,17 +1725,17 @@ func minOperations(nums []int) int {
 	}
 
 	// The amount of switches we will need to do is ALWAYS in {0, ...len-1}
-	diff := len(nums)-1
-	best := len(uniques)-1
-	for i:=0; i<len(uniques); i++ {
+	diff := len(nums) - 1
+	best := len(uniques) - 1
+	for i := 0; i < len(uniques); i++ {
 		// Try making this the smallest value in our continuous array
 		last := uniques[i] + diff
 		last_posn := algorithm.BinarySearchMeetOrLower(uniques, last)
 		if last_posn != -1 {
 			// Then all values from i to last_posn are PRODUCTIVE values to having a continuous array - all others within 'unique' must be changed
-			best = min(best, i + len(uniques) - last_posn - 1)
+			best = min(best, i+len(uniques)-last_posn-1)
 		}
-	} 
+	}
 
 	// Duplicates will be changed optimally to fill in whatever gaps are necessary to choose the above best starting value for our continuous array
 	return best + duplicates
@@ -1781,7 +1781,7 @@ func sumOfDistancesInTree(n int, edges [][]int) []int {
 	q.Enqueue(0)
 	for !q.Empty() {
 		dequeue := q.Length()
-		for i:=0; i<dequeue; i++ {
+		for i := 0; i < dequeue; i++ {
 			sum += num_edges
 			next := q.Dequeue()
 			for neigher := range connections[next] {
@@ -1841,7 +1841,7 @@ func sumOfDistancesInTree(n int, edges [][]int) []int {
 	// The above algorithm did not necessarily include the weights for all the single-connection nodes - since those were deleted - luckily we can fix that easily
 	for _, node := range single_edge_nodes {
 		// Record this node's path length sum
-		path_length_sum := n - 1 // Start with number of nodes minus 1
+		path_length_sum := n - 1                  // Start with number of nodes minus 1
 		for neighbor := range connections[node] { // (There will only be one neighbor)
 			path_length_sum += distance_sums[neighbor] - 1
 		}
@@ -1891,19 +1891,19 @@ https://leetcode.com/problems/number-of-islands/description/?envType=daily-quest
 func numIslands(grid [][]byte) int {
 	// Join all of the '1' cells together through disjoint sets, and the number of disjoint sets is the number of islands
 	type coordinate struct {
-		row 	int
-		col 	int
+		row int
+		col int
 	}
 
 	rows := len(grid)
 	cols := len(grid[0])
 
 	nodes := make([][]*disjointset.Node[coordinate], rows)
-	for j:=0; j<rows; j++ {
+	for j := 0; j < rows; j++ {
 		nodes[j] = make([]*disjointset.Node[coordinate], cols)
 	}
-	for i:=0; i<rows; i++ {
-		for j:=0; j<cols; j++ {
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
 			if grid[i][j] == '0' {
 				continue
 			}
@@ -1923,11 +1923,11 @@ func numIslands(grid [][]byte) int {
 
 	islands := 0
 	seen := make([][]bool, rows)
-	for i:=0; i<rows; i++ {
+	for i := 0; i < rows; i++ {
 		seen[i] = make([]bool, cols)
 	}
-	for i:=0; i<rows; i++ {
-		for j:=0; j<cols; j++ {
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
 			if nodes[i][j] != nil {
 				node_ptr := nodes[i][j]
 				island_row := node_ptr.RootValue().row
@@ -1940,7 +1940,7 @@ func numIslands(grid [][]byte) int {
 		}
 	}
 	return islands
-	
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1960,19 +1960,19 @@ https://leetcode.com/problems/find-all-groups-of-farmland/description/?envType=d
 func findFarmland(land [][]int) [][]int {
 	// Join all of the '1' cells together through disjoint sets, and the number of disjoint sets is the number of islands
 	type coordinate struct {
-		row 	int
-		col 	int
+		row int
+		col int
 	}
 
 	rows := len(land)
 	cols := len(land[0])
 
 	nodes := make([][]*disjointset.Node[coordinate], rows)
-	for j:=0; j<rows; j++ {
+	for j := 0; j < rows; j++ {
 		nodes[j] = make([]*disjointset.Node[coordinate], cols)
 	}
-	for i:=0; i<rows; i++ {
-		for j:=0; j<cols; j++ {
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
 			if land[i][j] == 0 {
 				continue
 			}
@@ -1992,13 +1992,13 @@ func findFarmland(land [][]int) [][]int {
 
 	corners := [][]int{}
 	seen := make([][]bool, rows)
-	for i:=0; i<rows; i++ {
+	for i := 0; i < rows; i++ {
 		seen[i] = make([]bool, cols)
 	}
 	// We need to remember the "index" of each plot of land
 	plots := make(map[int]map[int]int)
-	for i:=0; i<rows; i++ {
-		for j:=0; j<cols; j++ {
+	for i := 0; i < rows; i++ {
+		for j := 0; j < cols; j++ {
 			if nodes[i][j] != nil {
 				node_ptr := nodes[i][j]
 				island_row := node_ptr.RootValue().row
@@ -2036,4 +2036,69 @@ func findFarmland(land [][]int) [][]int {
 	}
 
 	return corners
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+We are playing the Guessing Game. The game will work as follows:
+
+1) I pick a number between 1 and n.
+2) You guess a number.
+3) If you guess the right number, you win the game.
+4) If you guess the wrong number, then I will tell you whether the number I picked is higher or lower, and you will continue guessing.
+5) Every time you guess a wrong number x, you will pay x dollars. If you run out of money, you lose the game.
+
+Given a particular n, return the minimum amount of money you need to guarantee a win regardless of what number I pick.
+
+Link:
+https://leetcode.com/problems/guess-number-higher-or-lower-ii/description/
+
+Source for Inspiration:
+https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction/#
+*/
+func getMoneyAmount(n int) int {
+	min_sols := make([][]int, n+1)
+	for i:=0; i<=n; i++ {
+		min_sols[i] = make([]int, n+1)
+		for j:=0; j<=n; j++ {
+		}
+	}
+	return topDownMinMoney(1, n, min_sols)
+}
+
+/*
+This is the part of the minimizer - see which choice will give the maximizer the lowest possible max result
+*/
+func topDownMinMoney(lower_bound int, upper_bound int, min_sols [][]int) int {
+	if lower_bound == upper_bound {
+		return 0 // You're not gonna need any money to guess right
+	} else if min_sols[lower_bound][upper_bound] != 0 {
+		return min_sols[lower_bound][upper_bound]
+	} else {
+		// Try every possible first guess, and see what the worst result could be
+		// Go with the lowest possible worst result
+		best := math.MaxInt
+		for choice := lower_bound; choice <= upper_bound; choice++ {
+			best = min(best, choice + topDownMaxMoney(lower_bound, upper_bound, choice, min_sols))
+		}
+		// Record and return
+		min_sols[lower_bound][upper_bound] = best
+		return best
+	}
+}
+
+/*
+This is the part of the maximizer - see which choice will give the minimizer the highest possible min result
+*/
+func topDownMaxMoney(lower_bound int, upper_bound int, guess int, min_sols [][]int) int {
+	if lower_bound == upper_bound {
+		return 0
+	} else if guess == lower_bound {
+		return topDownMinMoney(guess + 1, upper_bound, min_sols)
+	} else if guess == upper_bound {
+		return topDownMinMoney(lower_bound, guess-1, min_sols)
+	} else {
+		return max(topDownMinMoney(lower_bound, guess - 1, min_sols), topDownMinMoney(guess+1, upper_bound, min_sols))
+	}
 }
