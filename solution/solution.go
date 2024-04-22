@@ -2224,6 +2224,7 @@ func openLock(deadends []string, target string) int {
 		}
 	}
 
+	// No need for Djikstra's algorithm here as all edge weights are 1 - BFS will do
 	q := queue.New[*graph.Node]()
 	lock_nodes[0].underlying_node.IsVisited = true
 	q.Enqueue(lock_nodes[0].underlying_node)
