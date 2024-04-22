@@ -28,21 +28,6 @@ func (h *MaxHeap[K]) maxHeapifyUp(idx int) {
 	}
 }
 
-// Parent of the given index
-func parent(i int) int {
-	return (i - 1) / 2
-}
-
-// Left child of the given index
-func left(i int) int {
-	return 2*i + 1
-}
-
-// Right child of the given index
-func right(i int) int {
-	return 2 * (i + 1)
-}
-
 // Swap two values in the underlying array
 func (h *MaxHeap[K]) swap(i1, i2 int) {
 	h.array[i1], h.array[i2] = h.array[i2], h.array[i1]

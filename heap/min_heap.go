@@ -1,6 +1,8 @@
 package heap
 
-import "cmp"
+import (
+	"cmp"
+)
 
 // MinHeap struct has a slice that holds the array
 type MinHeap[K cmp.Ordered] struct {

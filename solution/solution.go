@@ -2,8 +2,9 @@ package solution
 
 import (
 	"leetcode/algorithm"
-	"leetcode/disjoint_set"
+	disjointset "leetcode/disjoint_set"
 	"leetcode/euclidean"
+	"leetcode/graph"
 	"leetcode/heap"
 	"leetcode/list_node"
 	"leetcode/modulo"
@@ -11,6 +12,7 @@ import (
 	"leetcode/stack"
 	"math"
 	"sort"
+	"strconv"
 )
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2059,9 +2061,9 @@ https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introductio
 */
 func getMoneyAmount(n int) int {
 	min_sols := make([][]int, n+1)
-	for i:=0; i<=n; i++ {
+	for i := 0; i <= n; i++ {
 		min_sols[i] = make([]int, n+1)
-		for j:=0; j<=n; j++ {
+		for j := 0; j <= n; j++ {
 		}
 	}
 	return topDownMinMoney(1, n, min_sols)
@@ -2080,7 +2082,7 @@ func topDownMinMoney(lower_bound int, upper_bound int, min_sols [][]int) int {
 		// Go with the lowest possible worst result
 		best := math.MaxInt
 		for choice := lower_bound; choice <= upper_bound; choice++ {
-			best = min(best, choice + topDownMaxMoney(lower_bound, upper_bound, choice, min_sols))
+			best = min(best, choice+topDownMaxMoney(lower_bound, upper_bound, choice, min_sols))
 		}
 		// Record and return
 		min_sols[lower_bound][upper_bound] = best
@@ -2095,10 +2097,154 @@ func topDownMaxMoney(lower_bound int, upper_bound int, guess int, min_sols [][]i
 	if lower_bound == upper_bound {
 		return 0
 	} else if guess == lower_bound {
-		return topDownMinMoney(guess + 1, upper_bound, min_sols)
+		return topDownMinMoney(guess+1, upper_bound, min_sols)
 	} else if guess == upper_bound {
 		return topDownMinMoney(lower_bound, guess-1, min_sols)
 	} else {
-		return max(topDownMinMoney(lower_bound, guess - 1, min_sols), topDownMinMoney(guess+1, upper_bound, min_sols))
+		return max(topDownMinMoney(lower_bound, guess-1, min_sols), topDownMinMoney(guess+1, upper_bound, min_sols))
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You have a lock in front of you with 4 circular wheels. Each wheel has 10 slots: '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'. The wheels can rotate freely and wrap around: for example we can turn '9' to be '0', or '0' to be '9'. Each move consists of turning one wheel one slot.
+
+The lock initially starts at '0000', a string representing the state of the 4 wheels.
+
+You are given a list of deadends dead ends, meaning if the lock displays any of these codes, the wheels of the lock will stop turning and you will be unable to open it.
+
+Given a target representing the value of the wheels that will unlock the lock, return the minimum total number of turns required to open the lock, or -1 if it is impossible.
+
+Link:
+https://leetcode.com/problems/open-the-lock/description/?envType=daily-question&envId=2024-04-22
+*/
+func openLock(deadends []string, target string) int {
+	// According to the hint, this is a graph problem with 10,000 different nodes - 0000 through 9999
+	// A node exists IF AND ONLY IF it is not in deadends
+	// Two nodes are connected IF AND ONLY IF exactly one of the digits between the two of them differs, and the difference is either of distance 1 (e.g. 7-8) or distance 9 (e.g. 0-9)
+	// We want the shortest path from 0000 to target
+	num_nodes := 10000
+	target_num, _ := strconv.Atoi(target)
+
+	type lock_node struct {
+		underlying_node *graph.Node
+		lock_values     []int
+	}
+
+	deadends_set := make(map[int]bool)
+	for _, deadend := range deadends {
+		deadend_int, _ := strconv.Atoi(deadend)
+		if deadend_int == 0 || deadend_int == target_num {
+			return -1
+		}
+		deadends_set[deadend_int] = true
+	}
+
+	lock_nodes := make([]*lock_node, num_nodes)
+	for i := 0; i < num_nodes; i++ {
+		_, ok := deadends_set[i]
+		if !ok {
+			lock_nodes[i] = &lock_node{
+				underlying_node: &graph.Node{
+					Id:          i,
+					Connections: []*graph.Edge{},
+					IsVisited:   false,
+					Cost:        math.MaxInt,
+				},
+				lock_values: []int{(i % 10) / 1, (i % 100) / 10, (i % 1000) / 100, (i % 10000) / 1000},
+			}
+		}
+	}
+
+	// Add all of each node's connections
+	for i := 0; i < num_nodes; i++ {
+		if lock_nodes[i] == nil {
+			continue
+		}
+		current := lock_nodes[i]
+		// Generate the neighbors
+		lock_nums := current.lock_values
+		for i := 0; i < 4; i++ {
+			// Find all the neighbors by changing each lock value
+			lock := lock_nums[i]
+			new_lock_nums := [][]int{
+				{lock_nums[0], lock_nums[1], lock_nums[2], lock_nums[3]},
+				{lock_nums[0], lock_nums[1], lock_nums[2], lock_nums[3]},
+			}
+			switch lock {
+			case 0: // 9 and 1
+				new_lock_nums[0][i] = 9
+				new_lock_nums[1][i] = 1
+			case 1: // 0 and 2
+				new_lock_nums[0][i] = 0
+				new_lock_nums[1][i] = 2
+			case 2: // 1 and 3
+				new_lock_nums[0][i] = 1
+				new_lock_nums[1][i] = 3
+			case 3: // 2 and 4
+				new_lock_nums[0][i] = 2
+				new_lock_nums[1][i] = 4
+			case 4: // 3 and 5
+				new_lock_nums[0][i] = 3
+				new_lock_nums[1][i] = 5
+			case 5: // 4 and 6
+				new_lock_nums[0][i] = 4
+				new_lock_nums[1][i] = 6
+			case 6: // 5 and 7
+				new_lock_nums[0][i] = 5
+				new_lock_nums[1][i] = 7
+			case 7: // 6 and 7
+				new_lock_nums[0][i] = 6
+				new_lock_nums[1][i] = 7
+			case 8: // 7 and 9
+				new_lock_nums[0][i] = 7
+				new_lock_nums[1][i] = 9
+			case 9: // 8 and 0
+				new_lock_nums[0][i] = 8
+				new_lock_nums[1][i] = 0
+			}
+			id_1 := new_lock_nums[0][0] + new_lock_nums[0][1]*10 + new_lock_nums[0][2]*100 + new_lock_nums[0][3]*1000
+			id_2 := new_lock_nums[1][0] + new_lock_nums[1][1]*10 + new_lock_nums[1][2]*100 + new_lock_nums[1][3]*1000
+			if lock_nodes[id_1] != nil {
+				// Not a dead end
+				current.underlying_node.Connections = append(current.underlying_node.Connections, &graph.Edge{To: lock_nodes[id_1].underlying_node, Weight: 1})
+			}
+			if lock_nodes[id_2] != nil {
+				// Not a dead end
+				current.underlying_node.Connections = append(current.underlying_node.Connections, &graph.Edge{To: lock_nodes[id_2].underlying_node, Weight: 1})
+			}
+		}
+	}
+
+	underlying_nodes := make([]*graph.Node, len(lock_nodes))
+	for idx, lock_node := range lock_nodes {
+		if lock_node != nil {
+			underlying_nodes[idx] = lock_node.underlying_node
+		}
+	}
+
+	q := queue.New[*graph.Node]()
+	lock_nodes[0].underlying_node.IsVisited = true
+	q.Enqueue(lock_nodes[0].underlying_node)
+	length := 0
+	for !q.Empty() {
+		empty_this_many := q.Length()
+		for i:=0; i<empty_this_many; i++ {
+			next := q.Dequeue()
+			if next.Id == target_num {
+				return length
+			} else {
+				for _, edge := range next.Connections {
+					if !edge.To.IsVisited {
+						edge.To.IsVisited = true
+						q.Enqueue(edge.To)
+					}
+				}
+			}
+		}
+		length++
+	}
+
+	return -1
 }
