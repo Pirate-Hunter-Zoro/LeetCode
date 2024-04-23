@@ -2249,3 +2249,86 @@ func openLock(deadends []string, target string) int {
 
 	return -1
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+A tree is an undirected graph in which any two vertices are connected by exactly one path. In other words, any connected graph without simple cycles is a tree.
+
+Given a tree of n nodes labelled from 0 to n - 1, and an array of n - 1 edges where edges[i] = [ai, bi] indicates that there is an undirected edge between the two nodes ai and bi in the tree, you can choose any node of the tree as the root. When you select a node x as the root, the result tree has height h. Among all possible rooted trees, those with minimum height (i.e. min(h))  are called minimum height trees (MHTs).
+
+Return a list of all MHTs' root labels. You can return the answer in any order.
+
+The height of a rooted tree is the number of edges on the longest downward path between the root and a leaf.
+
+Link:
+https://leetcode.com/problems/minimum-height-trees/description/?envType=daily-question&envId=2024-04-23
+
+Inspiration:
+https://leetcode.com/problems/minimum-height-trees/solutions/5060930/full-explanation-bfs-remove-leaf-nodes/?envType=daily-question&envId=2024-04-23
+*/
+func findMinHeightTrees(n int, edges [][]int) []int {
+	if n == 1 {
+		return []int{0}
+	} else if n == 2 {
+		return []int{0, 1}
+	}
+
+    // Turns out, all we need to do is repeatedly remove vertices
+	connectivity_list := make(map[int]map[int]bool)
+	
+	for _, edge := range edges {
+		first := edge[0]
+		second := edge[1]
+
+		// First node POV
+		neighbors, ok := connectivity_list[first]
+		if !ok {
+			// node not seen yet
+			neighbors = make(map[int]bool)
+		}
+		neighbors[second] = true
+		connectivity_list[first] = neighbors
+
+		// Second node POV
+		neighbors, ok = connectivity_list[second]
+		if !ok {
+			// node not seen yet
+			neighbors = make(map[int]bool)
+		}
+		neighbors[first] = true
+		connectivity_list[second] = neighbors
+	}
+
+	// Remove leaf nodes until there is nothing left
+	for len(connectivity_list) > 2 {
+		// Find your leaves
+		leaves := []int{}
+		for id, neighbors := range connectivity_list {
+			if len(neighbors) == 1 {
+				// MAY be a leaf node
+				for neighbor_id := range neighbors {
+					if len(connectivity_list[neighbor_id]) > 1 {
+						// Then id IS a leaf node
+						leaves = append(leaves, id)
+					}
+				}
+			}
+		}
+		for _, id := range leaves {
+			neighbors := connectivity_list[id]
+			for neighbor_id := range neighbors { // There will only be one neighbor
+				delete(connectivity_list, id)
+				delete(connectivity_list[neighbor_id], id)
+			}
+		}
+	}
+
+	// Return all the nodes left over
+	remaining := []int{}
+	for id := range connectivity_list {
+		remaining = append(remaining, id)
+	}
+
+	return remaining
+}

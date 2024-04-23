@@ -918,3 +918,35 @@ func TestOpenLock(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMinHeightTree(t *testing.T) {
+	type input struct {
+		n 		int
+		edges 	[][]int
+	}
+	inputs := []input{
+		{
+			4,
+			[][]int{
+				{1,0},{1,2},{1,3},
+			},
+		},
+		{
+			6,
+			[][]int{
+				{3,0},{3,1},{3,2},{3,4},{5,4},
+			},
+		},
+	}
+
+	expected_outputs := [][]int{
+		{1},
+		{3,4},
+	}
+
+	f := func(i input) []int {
+		return findMinHeightTrees(i.n, i.edges)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
