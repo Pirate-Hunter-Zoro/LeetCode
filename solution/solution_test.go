@@ -950,3 +950,28 @@ func TestMinHeightTree(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestWiggleMaxLength(t *testing.T) {
+	type input struct {
+		nums 	[]int
+	}
+	inputs := []input{
+		{[]int{1,7,4,9,2,5}},
+		{[]int{1,17,5,10,13,15,10,5,16,8}},
+		{[]int{1,2,3,4,5,6,7,8,9}},
+		{[]int{3,3,3,2,5}},
+	}
+
+	expected_outputs := []int{
+		6,
+		7,
+		2,
+		3,
+	}
+
+	f := func(i input) int {
+		return wiggleMaxLength(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

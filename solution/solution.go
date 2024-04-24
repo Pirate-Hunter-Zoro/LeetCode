@@ -2332,3 +2332,122 @@ func findMinHeightTrees(n int, edges [][]int) []int {
 
 	return remaining
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+A wiggle sequence is a sequence where the differences between successive numbers strictly alternate between positive and negative. The first difference (if one exists) may be either positive or negative. A sequence with one element and a sequence with two non-equal elements are trivially wiggle sequences.
+
+For example, [1, 7, 4, 9, 2, 5] is a wiggle sequence because the differences (6, -3, 5, -7, 3) alternate between positive and negative.
+In contrast, [1, 4, 7, 2, 5] and [1, 7, 4, 5, 5] are not wiggle sequences. The first is not because its first two differences are positive, and the second is not because its last difference is zero.
+A subsequence is obtained by deleting some elements (possibly zero) from the original sequence, leaving the remaining elements in their original order.
+
+Given an integer array nums, return the length of the longest wiggle subsequence of nums.
+
+Link:
+https://leetcode.com/problems/wiggle-subsequence/
+*/
+func wiggleMaxLength(nums []int) int {
+	// Firstly, any consecutive identical values are not helpful in increasing a wiggle subsequence length - remove
+	new_nums := []int{nums[0]}
+	for i:=1; i<len(nums); i++ {
+		if nums[i] != nums[i-1] {
+			new_nums = append(new_nums, nums[i])
+		}
+	}
+
+	// Edge case
+	if len(new_nums) == 1 {
+		return 1
+	}
+
+	// Bottom-up dynamic programming will accomplish this - we need to keep track of the maximum wiggle subsequence from start->end
+	// The maximum wiggle lengths from start->end being allowed
+	max_wiggle_lengths := make([][]int, len(new_nums))
+	for i:=0; i<len(new_nums); i++ {
+		max_wiggle_lengths[i] = make([]int, len(new_nums))
+	}
+	// Was the last addition an increase or a decrease? Was it allowed to be both?
+	last_change_allowed := make([][]int, len(new_nums)) // 0 - record could be accomplished by both, 1 - only accomplished by increase, 2 - only accomplished by decrease
+	for i:=0; i<len(new_nums); i++ {
+		last_change_allowed[i] = make([]int, len(new_nums))
+	}
+	// What was the last value used in the longest possible wiggle length subsequence from start to end?
+	// We do not need to keep track of this - it will ALWAYS be new_nums[end]
+	// Proof:
+		// If new_nums[end] can extend a previous subsequence to give you a new record, obviously the new end is nums[end]
+		// Otherwise, 
+			// If new_nums[end] is greater than the ending of a subsequence with an addition, then it's better to use nums[end] as the new ending since it'll have to be followed by a decrease
+			// Otherwise, new_nums[end] is smaller than the ending of a subsequence with a subtraction, so it's better to use nums[end] as the new ending since it'll have to be followed by an increase
+
+	// Base cases - lengths 2 and 1
+	for i:=1; i<len(new_nums); i++ {
+		max_wiggle_lengths[i-1][i] = 2
+		if new_nums[i] > new_nums[i-1] {
+			last_change_allowed[i-1][i] = 1 // Accomplished only by an increase
+		} else {
+			last_change_allowed[i-1][i] = 2 // Accomplished only by a decrease
+		}
+	}
+
+	// Now use bottom-up dynamic programming to solve our problem
+	for length := 3; length<=len(new_nums); length++ {
+		for start := 0; start<=len(new_nums)-length; start++ {
+			end := start + length - 1
+
+			// We have two subproblems to look at:
+
+			// First subproblem: start -> end-1 where we DO allow start
+			prev_end := new_nums[end-1] // Because remember from above, the best subsequence from (i,j) should ALWAYS end in nums[j]
+			first_record := max_wiggle_lengths[start][end-1]
+			first_decrease_record := first_record
+			if last_change_allowed[start][end-1] == 0 || last_change_allowed[start][end-1] == 1 {
+				// Then one possible extension is being less than the previous end
+				if new_nums[end] < prev_end {
+					first_decrease_record++
+				}
+			}
+			first_increase_record := first_record
+			if last_change_allowed[start][end-1] == 0 || last_change_allowed[start][end-1] == 2 {
+				// Then one possible extension is being greater than the previous end
+				if new_nums[end] > prev_end {
+					first_increase_record++
+				}
+			}
+			first_record_last_change_allowed := last_change_allowed[start][end-1]
+			if first_increase_record > first_decrease_record {
+				// Record ONLY accomplished by increase
+				first_record_last_change_allowed = 1
+			} else if first_increase_record < first_decrease_record {
+				// Record ONLY accomplished by decrease
+				first_record_last_change_allowed = 2
+			}
+			first_record = max(first_decrease_record, first_increase_record)
+
+			
+			second_record := max_wiggle_lengths[start+1][end]
+			second_record_last_change_allowed := last_change_allowed[start+1][end]
+
+			new_record_last_change_allowed := 0
+			if first_record == second_record {
+				if first_record_last_change_allowed == 1 && second_record_last_change_allowed == 1 {
+					// No choice
+					new_record_last_change_allowed = 1
+				} else if first_record_last_change_allowed == 2 && second_record_last_change_allowed == 2 {
+					// No choice
+					new_record_last_change_allowed = 2
+				}
+			} else if first_record > second_record { // first subproblem won
+				new_record_last_change_allowed = first_record_last_change_allowed
+			} else { // second won
+				new_record_last_change_allowed = second_record_last_change_allowed
+			}
+
+			new_record := max(first_record, second_record)
+			max_wiggle_lengths[start][end] = new_record
+			last_change_allowed[start][end] = new_record_last_change_allowed
+		}
+	}
+	
+	return max_wiggle_lengths[0][len(new_nums)-1]
+}
