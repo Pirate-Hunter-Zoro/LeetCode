@@ -2454,3 +2454,46 @@ func wiggleMaxLength(nums []int) int {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+You are given a string s consisting of lowercase letters and an integer k. We call a string t ideal if the following conditions are satisfied:
+
+- t is a subsequence of the string s.
+- The absolute difference in the alphabet order of every two adjacent letters in t is less than or equal to k.
+- Return the length of the longest ideal string.
+
+A subsequence is a string that can be derived from another string by deleting some or no characters without changing the order of the remaining characters.
+
+Note that the alphabet order is not cyclic. For example, the absolute difference in the alphabet order of 'a' and 'z' is 25, not 1.
+
+Link: (The hint was helpful)
+https://leetcode.com/problems/longest-ideal-subsequence/description/?envType=daily-question&envId=2024-04-25
+*/
+func longestIdealString(s string, k int) int {
+    asciis := make([]int, len(s))
+	for i:=0; i<len(s); i++ {
+		asciis[i] = int(s[i])
+	}
+
+	// Now we need to ask ourselves the question - at a particular index i, what is the longest possible ideal subsequence that MUST end at index i?
+	record := 1
+	records := make([]int, len(asciis))
+	// Keep track of a map of value versus earliest index occurrence (seen thus far as we iterate)
+	value_occurences := make(map[int]int)
+	for i:=0; i<len(asciis); i++ {
+		current_val := asciis[i]
+		current_record_for_i := 1
+		for other_val := current_val - k; other_val <= current_val + k; other_val++ {
+			idx, ok := value_occurences[other_val]
+			if ok {
+				current_record_for_i = max(current_record_for_i, 1 + records[idx])
+			}
+		}
+		// Update the latest occurrence for our current value
+		// Think about it - if we end on a certain SAME value, we'd rather force ourselves to end later rather than earlier - that's only going to give us a longer ideal subsequence
+		value_occurences[current_val] = i
+		records[i] = current_record_for_i
+		record = max(record, current_record_for_i)
+	}
+
+	return record
+}

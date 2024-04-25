@@ -975,3 +975,24 @@ func TestWiggleMaxLength(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestLongestIdealString(t *testing.T) {
+	type input struct {
+		s 	string
+		k 	int
+	}
+	inputs := []input{
+		{"acfgbd", 2},
+		{"abcd", 3},
+	}
+	expected_outputs := []int{
+		4,
+		4,
+	}
+
+	f := func(i input) int {
+		return longestIdealString(i.s, i.k)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
