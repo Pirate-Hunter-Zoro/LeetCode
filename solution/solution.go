@@ -2231,7 +2231,7 @@ func openLock(deadends []string, target string) int {
 	length := 0
 	for !q.Empty() {
 		empty_this_many := q.Length()
-		for i:=0; i<empty_this_many; i++ {
+		for i := 0; i < empty_this_many; i++ {
 			next := q.Dequeue()
 			if next.Id == target_num {
 				return length
@@ -2274,9 +2274,9 @@ func findMinHeightTrees(n int, edges [][]int) []int {
 		return []int{0, 1}
 	}
 
-    // Turns out, all we need to do is repeatedly remove vertices
+	// Turns out, all we need to do is repeatedly remove vertices
 	connectivity_list := make(map[int]map[int]bool)
-	
+
 	for _, edge := range edges {
 		first := edge[0]
 		second := edge[1]
@@ -2350,7 +2350,7 @@ https://leetcode.com/problems/wiggle-subsequence/
 func wiggleMaxLength(nums []int) int {
 	// Firstly, any consecutive identical values are not helpful in increasing a wiggle subsequence length - remove
 	new_nums := []int{nums[0]}
-	for i:=1; i<len(nums); i++ {
+	for i := 1; i < len(nums); i++ {
 		if nums[i] != nums[i-1] {
 			new_nums = append(new_nums, nums[i])
 		}
@@ -2364,24 +2364,24 @@ func wiggleMaxLength(nums []int) int {
 	// Bottom-up dynamic programming will accomplish this - we need to keep track of the maximum wiggle subsequence from start->end
 	// The maximum wiggle lengths from start->end being allowed
 	max_wiggle_lengths := make([][]int, len(new_nums))
-	for i:=0; i<len(new_nums); i++ {
+	for i := 0; i < len(new_nums); i++ {
 		max_wiggle_lengths[i] = make([]int, len(new_nums))
 	}
 	// Was the last addition an increase or a decrease? Was it allowed to be both?
 	last_change_allowed := make([][]int, len(new_nums)) // 0 - record could be accomplished by both, 1 - only accomplished by increase, 2 - only accomplished by decrease
-	for i:=0; i<len(new_nums); i++ {
+	for i := 0; i < len(new_nums); i++ {
 		last_change_allowed[i] = make([]int, len(new_nums))
 	}
 	// What was the last value used in the longest possible wiggle length subsequence from start to end?
 	// We do not need to keep track of this - it will ALWAYS be new_nums[end]
 	// Proof:
-		// If new_nums[end] can extend a previous subsequence to give you a new record, obviously the new end is nums[end]
-		// Otherwise, 
-			// If new_nums[end] is greater than the ending of a subsequence with an addition, then it's better to use nums[end] as the new ending since it'll have to be followed by a decrease
-			// Otherwise, new_nums[end] is smaller than the ending of a subsequence with a subtraction, so it's better to use nums[end] as the new ending since it'll have to be followed by an increase
+	// If new_nums[end] can extend a previous subsequence to give you a new record, obviously the new end is nums[end]
+	// Otherwise,
+	// If new_nums[end] is greater than the ending of a subsequence with an addition, then it's better to use nums[end] as the new ending since it'll have to be followed by a decrease
+	// Otherwise, new_nums[end] is smaller than the ending of a subsequence with a subtraction, so it's better to use nums[end] as the new ending since it'll have to be followed by an increase
 
 	// Base cases - lengths 2 and 1
-	for i:=1; i<len(new_nums); i++ {
+	for i := 1; i < len(new_nums); i++ {
 		max_wiggle_lengths[i-1][i] = 2
 		if new_nums[i] > new_nums[i-1] {
 			last_change_allowed[i-1][i] = 1 // Accomplished only by an increase
@@ -2391,8 +2391,8 @@ func wiggleMaxLength(nums []int) int {
 	}
 
 	// Now use bottom-up dynamic programming to solve our problem
-	for length := 3; length<=len(new_nums); length++ {
-		for start := 0; start<=len(new_nums)-length; start++ {
+	for length := 3; length <= len(new_nums); length++ {
+		for start := 0; start <= len(new_nums)-length; start++ {
 			end := start + length - 1
 
 			// We have two subproblems to look at:
@@ -2424,7 +2424,6 @@ func wiggleMaxLength(nums []int) int {
 			}
 			first_record = max(first_decrease_record, first_increase_record)
 
-			
 			second_record := max_wiggle_lengths[start+1][end]
 			second_record_last_change_allowed := last_change_allowed[start+1][end]
 
@@ -2448,7 +2447,7 @@ func wiggleMaxLength(nums []int) int {
 			last_change_allowed[start][end] = new_record_last_change_allowed
 		}
 	}
-	
+
 	return max_wiggle_lengths[0][len(new_nums)-1]
 }
 
@@ -2469,8 +2468,8 @@ Link: (The hint was helpful)
 https://leetcode.com/problems/longest-ideal-subsequence/description/?envType=daily-question&envId=2024-04-25
 */
 func longestIdealString(s string, k int) int {
-    asciis := make([]int, len(s))
-	for i:=0; i<len(s); i++ {
+	asciis := make([]int, len(s))
+	for i := 0; i < len(s); i++ {
 		asciis[i] = int(s[i])
 	}
 
@@ -2479,13 +2478,13 @@ func longestIdealString(s string, k int) int {
 	records := make([]int, len(asciis))
 	// Keep track of a map of value versus earliest index occurrence (seen thus far as we iterate)
 	value_occurences := make(map[int]int)
-	for i:=0; i<len(asciis); i++ {
+	for i := 0; i < len(asciis); i++ {
 		current_val := asciis[i]
 		current_record_for_i := 1
-		for other_val := current_val - k; other_val <= current_val + k; other_val++ {
+		for other_val := current_val - k; other_val <= current_val+k; other_val++ {
 			idx, ok := value_occurences[other_val]
 			if ok {
-				current_record_for_i = max(current_record_for_i, 1 + records[idx])
+				current_record_for_i = max(current_record_for_i, 1+records[idx])
 			}
 		}
 		// Update the latest occurrence for our current value
@@ -2497,3 +2496,86 @@ func longestIdealString(s string, k int) int {
 
 	return record
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an n x n integer matrix grid, return the minimum sum of a falling path with non-zero shifts.
+
+A falling path with non-zero shifts is a choice of exactly one element from each row of grid such that no two elements chosen in adjacent rows are in the same column.
+
+Link:
+https://leetcode.com/problems/minimum-falling-path-sum-ii/description/?envType=daily-question&envId=2024-04-26
+*/
+func minFallingPathSum(grid [][]int) int {
+	if len(grid) == 1 {
+		return grid[0][0]
+	}
+
+	sums := make([][]int, len(grid))
+	// We will have a square grid
+	for i := 0; i < len(sums); i++ {
+		sums[i] = make([]int, len(grid[0]))
+	}
+	copy(sums[0], grid[0])
+
+	// Keep track of the two best path sums from the previous row - they're the only one's we're going to be using
+	best_col := -1
+	second_best_col := -1
+	best_val := math.MaxInt
+	second_best_val := math.MaxInt
+	for i:=0; i<len(grid[0]); i++ {
+		if best_val > sums[0][i] {
+			if best_val < math.MaxInt {
+				// We have already found a candidate for lowest on this row
+				second_best_val = best_val
+				second_best_col = best_col
+			} 
+			// But either way, we still update the best record
+			best_val = sums[0][i]
+			best_col = i
+		} else if second_best_val > sums[0][i] {
+			second_best_val = sums[0][i]
+			second_best_col = i
+		}
+	}
+
+	for row := 1; row < len(grid); row++ {
+		best_val := math.MaxInt
+		second_best_val := math.MaxInt
+		new_best_col := -1
+		new_second_best_col := -1
+		for col := 0; col < len(grid[row]); col++ {
+			if col == best_col { // We can't take the best previous value because it was in the same column, so take second best
+				sums[row][col] = grid[row][col] + sums[row-1][second_best_col]
+			} else { // We CAN take the best previous value
+				sums[row][col] = grid[row][col] + sums[row-1][best_col]
+			}
+			if best_val > sums[row][col] {
+				if best_val < math.MaxInt {
+					// We have already found a candidate for lowest on this row
+					second_best_val = best_val
+					new_second_best_col = new_best_col
+				} 
+				// But either way, we still update the best record
+				best_val = sums[row][col]
+				new_best_col = col
+			} else if second_best_val > sums[row][col] {
+				second_best_val = sums[row][col]
+				new_second_best_col = col
+			}
+		}
+		best_col = new_best_col
+		second_best_col = new_second_best_col
+	}
+
+	min_path_sum := math.MaxInt
+	for _, path_sum := range sums[len(sums)-1] {
+		min_path_sum = min(min_path_sum, path_sum)
+	}
+
+	return min_path_sum
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
