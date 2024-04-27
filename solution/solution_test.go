@@ -1052,3 +1052,24 @@ func TestMinFallingPathSum(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestFindRotateSteps(t *testing.T) {
+	type input struct {
+		ring 	string
+		key 	string
+	}
+	inputs := []input {
+		{"godding", "gd"},
+		{"godding", "godding"},
+	}
+	expected_outputs := []int {
+		4,
+		13,
+	}
+
+	f := func(i input) int {
+		return findRotateSteps(i.ring, i.key)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

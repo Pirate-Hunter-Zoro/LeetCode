@@ -2524,13 +2524,13 @@ func minFallingPathSum(grid [][]int) int {
 	second_best_col := -1
 	best_val := math.MaxInt
 	second_best_val := math.MaxInt
-	for i:=0; i<len(grid[0]); i++ {
+	for i := 0; i < len(grid[0]); i++ {
 		if best_val > sums[0][i] {
 			if best_val < math.MaxInt {
 				// We have already found a candidate for lowest on this row
 				second_best_val = best_val
 				second_best_col = best_col
-			} 
+			}
 			// But either way, we still update the best record
 			best_val = sums[0][i]
 			best_col = i
@@ -2556,7 +2556,7 @@ func minFallingPathSum(grid [][]int) int {
 					// We have already found a candidate for lowest on this row
 					second_best_val = best_val
 					new_second_best_col = new_best_col
-				} 
+				}
 				// But either way, we still update the best record
 				best_val = sums[row][col]
 				new_best_col = col
@@ -2579,3 +2579,70 @@ func minFallingPathSum(grid [][]int) int {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+In the video game Fallout 4, the quest "Road to Freedom" requires players to reach a metal dial called the "Freedom Trail Ring" and use the dial to spell a specific keyword to open the door.
+
+Given a string ring that represents the code engraved on the outer ring and another string key that represents the keyword that needs to be spelled, return the minimum number of steps to spell all the characters in the keyword.
+
+Initially, the first character of the ring is aligned at the "12:00" direction. You should spell all the characters in key one by one by rotating ring clockwise or anticlockwise to make each character of the string key aligned at the "12:00" direction and then by pressing the center button.
+
+At the stage of rotating the ring to spell the key character key[i]:
+
+- You can rotate the ring clockwise or anticlockwise by one place, which counts as one step. The final purpose of the rotation is to align one of ring's characters at the "12:00" direction, where this character must equal key[i].
+- If the character key[i] has been aligned at the "12:00" direction, press the center button to spell, which also counts as one step. After the pressing, you could begin to spell the next character in the key (next stage). Otherwise, you have finished all the spelling.
+
+Link:
+https://leetcode.com/problems/freedom-trail/description/?envType=daily-question&envId=2024-04-27
+*/
+func findRotateSteps(ring string, key string) int {
+	// Keep track of each character's locations
+	char_locations := make(map[rune][]int)
+	for idx, r := range ring {
+		_, ok := char_locations[r]
+		if !ok {
+			char_locations[r] = []int{idx}
+		} else {
+			char_locations[r] = append(char_locations[r], idx)
+		}
+	}
+
+	// For a given position in 'ring', and position in 'key', we need to know how many moves it will take to enter in the rest of 'key', assuming the first character we need is our current position in 'ring'
+	sols := make([][]int, len(ring))
+	for i:=0; i<len(sols); i++ {
+		sols[i] = make([]int, len(key))
+	}
+
+	moves := math.MaxInt
+	// Move to all possible positions of the first character we need, and take the option which gives us the best result
+	if ring[0] == key[0] {
+		return topDownRotateSteps(ring, key, 0, len(key), sols, char_locations)
+	} else {
+		for _, posn := range char_locations[rune(key[0])] {
+			steps := min(posn, len(ring)-posn)
+			moves = min(moves, steps + topDownRotateSteps(ring, key, posn, len(key), sols, char_locations))
+		}
+		return moves
+	}
+}
+
+/*
+Top-down recursive helper method to find the minimum number of steps required to match the rest of the characters in key given our current position
+*/
+func topDownRotateSteps(ring string, key string, posn int, chars_left int, sols [][]int, char_locations map[rune][]int) int {
+	if chars_left == 1 {
+		return 1
+	} else {
+		if sols[posn][chars_left-1] == 0 {
+			// We need to solve this problem
+			next_char := rune(key[len(key)-chars_left+1])
+			next_moves := math.MaxInt
+			for _, next_posn := range char_locations[next_char] {
+				// Take the minimum amount of steps you need to get from posn to next_posn
+				steps := min(max(next_posn, posn) - min(next_posn, posn), min(next_posn, posn) + len(ring) - max(next_posn, posn))
+				next_moves = min(next_moves, steps + topDownRotateSteps(ring, key, next_posn, chars_left-1, sols, char_locations))
+			}
+			sols[posn][chars_left-1] = 1 + next_moves
+		}
+		return sols[posn][chars_left-1]
+	}
+}
