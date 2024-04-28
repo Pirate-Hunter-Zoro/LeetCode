@@ -2,6 +2,7 @@ package solution
 
 import (
 	"fmt"
+	"leetcode/binary_tree"
 	"leetcode/list_node"
 	"reflect"
 	"sort"
@@ -1069,6 +1070,26 @@ func TestFindRotateSteps(t *testing.T) {
 
 	f := func(i input) int {
 		return findRotateSteps(i.ring, i.key)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestDistributeCoins(t *testing.T) {
+	type input struct {
+		root 	*binary_tree.TreeNode
+	}
+	inputs := []input{
+		{binary_tree.New([]int{3,0,0})},
+		{binary_tree.New([]int{0,3,0})},
+	}
+	expected_outputs := []int{
+		2,
+		3,
+	}
+
+	f := func (i input) int  {
+		return distributeCoins(i.root)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

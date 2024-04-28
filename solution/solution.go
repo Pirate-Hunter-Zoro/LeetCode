@@ -2,7 +2,7 @@ package solution
 
 import (
 	"leetcode/algorithm"
-	disjointset "leetcode/disjoint_set"
+	"leetcode/disjoint_set"
 	"leetcode/euclidean"
 	"leetcode/graph"
 	"leetcode/heap"
@@ -10,6 +10,7 @@ import (
 	"leetcode/modulo"
 	"leetcode/queue"
 	"leetcode/stack"
+	"leetcode/binary_tree"
 	"math"
 	"sort"
 	"strconv"
@@ -2645,4 +2646,38 @@ func topDownRotateSteps(ring string, key string, posn int, chars_left int, sols 
 		}
 		return sols[posn][chars_left-1]
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given the root of a binary tree with n nodes where each node in the tree has node.val coins. There are n coins in total throughout the whole tree.
+
+In one move, we may choose two adjacent nodes and move one coin from one node to another. A move may be from parent to child, or from child to parent.
+
+Return the minimum number of moves required to make every node have exactly one coin.
+
+Link:
+https://leetcode.com/problems/distribute-coins-in-binary-tree/
+*/
+func distributeCoins(root *binary_tree.TreeNode) int {
+	moves := []int{0}
+	coinsFromAbove(root, moves)
+	return moves[0]
+}
+
+/*
+Recursive helper method
+*/
+func coinsFromAbove(current *binary_tree.TreeNode, moves []int) int {
+	num := 1 - current.Val
+	if current.Left != nil {
+		num += coinsFromAbove(current.Left, moves)
+	}
+	if current.Right != nil {
+		num += coinsFromAbove(current.Right, moves)
+	}
+	// We either need coins from above, to travel through me, or coins from below to travel through me
+	moves[0] += int(math.Abs(float64(num)))
+	return num
 }
