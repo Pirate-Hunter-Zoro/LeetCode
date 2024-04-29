@@ -2681,3 +2681,56 @@ func coinsFromAbove(current *binary_tree.TreeNode, moves []int) int {
 	moves[0] += int(math.Abs(float64(num)))
 	return num
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given a 0-indexed integer array nums and a positive integer k.
+
+You can apply the following operation on the array any number of times:
+- Choose any element of the array and flip a bit in its binary representation. Flipping a bit means changing a 0 to 1 or vice versa.
+
+Return the minimum number of operations required to make the bitwise XOR of all elements of the final array equal to k.
+
+Note that you can flip leading zero bits in the binary representation of elements. For example, for the number (101) (base 2) you can flip the fourth bit and obtain (1101) (base 2).
+
+Link:
+https://leetcode.com/problems/minimum-number-of-operations-to-make-array-xor-equal-to-k/?envType=daily-question&envId=2024-04-29
+*/
+func minBitOperations(nums []int, k int) int {
+	// For every single 1 in the binary representation of k, we need an ODD number of elements in nums to have a one in that position
+	
+	// So for each bit that's a 1 in k, linear search through all numbers in nums, and the number of operations needed is the number of said elements that have a 1 in that position MINUS 1
+	// If NO elements have a 1 in that position, add an additional move because we'll just need to flip some number's bit at that position to a 1 - any number will do
+
+	// For each bit that's a 0 in k, linear search through all numbers in nums, and if an odd number of elements have a 1 in that position, we need to flip it to a zero, which is an additional move
+	// Otherwise we need no additional move
+
+	moves := 0
+	for i:=0; i<32; i++ {
+		if (1 << i) & k == (1 << i) {
+			// k has a 1 in this position
+			count := 0
+			for _, n := range nums {
+				if (1 << i) & n == (1 << i) {
+					count++
+				}
+			}
+			if (count % 2 == 0) {
+				moves++
+			}
+		} else {
+			// k has a 0 in this position
+			// k has a 1 in this position
+			count := 0
+			for _, n := range nums {
+				if (1 << i) & n == (1 << i) {
+					count++
+				}
+			}
+			moves += count % 2
+		}
+	}
+
+	return moves
+}

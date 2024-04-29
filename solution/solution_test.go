@@ -1094,3 +1094,32 @@ func TestDistributeCoins(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMinBitOperations(t *testing.T) {
+	type input struct {
+		nums 	[]int
+		k 		int
+	}
+
+	inputs := []input{
+		{
+			[]int{2,1,3,4},
+			1,
+		},
+		{
+			[]int{2,0,2,0},
+			0,
+		},
+	}
+
+	expected_outputs := []int{
+		2,
+		0,
+	}
+
+	f := func(i input) int {
+		return minBitOperations(i.nums, i.k)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
