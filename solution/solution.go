@@ -2803,5 +2803,50 @@ Link:
 https://leetcode.com/problems/combination-sum-iv/description/
 */
 func combinationSum(nums []int, target int) int {
-    return 0
+
+	sort.SliceStable(nums, func(i, j int) bool {
+		return nums[i] < nums[j]
+	})
+
+	if target < nums[0] {
+		return 0
+	}
+
+    dp := make([][]int, target+1)
+	for i:=0; i<=target; i++ {
+		dp[i] = make([]int, target+1)
+	}
+	// dp[i][j] is how many orderings of i numbers are there that produce a total of j?
+	for _, val := range nums {
+		if val <= target {
+			dp[1][val] = 1
+		} else {
+			break
+		}
+	}
+
+	for i:=2; i<=target; i++ {
+		// i is the number of values was are letting ourselves work with
+		for j:=nums[0] * i; j<=target; j++ {
+			// j is the target sum we want to reach - clearly cannot be lower than the lowest value in nums times i
+			for _, val := range nums {
+				if val < j {
+					// we pick this value, which sends us to a subproblem of lower target value and one less allowed number
+					dp[i][j] += dp[i-1][j - val]
+				} else {
+					break
+				}
+			}
+		}
+	}
+
+	total := 0
+	for i:=0; i<=target; i++ {
+		total += dp[i][target]
+	}
+
+	return total
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
