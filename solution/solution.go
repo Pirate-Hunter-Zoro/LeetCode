@@ -2,7 +2,8 @@ package solution
 
 import (
 	"leetcode/algorithm"
-	"leetcode/disjoint_set"
+	"leetcode/binary_tree"
+	disjointset "leetcode/disjoint_set"
 	"leetcode/euclidean"
 	"leetcode/graph"
 	"leetcode/heap"
@@ -10,7 +11,6 @@ import (
 	"leetcode/modulo"
 	"leetcode/queue"
 	"leetcode/stack"
-	"leetcode/binary_tree"
 	"math"
 	"sort"
 	"strconv"
@@ -961,7 +961,7 @@ func findAllPeople(n int, meetings [][]int, firstPerson int) []int {
 	// Nodes to implement disjoint sets
 	people_nodes := make([]*disjointset.Node[int], n)
 	for i := 0; i < len(people_nodes); i++ {
-		people_nodes[i] = disjointset.New[int](i)
+		people_nodes[i] = disjointset.NewNode[int](i)
 	}
 
 	// Sort all meetings by the time they occur
@@ -1022,33 +1022,25 @@ Link:
 https://leetcode.com/problems/greatest-common-divisor-traversal/?envType=daily-question&envId=2024-03-30
 */
 func canTraverseAllPairs(nums []int) bool {
-	s := disjointset.NewSet[int]()
+	s := disjointset.NewSetOfSets[int]()
 
 	if len(nums) == 1 {
 		return true
 	}
 
-	// Set of primes we have run into so far
-	// If we are divisible by any of them, then we can reach a value in the right side of the array from our current index, and have not broken the streak
 	nodes := make([]*disjointset.Node[int], len(nums))
 	for idx, n := range nums {
 		if n == 1 {
 			return false
 		}
-		nodes[idx] = s.New(n)
+		nodes[idx] = s.MakeNode(n)
 	}
 
-	seen_nums := make(map[int]bool)
-
 	for idx, n := range nums {
-		_, ok := seen_nums[n]
-		if !ok { // If we have not yet seen this number
-			prime_factors := euclidean.GetPrimeFactors(n)
-			for _, p := range prime_factors {
-				nodes[idx].Join(s.New(p))
-			}
-			seen_nums[n] = true
-		}
+		prime_factors := euclidean.GetPrimeFactors(n)
+        for _, p := range prime_factors {
+            nodes[idx].Join(s.MakeNode(p))
+        }
 	}
 
 	first := nodes[0].RootValue()
@@ -1910,7 +1902,7 @@ func numIslands(grid [][]byte) int {
 			if grid[i][j] == '0' {
 				continue
 			}
-			nodes[i][j] = disjointset.New(coordinate{i, j})
+			nodes[i][j] = disjointset.NewNode(coordinate{i, j})
 			if i > 0 { // Look up
 				if grid[i-1][j] == '1' {
 					nodes[i][j].Join(nodes[i-1][j])
@@ -1979,7 +1971,7 @@ func findFarmland(land [][]int) [][]int {
 			if land[i][j] == 0 {
 				continue
 			}
-			nodes[i][j] = disjointset.New(coordinate{i, j})
+			nodes[i][j] = disjointset.NewNode(coordinate{i, j})
 			if i > 0 { // Look up
 				if land[i-1][j] == 1 {
 					nodes[i][j].Join(nodes[i-1][j])
@@ -2609,7 +2601,7 @@ func findRotateSteps(ring string, key string) int {
 
 	// For a given position in 'ring', and position in 'key', we need to know how many moves it will take to enter in the rest of 'key', assuming the first character we need is our current position in 'ring'
 	sols := make([][]int, len(ring))
-	for i:=0; i<len(sols); i++ {
+	for i := 0; i < len(sols); i++ {
 		sols[i] = make([]int, len(key))
 	}
 
@@ -2620,7 +2612,7 @@ func findRotateSteps(ring string, key string) int {
 	} else {
 		for _, posn := range char_locations[rune(key[0])] {
 			steps := min(posn, len(ring)-posn)
-			moves = min(moves, steps + topDownRotateSteps(ring, key, posn, len(key), sols, char_locations))
+			moves = min(moves, steps+topDownRotateSteps(ring, key, posn, len(key), sols, char_locations))
 		}
 		return moves
 	}
@@ -2639,8 +2631,8 @@ func topDownRotateSteps(ring string, key string, posn int, chars_left int, sols 
 			next_moves := math.MaxInt
 			for _, next_posn := range char_locations[next_char] {
 				// Take the minimum amount of steps you need to get from posn to next_posn
-				steps := min(max(next_posn, posn) - min(next_posn, posn), min(next_posn, posn) + len(ring) - max(next_posn, posn))
-				next_moves = min(next_moves, steps + topDownRotateSteps(ring, key, next_posn, chars_left-1, sols, char_locations))
+				steps := min(max(next_posn, posn)-min(next_posn, posn), min(next_posn, posn)+len(ring)-max(next_posn, posn))
+				next_moves = min(next_moves, steps+topDownRotateSteps(ring, key, next_posn, chars_left-1, sols, char_locations))
 			}
 			sols[posn][chars_left-1] = 1 + next_moves
 		}
@@ -2699,7 +2691,7 @@ https://leetcode.com/problems/minimum-number-of-operations-to-make-array-xor-equ
 */
 func minBitOperations(nums []int, k int) int {
 	// For every single 1 in the binary representation of k, we need an ODD number of elements in nums to have a one in that position
-	
+
 	// So for each bit that's a 1 in k, linear search through all numbers in nums, and the number of operations needed is the number of said elements that have a 1 in that position MINUS 1
 	// If NO elements have a 1 in that position, add an additional move because we'll just need to flip some number's bit at that position to a 1 - any number will do
 
@@ -2707,16 +2699,16 @@ func minBitOperations(nums []int, k int) int {
 	// Otherwise we need no additional move
 
 	moves := 0
-	for i:=0; i<32; i++ {
-		if (1 << i) & k == (1 << i) {
+	for i := 0; i < 32; i++ {
+		if (1<<i)&k == (1 << i) {
 			// k has a 1 in this position
 			count := 0
 			for _, n := range nums {
-				if (1 << i) & n == (1 << i) {
+				if (1<<i)&n == (1 << i) {
 					count++
 				}
 			}
-			if (count % 2 == 0) {
+			if count%2 == 0 {
 				moves++
 			}
 		} else {
@@ -2724,7 +2716,7 @@ func minBitOperations(nums []int, k int) int {
 			// k has a 1 in this position
 			count := 0
 			for _, n := range nums {
-				if (1 << i) & n == (1 << i) {
+				if (1<<i)&n == (1 << i) {
 					count++
 				}
 			}
@@ -2734,3 +2726,71 @@ func minBitOperations(nums []int, k int) int {
 
 	return moves
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+In the "100 game" two players take turns adding, to a running total, any integer from 1 to 10. The player who first causes the running total to reach or exceed 100 wins.
+
+What if we change the game so that players cannot re-use integers?
+
+For example, two players might take turns drawing from a common pool of numbers from 1 to 15 without replacement until they reach a total >= 100.
+
+Given two integers maxChoosableInteger and desiredTotal, return true if the first player to move can force a win, otherwise, return false. Assume both players play optimally.
+
+Link:
+https://leetcode.com/problems/can-i-win/
+*/
+func canIWin(maxChoosableInteger int, desiredTotal int) bool {
+	if maxChoosableInteger * (maxChoosableInteger + 1) / 2 < desiredTotal {
+		// The total number of all available integers does not meet desiredTotal - NOBODY can win
+		return false
+	}
+
+    sols := make(map[int]map[int]bool)
+	available := 0 // We will represent our available numbers with a bit string
+	for i := 0; i<maxChoosableInteger; i++ {
+		available += (1 << i)
+	}
+
+	return topDownCanIWin(available, maxChoosableInteger, desiredTotal, sols)
+}
+
+/*
+Top down recursive helper method to solve this problem
+*/
+func topDownCanIWin(available int, maxChoosableInteger int, desiredTotal int, sols map[int]map[int]bool) bool {
+	if desiredTotal < 0 {
+		return false
+	} else {
+		_, ok := sols[available][desiredTotal]
+		if !ok {
+			// We need to solve this problem - try picking each available number
+			can_win := false
+			for i:=0; i<maxChoosableInteger; i++ {
+				pick := 1 << i
+				if available & pick == pick { // We can pick this option
+					value_picked := i + 1
+					if value_picked >= desiredTotal {
+						can_win = true
+						break
+					}
+					new_available := available ^ pick
+					if !topDownCanIWin(new_available, maxChoosableInteger, desiredTotal - value_picked, sols) {
+						can_win = true
+						break
+					}
+				}
+			}
+			_, ok := sols[available]
+			if !ok {
+				sols[available] = make(map[int]bool)
+			}
+			sols[available][desiredTotal] = can_win
+		}
+		return sols[available][desiredTotal]
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

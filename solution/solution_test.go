@@ -1123,3 +1123,27 @@ func TestMinBitOperations(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestCanIWin(t *testing.T) {
+	type input struct {
+		maxChoosableInteger 	int
+		desiredTotal			int
+	}
+	inputs := []input{
+		{10, 11},
+		{10, 0},
+		{10, 1},
+	}
+
+	expected_outputs := []bool{
+		false,
+		true,
+		true,
+	}
+
+	f := func(i input) bool {
+		return canIWin(i.maxChoosableInteger, i.desiredTotal)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

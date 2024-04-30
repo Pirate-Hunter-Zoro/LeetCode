@@ -1,13 +1,13 @@
 package disjointset
 
 type Node[T comparable] struct {
-	val T
+	val    T
 	parent *Node[T]
 }
 
-func New[T comparable](t T) *Node[T] {
+func NewNode[T comparable](t T) *Node[T] {
 	return &Node[T]{
-		val: t,
+		val:    t,
 		parent: nil,
 	}
 }
@@ -60,11 +60,13 @@ func (n *Node[T]) collapse() {
 ///////////////////////////////////////////////////////////////////////////////////////
 
 // You may only use Nodes - that's all well and good - but using this SetOfSets object will prohibit a repeat node value which may sometimes be useful
+
+// Use an underlying hash map to prevent repeat nodes from existing
 type SetOfSets[T comparable] struct {
 	nodes map[T]*Node[T]
 }
 
-func NewSet[T comparable]() *SetOfSets[T] {
+func NewSetOfSets[T comparable]() *SetOfSets[T] {
 	return &SetOfSets[T]{make(map[T]*Node[T])}
 }
 
@@ -72,10 +74,11 @@ func (s *SetOfSets[T]) Clear() {
 	s.nodes = make(map[T]*Node[T])
 }
 
-func (s *SetOfSets[T]) New(v T) *Node[T] {
-	_, ok := s.nodes[v] 
+// Make the node if it does not already exist, and return it.
+func (s *SetOfSets[T]) MakeNode(v T) *Node[T] {
+	_, ok := s.nodes[v]
 	if !ok {
-		s.nodes[v] = New[T](v)
+		s.nodes[v] = NewNode[T](v)
 	}
 	return s.nodes[v]
 }

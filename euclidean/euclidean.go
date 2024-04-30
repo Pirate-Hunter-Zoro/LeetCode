@@ -58,6 +58,9 @@ func initializePrimes() []int {
 var prime_factors = make(map[int][]int)
 
 func GetPrimeFactors(n int) []int {
+	if (n == 1) {
+		return []int{}
+	}
 	_, ok := prime_factors[n]
 	if !ok {
 		// We need to find the prime factors since we have not solved this problem yet
@@ -70,6 +73,7 @@ func GetPrimeFactors(n int) []int {
 				prev := GetPrimeFactors(v)
 				prev = append(prev, p)
 				prime_factors[n] = prev
+				break
 			}
 		}
 	}
