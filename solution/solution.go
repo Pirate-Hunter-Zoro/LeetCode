@@ -2850,3 +2850,85 @@ func combinationSum(nums []int, target int) int {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+Given a binary tree root, return the maximum sum of all keys of any sub-tree which is also a Binary Search Tree (BST).
+
+Assume a BST is defined as follows:
+
+The left subtree of a node contains only nodes with keys less than the node's key.
+The right subtree of a node contains only nodes with keys greater than the node's key.
+Both the left and right subtrees must also be binary search trees.
+
+Link:
+https://leetcode.com/problems/maximum-sum-bst-in-binary-tree/description/
+*/
+func maxSumBST(root *binary_tree.TreeNode) int {
+	sums := make(map[*binary_tree.TreeNode]int)
+	findSums(root, sums)
+
+	bsts := &[]*binary_tree.TreeNode{}
+	isBST(root, bsts)
+
+	max_bst_sum := 0
+	for _, node := range *bsts {
+		max_bst_sum = max(max_bst_sum, sums[node])
+	}
+
+	return max_bst_sum
+}
+
+// No need for DP - a tree has no cycles so we have no overlapping subproblems
+func findSums(root *binary_tree.TreeNode, sums map[*binary_tree.TreeNode]int) {
+	sum := root.Val
+	if (root.Left != nil) {
+		findSums(root.Left, sums)
+		sum += sums[root.Left]
+	}
+	if (root.Right != nil) {
+		findSums(root.Right, sums)
+		sum += sums[root.Right]
+	}
+	sums[root] = sum
+}
+
+// Find all the BST's - O(n^2) is too slow!
+/*
+Returns whether this root is a binary search tree, and if so gives the lowest and highest values present
+*/
+func isBST(root *binary_tree.TreeNode, bsts *[]*binary_tree.TreeNode) (int, int, bool) {
+	// Leaf nodes by default are trivial BSTs
+	if root.Left == nil && root.Right == nil {
+		*bsts = append(*bsts, root)
+		return root.Val, root.Val, true
+	}
+
+	// These may change
+	min_val := root.Val
+	max_val := root.Val
+
+	right_works := true
+	if root.Right != nil {
+		max_value_in_right, min_value_in_right, right_is_bst := isBST(root.Right, bsts)
+		if !right_is_bst || (min_value_in_right <= root.Val) {
+			right_works = false
+		} else {
+			max_val = max_value_in_right
+		}
+	}
+	left_works := true
+	if root.Left != nil {
+		max_value_in_left, min_value_in_left, left_is_bst := isBST(root.Left, bsts)
+		if !left_is_bst || (max_value_in_left >= root.Val) {
+			left_works = false
+		} else {
+			min_val = min_value_in_left
+		}
+	}
+
+	bst := (left_works && right_works)
+	if bst {
+		*bsts = append(*bsts, root)
+	}
+
+	return max_val, min_val, bst
+}

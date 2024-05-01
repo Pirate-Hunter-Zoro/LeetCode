@@ -1173,3 +1173,25 @@ func TestCombinationSum(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMaxSumBST(t *testing.T) {
+	type input struct {
+		root 	*binary_tree.TreeNode
+	}
+	inputs := []input{
+		{binary_tree.New([]int{1,4,3,2,4,2,5,binary_tree.NULL,binary_tree.NULL,binary_tree.NULL,binary_tree.NULL,binary_tree.NULL,binary_tree.NULL,4,6})},
+		{binary_tree.New([]int{4,3,binary_tree.NULL,1,2})},
+		{binary_tree.New([]int{-4,-2,-5})},
+	}
+	expected_outputs := []int{
+		20,
+		2,
+		0,
+	}
+
+	f := func(i input) int {
+		return maxSumBST(i.root)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

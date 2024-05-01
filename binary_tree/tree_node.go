@@ -1,5 +1,9 @@
 package binary_tree
 
+import "math"
+
+var NULL = math.MinInt
+
 type TreeNode struct {
 	Val		int
 	Left	*TreeNode
@@ -11,7 +15,7 @@ func New(values []int) *TreeNode {
 }
 
 func new(values []int, idx int) *TreeNode {
-	if idx >= len(values) {
+	if idx >= len(values) || values[idx] == NULL {
 		return nil
 	} else {
 		current := &TreeNode{Val: values[idx]}
