@@ -2932,3 +2932,38 @@ func isBST(root *binary_tree.TreeNode, bsts *[]*binary_tree.TreeNode) (int, int,
 
 	return max_val, min_val, bst
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a positive integer n, you can apply one of the following operations:
+
+If n is even, replace n with n / 2.
+If n is odd, replace n with either n + 1 or n - 1.
+Return the minimum number of operations needed for n to become 1.
+
+Link:
+https://leetcode.com/problems/integer-replacement/description/
+*/
+func integerReplacement(n int) int {
+	sols := make(map[int]int)
+	return topDownIntegerReplacement(n, sols)
+}
+
+// Recursive helper method
+func topDownIntegerReplacement(n int, sols map[int]int) int {
+	if n == 1 {
+		return 0
+	} else {
+		_, ok := sols[n]
+		if !ok {
+			// We need to solve this problem
+			if n % 2 == 0 {
+				sols[n] = 1 + topDownIntegerReplacement(n/2, sols)
+			} else {
+				sols[n] = 1 + min(topDownIntegerReplacement(n+1, sols), topDownIntegerReplacement(n-1, sols))
+			}
+		}
+		return sols[n]
+	}
+}

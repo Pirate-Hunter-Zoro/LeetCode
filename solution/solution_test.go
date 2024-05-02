@@ -1195,3 +1195,25 @@ func TestMaxSumBST(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestIntegerReplacement(t *testing.T) {
+	type input struct {
+		n 	int
+	}
+	inputs := []input{
+		{8},
+		{7},
+		{4},
+	}
+	expected_outputs := []int{
+		3,
+		4,
+		2,
+	}
+
+	f := func(i input) int {
+		return integerReplacement(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
