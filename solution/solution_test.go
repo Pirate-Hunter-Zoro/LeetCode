@@ -1217,3 +1217,25 @@ func TestIntegerReplacement(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestWinnerSquareGame(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{1},
+		{2},
+		{4},
+	}
+	expected_outputs := []bool{
+		true,
+		false,
+		true,
+	}
+
+	f := func(i input) bool {
+		return winnerSquareGame(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

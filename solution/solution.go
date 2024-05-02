@@ -2967,3 +2967,76 @@ func topDownIntegerReplacement(n int, sols map[int]int) int {
 		return sols[n]
 	}
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Alice and Bob take turns playing a game, with Alice starting first.
+
+Initially, there are n stones in a pile. On each player's turn, that player makes a move consisting of removing any non-zero square number of stones in the pile.
+
+Also, if a player cannot make a move, he/she loses the game.
+
+Given a positive integer n, return true if and only if Alice wins the game otherwise return false, assuming both players play optimally.
+
+Link:
+https://leetcode.com/problems/stone-game-iv/description/
+*/
+func winnerSquareGame(n int) bool {
+	// First we need to generate a list of perfect squares less than or equal to n
+	squares := []int{}
+	for i:=1; i<=n; i++ {
+		if i * i <= n {
+			squares = append(squares, i * i)
+		} else {
+			break
+		}
+	}
+
+	can_win := make(map[int]bool)
+	for _, square := range squares {
+		can_win[square] = true
+	}
+	return canWinSquareGame(n, can_win, squares)
+}
+
+func canWinSquareGame(n int, can_win map[int]bool, squares []int) bool {
+	_, ok := can_win[n]
+	if !ok {
+		// Need to solve this subproblem
+		// Try picking every possible perfect square less than n (n is clearly not a perfect square or it would already be in our map)
+		able_to_win := false
+		for _, square := range squares {
+			if square > n {
+				break
+			}
+			if !canWinSquareGame(n - square, can_win, squares) {
+				able_to_win = true
+				break
+			}
+		}
+		can_win[n] = able_to_win
+	}
+
+	return can_win[n]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There are several stones arranged in a row, and each stone has an associated value which is an integer given in the array stoneValue.
+
+In each round of the game, Alice divides the row into two non-empty rows (i.e. left row and right row), then Bob calculates the value of each row which is the sum of the values of all the stones in this row. Bob throws away the row which has the maximum value, and Alice's score increases by the value of the remaining row. If the value of the two rows are equal, Bob lets Alice decide which row will be thrown away. The next round starts with the remaining row.
+
+The game ends when there is only one stone remaining. Alice's is initially zero.
+
+Return the maximum score that Alice can obtain.
+
+Link:
+https://leetcode.com/problems/stone-game-v/description/
+*/
+func stoneGameV(stoneValue []int) int {
+	return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
