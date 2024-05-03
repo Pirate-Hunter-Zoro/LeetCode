@@ -3,7 +3,7 @@ package solution
 import (
 	"leetcode/algorithm"
 	"leetcode/binary_tree"
-	disjointset "leetcode/disjoint_set"
+	"leetcode/disjoint_set"
 	"leetcode/euclidean"
 	"leetcode/graph"
 	"leetcode/heap"
@@ -2971,6 +2971,61 @@ func topDownIntegerReplacement(n int, sols map[int]int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
+Alice and Bob continue their games with piles of stones. There are several stones arranged in a row, and each stone has an associated value which is an integer given in the array stoneValue.
+
+Alice and Bob take turns, with Alice starting first. On each player's turn, that player can take 1, 2, or 3 stones from the first remaining stones in the row.
+
+The score of each player is the sum of the values of the stones taken. The score of each player is 0 initially.
+
+The objective of the game is to end with the highest score, and the winner is the player with the highest score and there could be a tie. The game continues until all the stones have been taken.
+
+Assume Alice and Bob play optimally.
+
+Return "Alice" if Alice will win, "Bob" if Bob will win, or "Tie" if they will end the game with the same score.
+
+Link:
+https://leetcode.com/problems/stone-game-iii/description/
+*/
+func stoneGameIII(stoneValue []int) string {
+	sols := make([]int, len(stoneValue)+1)
+	for i:=0; i<len(stoneValue); i++ {
+		sols[i] = math.MinInt
+	}
+	res := topDownStoneGameIII(stoneValue, 0, sols)
+	if res == 0 {
+		return "Tie"
+	} else if res > 0 {
+		return "Alice"
+	} else {
+		return "Bob"
+	}
+}
+
+/*
+Top-down recursive helper method to solve the stone game problem
+*/
+func topDownStoneGameIII(stoneValue []int, start int, sols []int) int {
+	if sols[start] == math.MinInt { // We need to solve this problem
+		// Try all possible stone pickings
+		record := math.MinInt
+		if start < len(stoneValue) - 2 {
+			// Try picking 3 stones, get their total, and SUBTRACT whatever the opponent can win by given the rest
+			record = max(record, stoneValue[start] + stoneValue[start+1] + stoneValue[start+2] - topDownStoneGameIII(stoneValue, start+3, sols))
+		}
+		if start < len(stoneValue) - 1 {
+			// Try picking 2 stones, and do the same thing
+			record = max(record, stoneValue[start] + stoneValue[start+1] - topDownStoneGameIII(stoneValue, start + 2, sols))
+		}
+		// We KNOW we can pick 1 stone, because in the above function we made sols[len(sols)-1] = 0, and so a starting point of len(sols)-1 would NEVER end up in this conditional
+		record = max(record, stoneValue[start] - topDownStoneGameIII(stoneValue, start + 1, sols))
+		sols[start] = record
+	}
+	return sols[start]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
 Alice and Bob take turns playing a game, with Alice starting first.
 
 Initially, there are n stones in a pile. On each player's turn, that player makes a move consisting of removing any non-zero square number of stones in the pile.
@@ -3036,7 +3091,55 @@ Link:
 https://leetcode.com/problems/stone-game-v/description/
 */
 func stoneGameV(stoneValue []int) int {
-	return 0
+	if len(stoneValue) == 1 {
+		return 0
+	}
+
+	sums := make([][]int, len(stoneValue))
+	sols := make([][]int, len(stoneValue))
+	for i:=0; i<len(sums); i++ {
+		sums[i] = make([]int, len(stoneValue))
+		sums[i][i] = stoneValue[i]
+		sols[i] = make([]int, len(sols))
+		if i < len(sums)-1 {
+			sols[i][i+1] = min(stoneValue[i], stoneValue[i+1])
+		}
+	}
+	for row:=0; row<len(sums); row++ {
+		for col:=row+1; col<len(sums); col++ {
+			sums[row][col] = sums[row][col-1] + stoneValue[col]
+		}
+	}
+
+	return topDownStoneGameV(0, len(stoneValue)-1, sols, sums)
+}
+
+/*
+Recursive helper method to solve the stone game v
+*/
+func topDownStoneGameV(start int, end int, sols [][]int, sums [][]int) int {
+	if sols[start][end] == 0 {
+		// We need to solve this problem
+		record := 0
+		// Try each possible split
+		for split := start; split < end; split ++ {
+			left_sum := sums[start][split]
+			right_sum := sums[split+1][end]
+			if left_sum < right_sum {
+				// We get left half
+				record = max(record, left_sum + topDownStoneGameV(start, split, sols, sums))
+			} else if left_sum > right_sum {
+				// We get right half
+				record = max(record, right_sum + topDownStoneGameV(split+1, end, sols, sums))
+			} else {
+				// Equal sums - we get to pick
+				record = max(record, left_sum + max(topDownStoneGameV(start, split, sols, sums), topDownStoneGameV(split+1, end, sols, sums)))
+			}
+		}
+		sols[start][end] = record
+	}
+
+	return sols[start][end]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1239,3 +1239,48 @@ func TestWinnerSquareGame(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestStoneGameIII(t *testing.T) {
+	type input struct {
+		stoneValue 	[]int
+	}
+	inputs := []input{
+		{[]int{1,2,3,7}},
+		{[]int{1,2,3,-9}},
+		{[]int{1,2,3,6}},
+	}
+
+	expected_outputs := []string{
+		"Bob",
+		"Alice",
+		"Tie",
+	}
+
+	f := func(i input) string {
+		return stoneGameIII(i.stoneValue)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestStoneGameV(t *testing.T) {
+	type input struct {
+		stoneValue 	[]int
+	}
+	inputs := []input {
+		{[]int{6,2,3,4,5,5}},
+		{[]int{7,7,7,7,7,7,7}},
+		{[]int{4}},
+	}
+	expected_outputs := []int {
+		18,
+		28,
+		0,
+	}
+
+	f := func(i input) int {
+		return stoneGameV(i.stoneValue)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
