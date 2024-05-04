@@ -1240,6 +1240,27 @@ func TestWinnerSquareGame(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
 }
 
+func TestStoneGameII(t *testing.T) {
+	type input struct {
+		piles 	[]int
+	}
+	inputs := []input{
+		{[]int{2,7,9,4,4}},
+		{[]int{1,2,3,4,5,100}},
+	}
+
+	expected_outputs := []int{
+		10,
+		104,
+	}
+
+	f := func(i input) int {
+		return stoneGameII(i.piles)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
 func TestStoneGameIII(t *testing.T) {
 	type input struct {
 		stoneValue 	[]int
@@ -1280,6 +1301,33 @@ func TestStoneGameV(t *testing.T) {
 
 	f := func(i input) int {
 		return stoneGameV(i.stoneValue)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestNumRescueBoats(t *testing.T) {
+	type input struct {
+		people 	[]int
+		limit 	int
+	}
+	inputs := []input{
+		{[]int{1,2}, 3},
+		{[]int{3,2,2,1}, 3},
+		{[]int{3,5,3,4}, 5},
+		{[]int{3,1,7}, 7},
+		{[]int{5,1,4,2}, 6},
+	}
+	expected_outputs := []int{
+		1,
+		3,
+		4,
+		2,
+		2,
+	}
+
+	f := func(i input) int {
+		return numRescueBoats(i.people, i.limit)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

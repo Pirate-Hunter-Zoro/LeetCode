@@ -2971,6 +2971,75 @@ func topDownIntegerReplacement(n int, sols map[int]int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
+Alice and Bob continue their games with piles of stones.  There are a number of piles arranged in a row, and each pile has a positive integer number of stones piles[i].  The objective of the game is to end with the most stones. 
+
+Alice and Bob take turns, with Alice starting first.  Initially, M = 1.
+
+On each player's turn, that player can take all the stones in the first X remaining piles, where 1 <= X <= 2M.  Then, we set M = max(M, X).
+
+The game continues until all the stones have been taken.
+
+Assuming Alice and Bob play optimally, return the maximum number of stones Alice can get.
+
+Link:
+https://leetcode.com/problems/stone-game-ii/description/
+*/
+func stoneGameII(piles []int) int {
+	sols := make([][]int, len(piles))
+	sums := make([][]int, len(piles))
+	for i:=0; i<len(sols); i++ {
+		sols[i] = make([]int, len(sols)+1)
+		sums[i] = make([]int, len(sols))
+		sums[i][i] = piles[i]
+	}
+	for row:=0; row<len(sums); row++ {
+		for col:=row+1; col<len(sums[row]); col++ {
+			sums[row][col] = sums[row][col-1] + piles[col]
+		}
+	}
+	return topDownStoneGameII(0, 1, piles, sols, sums)
+}
+
+/*
+Recursive helper method to solve stoneGameII
+*/
+func topDownStoneGameII(first_unpicked_idx int, M int, piles []int, sols [][]int, sums [][]int) int {
+	if first_unpicked_idx >= len(piles) {
+		// We ran out of stones to pick
+		return 0
+	}
+	if sols[first_unpicked_idx][M] == 0 {
+		// We need to solve this problem
+		if first_unpicked_idx == len(piles) - 1 {
+			sols[first_unpicked_idx][M] = piles[first_unpicked_idx]
+		} else {
+			// We can take all stones in the first X remaining piles, where 1 <= X <= 2M
+			min_num_piles := 1
+			max_num_piles := min(2 * M, len(piles)-first_unpicked_idx)
+			if max_num_piles == 0 {
+				sols[first_unpicked_idx][M] = 0
+			} else {
+				record := math.MinInt
+				for num_pick := min_num_piles; num_pick <= max_num_piles; num_pick++ {
+					// If we pick these many piles, the total we get is the piles' sum, PLUS all the remaining piles, MINUS the maximum number of piles our opponent can pick up if we do this
+					new_M := max(M, num_pick)
+					pick_total := sums[first_unpicked_idx][first_unpicked_idx+num_pick-1]
+					rest_stones_total := 0
+					if first_unpicked_idx + num_pick < len(piles) {
+						rest_stones_total += sums[first_unpicked_idx+num_pick][len(piles)-1]
+					}
+					record = max(record, pick_total + rest_stones_total - topDownStoneGameII(first_unpicked_idx + num_pick, new_M, piles, sols, sums))
+				}
+				sols[first_unpicked_idx][M] = record
+			}
+		}
+	}
+	return sols[first_unpicked_idx][M]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
 Alice and Bob continue their games with piles of stones. There are several stones arranged in a row, and each stone has an associated value which is an integer given in the array stoneValue.
 
 Alice and Bob take turns, with Alice starting first. On each player's turn, that player can take 1, 2, or 3 stones from the first remaining stones in the row.
@@ -3143,3 +3212,52 @@ func topDownStoneGameV(start int, end int, sols [][]int, sums [][]int) int {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an array people where people[i] is the weight of the ith person, and an infinite number of boats where each boat can carry a maximum weight of limit. 
+Each boat carries at most two people at the same time, provided the sum of the weight of those people is at most limit.
+
+Return the minimum number of boats to carry every given person.
+
+Link:
+https://leetcode.com/problems/boats-to-save-people/description/?envType=daily-question&envId=2024-05-04
+*/
+func numRescueBoats(people []int, limit int) int {
+	if len(people) == 1 {
+		return 1
+	}
+	sort.SliceStable(people, func(i, j int) bool {
+		return people[i] < people[j]
+	})
+	// Combine the people into doubles for as long as we can
+	// Find the heavieset person who weighs less than the limit of the boat
+	heaviest_person_less := algorithm.BinarySearchMeetOrLower(people, limit-1)
+	if heaviest_person_less == -1 {
+		// NO ONE is lighter than the boat capacity
+		return len(people)
+	} else {
+		// All the people who need their own boat first of all
+		boats := len(people) - heaviest_person_less - 1
+
+		// Now for everyone else, greedily combine heaviest people with lighest people if we can
+		heavier := heaviest_person_less
+		lighter := 0
+		for heavier > lighter {
+			if people[heavier] + people[lighter] <= limit {
+				// They can go on their own boat together
+				heavier--
+				lighter++
+			} else {
+				// The heavier person will DEFINITELY need their own boat
+				heavier--
+			}
+			boats++
+		}
+		if heavier == lighter {
+			// One last person
+			boats++
+		}
+
+		return boats
+	}
+}

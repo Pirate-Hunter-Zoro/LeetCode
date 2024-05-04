@@ -70,26 +70,47 @@ func BinarySearch[T cmp.Ordered](values []T, target T) int {
 }
 
 /*
-Returns the index of the greatest element which does not exceed target - values contains unique elements
+Returns the index of the latest element which does not exceed target - values contains unique elements
 */
 func BinarySearchMeetOrLower[T cmp.Ordered](values []T, target T) int {
 	left := 0
 	right := len(values)
 	for left < right {
 		mid := (left + right) / 2
-		if values[mid] < target {
+		if values[mid] <= target {
 			// we may return this if the next value is greater than target
 			if (mid == len(values) - 1 || values[mid+1] > target) {
 				return mid
 			}
-			// Otherwise
+			// Otherwise look right
 			left = mid + 1
-		} else if values[mid] > target {
+		} else {
 			// look left
 			right = mid
+		}
+	}
+
+	return -1
+}
+
+/*
+Returns the index of the first element which is not lower than target - values contains unique elements
+*/
+func BinarySearchMeetOrHigher[T cmp.Ordered](values []T, target T) int {
+	left := 0
+	right := len(values)
+	for left < right {
+		mid := (left + right) / 2
+		if values[mid] >= target {
+			// we may return this if the previous value is lower than target
+			if (mid == 0 || values[mid-1] < target) {
+				return mid
+			}
+			// Otherwise look left
+			right = mid
 		} else {
-			// we are done
-			return mid
+			// look right
+			left = mid + 1
 		}
 	}
 

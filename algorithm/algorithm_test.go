@@ -69,19 +69,50 @@ func TestBinarySearchMeetOrLower(t *testing.T) {
 	}
 	inputs := []input{
 		{[]int{0,4,5,6,7,8}, 5},
-		{[]int{3,4,7,8,10,11}, 11},
+		{[]int{3,4,7,8,10,11,11,11,12}, 11},
 		{[]int{1}, 2},
 		{[]int{3,4,7,8,10,11}, 9},
+		{[]int{4,5,6,7,10}, 3},
 	}
 	expected_outputs := []int{
 		2,
-		5,
+		7,
 		0,
 		3,
+		-1,
 	}
 
 	f := func(i input) int {
 		return BinarySearchMeetOrLower(i.nums, i.target)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestBinarySearchMeetOrExceed(t *testing.T) {
+	type input struct {
+		nums 	[]int
+		target 	int
+	}
+	inputs := []input{
+		{[]int{0,4,6,7,8}, 5},
+		{[]int{3,4,7,8,10,10,10,11,11,11,12}, 11},
+		{[]int{1}, 2},
+		{[]int{3,4,7,8,10,11}, 9},
+		{[]int{4,5,6,7,10}, 11},
+		{[]int{3,4,7,7,9,11}, 9},
+	}
+	expected_outputs := []int{
+		2,
+		7,
+		-1,
+		4,
+		-1,
+		4,
+	}
+
+	f := func(i input) int {
+		return BinarySearchMeetOrHigher(i.nums, i.target)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
