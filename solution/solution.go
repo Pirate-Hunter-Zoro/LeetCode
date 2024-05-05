@@ -1038,9 +1038,9 @@ func canTraverseAllPairs(nums []int) bool {
 
 	for idx, n := range nums {
 		prime_factors := euclidean.GetPrimeFactors(n)
-        for _, p := range prime_factors {
-            nodes[idx].Join(s.MakeNode(p))
-        }
+		for _, p := range prime_factors {
+			nodes[idx].Join(s.MakeNode(p))
+		}
 	}
 
 	first := nodes[0].RootValue()
@@ -2742,14 +2742,14 @@ Link:
 https://leetcode.com/problems/can-i-win/
 */
 func canIWin(maxChoosableInteger int, desiredTotal int) bool {
-	if maxChoosableInteger * (maxChoosableInteger + 1) / 2 < desiredTotal {
+	if maxChoosableInteger*(maxChoosableInteger+1)/2 < desiredTotal {
 		// The total number of all available integers does not meet desiredTotal - NOBODY can win
 		return false
 	}
 
-    sols := make(map[int]map[int]bool)
+	sols := make(map[int]map[int]bool)
 	available := 0 // We will represent our available numbers with a bit string
-	for i := 0; i<maxChoosableInteger; i++ {
+	for i := 0; i < maxChoosableInteger; i++ {
 		available += (1 << i)
 	}
 
@@ -2767,16 +2767,16 @@ func topDownCanIWin(available int, maxChoosableInteger int, desiredTotal int, so
 		if !ok {
 			// We need to solve this problem - try picking each available number
 			can_win := false
-			for i:=0; i<maxChoosableInteger; i++ {
+			for i := 0; i < maxChoosableInteger; i++ {
 				pick := 1 << i
-				if available & pick == pick { // We can pick this option
+				if available&pick == pick { // We can pick this option
 					value_picked := i + 1
 					if value_picked >= desiredTotal {
 						can_win = true
 						break
 					}
 					new_available := available ^ pick
-					if !topDownCanIWin(new_available, maxChoosableInteger, desiredTotal - value_picked, sols) {
+					if !topDownCanIWin(new_available, maxChoosableInteger, desiredTotal-value_picked, sols) {
 						can_win = true
 						break
 					}
@@ -2812,8 +2812,8 @@ func combinationSum(nums []int, target int) int {
 		return 0
 	}
 
-    dp := make([][]int, target+1)
-	for i:=0; i<=target; i++ {
+	dp := make([][]int, target+1)
+	for i := 0; i <= target; i++ {
 		dp[i] = make([]int, target+1)
 	}
 	// dp[i][j] is how many orderings of i numbers are there that produce a total of j?
@@ -2825,14 +2825,14 @@ func combinationSum(nums []int, target int) int {
 		}
 	}
 
-	for i:=2; i<=target; i++ {
+	for i := 2; i <= target; i++ {
 		// i is the number of values was are letting ourselves work with
-		for j:=nums[0] * i; j<=target; j++ {
+		for j := nums[0] * i; j <= target; j++ {
 			// j is the target sum we want to reach - clearly cannot be lower than the lowest value in nums times i
 			for _, val := range nums {
 				if val < j {
 					// we pick this value, which sends us to a subproblem of lower target value and one less allowed number
-					dp[i][j] += dp[i-1][j - val]
+					dp[i][j] += dp[i-1][j-val]
 				} else {
 					break
 				}
@@ -2841,7 +2841,7 @@ func combinationSum(nums []int, target int) int {
 	}
 
 	total := 0
-	for i:=0; i<=target; i++ {
+	for i := 0; i <= target; i++ {
 		total += dp[i][target]
 	}
 
@@ -2880,11 +2880,11 @@ func maxSumBST(root *binary_tree.TreeNode) int {
 // No need for DP - a tree has no cycles so we have no overlapping subproblems
 func findSums(root *binary_tree.TreeNode, sums map[*binary_tree.TreeNode]int) {
 	sum := root.Val
-	if (root.Left != nil) {
+	if root.Left != nil {
 		findSums(root.Left, sums)
 		sum += sums[root.Left]
 	}
-	if (root.Right != nil) {
+	if root.Right != nil {
 		findSums(root.Right, sums)
 		sum += sums[root.Right]
 	}
@@ -2958,7 +2958,7 @@ func topDownIntegerReplacement(n int, sols map[int]int) int {
 		_, ok := sols[n]
 		if !ok {
 			// We need to solve this problem
-			if n % 2 == 0 {
+			if n%2 == 0 {
 				sols[n] = 1 + topDownIntegerReplacement(n/2, sols)
 			} else {
 				sols[n] = 1 + min(topDownIntegerReplacement(n+1, sols), topDownIntegerReplacement(n-1, sols))
@@ -2971,7 +2971,7 @@ func topDownIntegerReplacement(n int, sols map[int]int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-Alice and Bob continue their games with piles of stones.  There are a number of piles arranged in a row, and each pile has a positive integer number of stones piles[i].  The objective of the game is to end with the most stones. 
+Alice and Bob continue their games with piles of stones.  There are a number of piles arranged in a row, and each pile has a positive integer number of stones piles[i].  The objective of the game is to end with the most stones.
 
 Alice and Bob take turns, with Alice starting first.  Initially, M = 1.
 
@@ -2987,13 +2987,13 @@ https://leetcode.com/problems/stone-game-ii/description/
 func stoneGameII(piles []int) int {
 	sols := make([][]int, len(piles))
 	sums := make([][]int, len(piles))
-	for i:=0; i<len(sols); i++ {
+	for i := 0; i < len(sols); i++ {
 		sols[i] = make([]int, len(sols)+1)
 		sums[i] = make([]int, len(sols))
 		sums[i][i] = piles[i]
 	}
-	for row:=0; row<len(sums); row++ {
-		for col:=row+1; col<len(sums[row]); col++ {
+	for row := 0; row < len(sums); row++ {
+		for col := row + 1; col < len(sums[row]); col++ {
 			sums[row][col] = sums[row][col-1] + piles[col]
 		}
 	}
@@ -3010,12 +3010,12 @@ func topDownStoneGameII(first_unpicked_idx int, M int, piles []int, sols [][]int
 	}
 	if sols[first_unpicked_idx][M] == 0 {
 		// We need to solve this problem
-		if first_unpicked_idx == len(piles) - 1 {
+		if first_unpicked_idx == len(piles)-1 {
 			sols[first_unpicked_idx][M] = piles[first_unpicked_idx]
 		} else {
 			// We can take all stones in the first X remaining piles, where 1 <= X <= 2M
 			min_num_piles := 1
-			max_num_piles := min(2 * M, len(piles)-first_unpicked_idx)
+			max_num_piles := min(2*M, len(piles)-first_unpicked_idx)
 			if max_num_piles == 0 {
 				sols[first_unpicked_idx][M] = 0
 			} else {
@@ -3025,16 +3025,65 @@ func topDownStoneGameII(first_unpicked_idx int, M int, piles []int, sols [][]int
 					new_M := max(M, num_pick)
 					pick_total := sums[first_unpicked_idx][first_unpicked_idx+num_pick-1]
 					rest_stones_total := 0
-					if first_unpicked_idx + num_pick < len(piles) {
+					if first_unpicked_idx+num_pick < len(piles) {
 						rest_stones_total += sums[first_unpicked_idx+num_pick][len(piles)-1]
 					}
-					record = max(record, pick_total + rest_stones_total - topDownStoneGameII(first_unpicked_idx + num_pick, new_M, piles, sols, sums))
+					record = max(record, pick_total+rest_stones_total-topDownStoneGameII(first_unpicked_idx+num_pick, new_M, piles, sols, sums))
 				}
 				sols[first_unpicked_idx][M] = record
 			}
 		}
 	}
 	return sols[first_unpicked_idx][M]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Alice and Bob take turns playing a game, with Alice starting first.
+
+There are n stones in a pile. On each player's turn, they can remove a stone from the pile and receive points based on the stone's value. Alice and Bob may value the stones differently.
+
+You are given two integer arrays of length n, aliceValues and bobValues. Each aliceValues[i] and bobValues[i] represents how Alice and Bob, respectively, value the ith stone.
+
+The winner is the person with the most points after all the stones are chosen. If both players have the same amount of points, the game results in a draw. Both players will play optimally. Both players know the other's values.
+
+Determine the result of the game, and:
+
+If Alice wins, return 1.
+If Bob wins, return -1.
+If the game results in a draw, return 0.
+
+Link:
+https://leetcode.com/problems/stone-game-vi/description/
+*/
+func stoneGameVI(aliceValues []int, bobValues []int) int {
+	// FROM THE HINT - we want to take greedily based on the sum of Alice's and Bob's values of a stone
+	sums := make([][]int, len(aliceValues))
+	for i := 0; i < len(sums); i++ {
+		// Remember Alice and Bob's individual values as well
+		sums[i] = []int{aliceValues[i] + bobValues[i], aliceValues[i], bobValues[i]}
+	}
+	sort.SliceStable(sums, func(i, j int) bool {
+		return sums[i][0] > sums[j][0]
+	})
+	
+	alice_sum := 0
+	bob_sum := 0
+	for i := 0; i < len(sums); i += 2 {
+		alice_sum += sums[i][1]
+		if i < len(sums)-1 {
+			bob_sum += sums[i+1][2]
+		}
+	}
+
+	if alice_sum > bob_sum {
+		return 1
+	} else if alice_sum < bob_sum {
+		return -1
+	} else {
+		return 0
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3057,7 +3106,7 @@ https://leetcode.com/problems/stone-game-iii/description/
 */
 func stoneGameIII(stoneValue []int) string {
 	sols := make([]int, len(stoneValue)+1)
-	for i:=0; i<len(stoneValue); i++ {
+	for i := 0; i < len(stoneValue); i++ {
 		sols[i] = math.MinInt
 	}
 	res := topDownStoneGameIII(stoneValue, 0, sols)
@@ -3077,16 +3126,16 @@ func topDownStoneGameIII(stoneValue []int, start int, sols []int) int {
 	if sols[start] == math.MinInt { // We need to solve this problem
 		// Try all possible stone pickings
 		record := math.MinInt
-		if start < len(stoneValue) - 2 {
+		if start < len(stoneValue)-2 {
 			// Try picking 3 stones, get their total, and SUBTRACT whatever the opponent can win by given the rest
-			record = max(record, stoneValue[start] + stoneValue[start+1] + stoneValue[start+2] - topDownStoneGameIII(stoneValue, start+3, sols))
+			record = max(record, stoneValue[start]+stoneValue[start+1]+stoneValue[start+2]-topDownStoneGameIII(stoneValue, start+3, sols))
 		}
-		if start < len(stoneValue) - 1 {
+		if start < len(stoneValue)-1 {
 			// Try picking 2 stones, and do the same thing
-			record = max(record, stoneValue[start] + stoneValue[start+1] - topDownStoneGameIII(stoneValue, start + 2, sols))
+			record = max(record, stoneValue[start]+stoneValue[start+1]-topDownStoneGameIII(stoneValue, start+2, sols))
 		}
 		// We KNOW we can pick 1 stone, because in the above function we made sols[len(sols)-1] = 0, and so a starting point of len(sols)-1 would NEVER end up in this conditional
-		record = max(record, stoneValue[start] - topDownStoneGameIII(stoneValue, start + 1, sols))
+		record = max(record, stoneValue[start]-topDownStoneGameIII(stoneValue, start+1, sols))
 		sols[start] = record
 	}
 	return sols[start]
@@ -3109,9 +3158,9 @@ https://leetcode.com/problems/stone-game-iv/description/
 func winnerSquareGame(n int) bool {
 	// First we need to generate a list of perfect squares less than or equal to n
 	squares := []int{}
-	for i:=1; i<=n; i++ {
-		if i * i <= n {
-			squares = append(squares, i * i)
+	for i := 1; i <= n; i++ {
+		if i*i <= n {
+			squares = append(squares, i*i)
 		} else {
 			break
 		}
@@ -3134,7 +3183,7 @@ func canWinSquareGame(n int, can_win map[int]bool, squares []int) bool {
 			if square > n {
 				break
 			}
-			if !canWinSquareGame(n - square, can_win, squares) {
+			if !canWinSquareGame(n-square, can_win, squares) {
 				able_to_win = true
 				break
 			}
@@ -3166,7 +3215,7 @@ func stoneGameV(stoneValue []int) int {
 
 	sums := make([][]int, len(stoneValue))
 	sols := make([][]int, len(stoneValue))
-	for i:=0; i<len(sums); i++ {
+	for i := 0; i < len(sums); i++ {
 		sums[i] = make([]int, len(stoneValue))
 		sums[i][i] = stoneValue[i]
 		sols[i] = make([]int, len(sols))
@@ -3174,8 +3223,8 @@ func stoneGameV(stoneValue []int) int {
 			sols[i][i+1] = min(stoneValue[i], stoneValue[i+1])
 		}
 	}
-	for row:=0; row<len(sums); row++ {
-		for col:=row+1; col<len(sums); col++ {
+	for row := 0; row < len(sums); row++ {
+		for col := row + 1; col < len(sums); col++ {
 			sums[row][col] = sums[row][col-1] + stoneValue[col]
 		}
 	}
@@ -3191,18 +3240,18 @@ func topDownStoneGameV(start int, end int, sols [][]int, sums [][]int) int {
 		// We need to solve this problem
 		record := 0
 		// Try each possible split
-		for split := start; split < end; split ++ {
+		for split := start; split < end; split++ {
 			left_sum := sums[start][split]
 			right_sum := sums[split+1][end]
 			if left_sum < right_sum {
 				// We get left half
-				record = max(record, left_sum + topDownStoneGameV(start, split, sols, sums))
+				record = max(record, left_sum+topDownStoneGameV(start, split, sols, sums))
 			} else if left_sum > right_sum {
 				// We get right half
-				record = max(record, right_sum + topDownStoneGameV(split+1, end, sols, sums))
+				record = max(record, right_sum+topDownStoneGameV(split+1, end, sols, sums))
 			} else {
 				// Equal sums - we get to pick
-				record = max(record, left_sum + max(topDownStoneGameV(start, split, sols, sums), topDownStoneGameV(split+1, end, sols, sums)))
+				record = max(record, left_sum+max(topDownStoneGameV(start, split, sols, sums), topDownStoneGameV(split+1, end, sols, sums)))
 			}
 		}
 		sols[start][end] = record
@@ -3214,7 +3263,7 @@ func topDownStoneGameV(start int, end int, sols [][]int, sums [][]int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are given an array people where people[i] is the weight of the ith person, and an infinite number of boats where each boat can carry a maximum weight of limit. 
+You are given an array people where people[i] is the weight of the ith person, and an infinite number of boats where each boat can carry a maximum weight of limit.
 Each boat carries at most two people at the same time, provided the sum of the weight of those people is at most limit.
 
 Return the minimum number of boats to carry every given person.
@@ -3243,7 +3292,7 @@ func numRescueBoats(people []int, limit int) int {
 		heavier := heaviest_person_less
 		lighter := 0
 		for heavier > lighter {
-			if people[heavier] + people[lighter] <= limit {
+			if people[heavier]+people[lighter] <= limit {
 				// They can go on their own boat together
 				heavier--
 				lighter++
