@@ -3040,55 +3040,6 @@ func topDownStoneGameII(first_unpicked_idx int, M int, piles []int, sols [][]int
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-Alice and Bob take turns playing a game, with Alice starting first.
-
-There are n stones in a pile. On each player's turn, they can remove a stone from the pile and receive points based on the stone's value. Alice and Bob may value the stones differently.
-
-You are given two integer arrays of length n, aliceValues and bobValues. Each aliceValues[i] and bobValues[i] represents how Alice and Bob, respectively, value the ith stone.
-
-The winner is the person with the most points after all the stones are chosen. If both players have the same amount of points, the game results in a draw. Both players will play optimally. Both players know the other's values.
-
-Determine the result of the game, and:
-
-If Alice wins, return 1.
-If Bob wins, return -1.
-If the game results in a draw, return 0.
-
-Link:
-https://leetcode.com/problems/stone-game-vi/description/
-*/
-func stoneGameVI(aliceValues []int, bobValues []int) int {
-	// FROM THE HINT - we want to take greedily based on the sum of Alice's and Bob's values of a stone
-	sums := make([][]int, len(aliceValues))
-	for i := 0; i < len(sums); i++ {
-		// Remember Alice and Bob's individual values as well
-		sums[i] = []int{aliceValues[i] + bobValues[i], aliceValues[i], bobValues[i]}
-	}
-	sort.SliceStable(sums, func(i, j int) bool {
-		return sums[i][0] > sums[j][0]
-	})
-	
-	alice_sum := 0
-	bob_sum := 0
-	for i := 0; i < len(sums); i += 2 {
-		alice_sum += sums[i][1]
-		if i < len(sums)-1 {
-			bob_sum += sums[i+1][2]
-		}
-	}
-
-	if alice_sum > bob_sum {
-		return 1
-	} else if alice_sum < bob_sum {
-		return -1
-	} else {
-		return 0
-	}
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*
 Alice and Bob continue their games with piles of stones. There are several stones arranged in a row, and each stone has an associated value which is an integer given in the array stoneValue.
 
 Alice and Bob take turns, with Alice starting first. On each player's turn, that player can take 1, 2, or 3 stones from the first remaining stones in the row.
@@ -3258,6 +3209,139 @@ func topDownStoneGameV(start int, end int, sols [][]int, sums [][]int) int {
 	}
 
 	return sols[start][end]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Alice and Bob take turns playing a game, with Alice starting first.
+
+There are n stones in a pile. On each player's turn, they can remove a stone from the pile and receive points based on the stone's value. Alice and Bob may value the stones differently.
+
+You are given two integer arrays of length n, aliceValues and bobValues. Each aliceValues[i] and bobValues[i] represents how Alice and Bob, respectively, value the ith stone.
+
+The winner is the person with the most points after all the stones are chosen. If both players have the same amount of points, the game results in a draw. Both players will play optimally. Both players know the other's values.
+
+Determine the result of the game, and:
+
+If Alice wins, return 1.
+If Bob wins, return -1.
+If the game results in a draw, return 0.
+
+Link:
+https://leetcode.com/problems/stone-game-vi/description/
+*/
+func stoneGameVI(aliceValues []int, bobValues []int) int {
+	// FROM THE HINT - we want to take greedily based on the sum of Alice's and Bob's values of a stone
+	sums := make([][]int, len(aliceValues))
+	for i := 0; i < len(sums); i++ {
+		// Remember Alice and Bob's individual values as well
+		sums[i] = []int{aliceValues[i] + bobValues[i], aliceValues[i], bobValues[i]}
+	}
+	sort.SliceStable(sums, func(i, j int) bool {
+		return sums[i][0] > sums[j][0]
+	})
+	
+	alice_sum := 0
+	bob_sum := 0
+	for i := 0; i < len(sums); i += 2 {
+		alice_sum += sums[i][1]
+		if i < len(sums)-1 {
+			bob_sum += sums[i+1][2]
+		}
+	}
+
+	if alice_sum > bob_sum {
+		return 1
+	} else if alice_sum < bob_sum {
+		return -1
+	} else {
+		return 0
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Alice and Bob take turns playing a game, with Alice starting first.
+
+There are n stones arranged in a row. 
+On each player's turn, they can remove either the leftmost stone or the rightmost stone from the row and receive points equal to the sum of the remaining stones' values in the row. 
+The winner is the one with the higher score when there are no stones left to remove.
+
+Bob found that he will always lose this game (poor Bob, he always loses), so he decided to minimize the score's difference. 
+Alice's goal is to maximize the difference in the score.
+
+Given an array of integers stones where stones[i] represents the value of the ith stone from the left, return the difference in Alice and Bob's score if they both play optimally.
+
+Link:
+https://leetcode.com/problems/stone-game-vii/description/
+*/
+func stoneGameVII(stones []int) int {
+	sums := make([][]int, len(stones))
+	for i:=0; i<len(sums); i++ {
+		sums[i] = make([]int, len(stones))
+		sums[i][i] = stones[i]
+	}
+	for row := 0; row < len(stones); row ++ {
+		for col := row + 1; col < len(stones); col++ {
+			sums[row][col] = sums[row][col-1] + stones[col]
+		}
+	}
+
+	alice_sols := make(map[int]map[int]int)
+	bob_sols := make(map[int]map[int]int)
+	return topDownStoneGameVIIAlice(0, len(stones)-1, stones, sums, alice_sols, bob_sols)
+}
+
+/*
+Maximizer top-down helper
+*/
+func topDownStoneGameVIIAlice(left int, right int, stones []int, sums [][]int, alice_sols map[int]map[int]int, bob_sols map[int]map[int]int) int {
+	_, ok := alice_sols[left]
+	if !ok {
+		alice_sols[left] = make(map[int]int)
+	}
+	_, ok = alice_sols[left][right]
+	if !ok {
+		// We need to solve this problem
+		if left == right {
+			// Base case - if left == right, the answer is just zero - remove that value and nothing is left
+			alice_sols[left][right] = 0
+		} else {
+			// Try picking the left value, and try picking the right value, and the difference in scores INCREASES by whatever sum Alice picks since she goes first
+			pick_left_difference := sums[left+1][right] + topDownStoneGameVIIBob(left+1, right, stones, sums, alice_sols, bob_sols)
+			pick_right_difference := sums[left][right-1] + topDownStoneGameVIIBob(left, right-1, stones, sums, alice_sols, bob_sols)
+			alice_sols[left][right] = max(pick_left_difference, pick_right_difference)
+		}
+	}
+
+	return alice_sols[left][right]
+}
+
+/*
+Minimizer top-down helper
+*/
+func topDownStoneGameVIIBob(left int, right int, stones []int, sums [][]int, alice_sols map[int]map[int]int, bob_sols map[int]map[int]int) int {
+	_, ok := bob_sols[left]
+	if !ok {
+		bob_sols[left] = make(map[int]int)
+	}
+	_, ok = bob_sols[left][right]
+	if !ok {
+		// We need to solve this problem
+		if left == right {
+			// Base case - if left == right, the answer is just zero - remove that value and nothing is left
+			bob_sols[left][right] = 0
+		} else {
+			// Try picking the left value, and try picking the right value, and the difference in scores DECREASES by whatever sum Bob picks since he goes second
+			pick_left_difference := topDownStoneGameVIIAlice(left+1, right, stones, sums, alice_sols, bob_sols) - sums[left+1][right]
+			pick_right_difference := topDownStoneGameVIIAlice(left, right-1, stones, sums, alice_sols, bob_sols) - sums[left][right-1]
+			bob_sols[left][right] = min(pick_left_difference, pick_right_difference)
+		}
+	}
+
+	return bob_sols[left][right]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1328,6 +1328,27 @@ func TestStoneGameVI(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
 }
 
+func TestStoneGameVII(t *testing.T) {
+	type input struct {
+		stones	[]int
+	}
+	inputs := []input{
+		{[]int{5,3,1,4,2}},
+		{[]int{7,90,5,1,100,10,10,2}},
+	}
+
+	expected_outputs := []int{
+		6,
+		122,
+	}
+
+	f := func(i input) int {
+		return stoneGameVII(i.stones)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
 func TestNumRescueBoats(t *testing.T) {
 	type input struct {
 		people []int
