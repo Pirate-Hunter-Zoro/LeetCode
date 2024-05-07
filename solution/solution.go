@@ -3347,6 +3347,29 @@ func topDownStoneGameVIIBob(left int, right int, stones []int, sums [][]int, ali
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
+Alice and Bob take turns playing a game, with Alice starting first.
+
+There are n stones arranged in a row. On each player's turn, while the number of stones is more than one, they will do the following:
+
+- Choose an integer x > 1, and remove the leftmost x stones from the row.
+- Add the sum of the removed stones' values to the player's score.
+- Place a new stone, whose value is equal to that sum, on the left side of the row.
+- The game stops when only one stone is left in the row.
+
+The score difference between Alice and Bob is (Alice's score - Bob's score). Alice's goal is to maximize the score difference, and Bob's goal is the minimize the score difference.
+
+Given an integer array stones of length n where stones[i] represents the value of the ith stone from the left, return the score difference between Alice and Bob if they both play optimally.
+
+Link:
+https://leetcode.com/problems/stone-game-viii/description/
+*/
+func stoneGameVIII(stones []int) int {
+	return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
 You are given an array people where people[i] is the weight of the ith person, and an infinite number of boats where each boat can carry a maximum weight of limit.
 Each boat carries at most two people at the same time, provided the sum of the weight of those people is at most limit.
 
@@ -3393,4 +3416,43 @@ func numRescueBoats(people []int, limit int) int {
 
 		return boats
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given the head of a non-empty linked list representing a non-negative integer without leading zeroes.
+
+Return the head of the linked list after doubling it.
+
+Link:
+https://leetcode.com/problems/double-a-number-represented-as-a-linked-list/description/?envType=daily-question&envId=2024-05-07
+*/
+func doubleIt(head *list_node.ListNode) *list_node.ListNode {
+	node_values := []int{}
+	current := head
+	for current != nil {
+		node_values = append(node_values, current.Val)
+		current = current.Next
+	}
+
+	carry := 0
+	for i:=len(node_values)-1; i>=0; i-- {
+		sum := 2 * node_values[i] + carry
+		carry = sum / 10
+		val := sum % 10
+		node_values[i] = val
+	}
+	to_return := head
+	if carry > 0 {
+		to_return = &list_node.ListNode{Val: carry}
+		to_return.Next = head
+	}
+	current = head
+	for i:=0; i<len(node_values); i++ {
+		current.Val = node_values[i]
+		current = current.Next
+	}
+
+	return to_return
 }

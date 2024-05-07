@@ -1375,3 +1375,24 @@ func TestNumRescueBoats(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestDoubleIt(t *testing.T) {
+	type input struct {
+		head 	*list_node.ListNode
+	}
+	inputs := []input{
+		{list_node.NewList([]int{1,8,9})},
+		{list_node.NewList([]int{9,9,9})},
+	}
+
+	expected_outputs := []list_node.ListNode{
+		*list_node.NewList([]int{3,7,8}),
+		*list_node.NewList([]int{1,9,9,8}),
+	}
+
+	f := func(i input) list_node.ListNode {
+		return *doubleIt(i.head)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
