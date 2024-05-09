@@ -1349,6 +1349,33 @@ func TestStoneGameVII(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
 }
 
+func TestStoneGameVIII(t *testing.T) {
+	type input struct {
+		stones 	[]int
+	}
+	inputs := []input{
+		{[]int{-1,2,-3,4,-5}},
+		{[]int{7,-6,5,10,5,-2,-6}},
+		{[]int{-10,-12}},
+		{[]int{-10,-12,-10,-12}},
+		{[]int{25,-35,-37,4,34,43,16,-33,0,-17,-31,-42,-42,38,12,-5,-43,-10,-37,12}},
+	}
+
+	expected_outputs := []int{
+		5,
+		13,
+		-22,
+		12,
+		38,
+	}
+
+	f := func(i input) int {
+		return stoneGameVIII(i.stones)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
 func TestNumRescueBoats(t *testing.T) {
 	type input struct {
 		people []int
@@ -1392,6 +1419,30 @@ func TestDoubleIt(t *testing.T) {
 
 	f := func(i input) list_node.ListNode {
 		return *doubleIt(i.head)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMaximumHappinessSum(t *testing.T) {
+	type input struct {
+		happiness []int
+		k 			int
+	}
+	inputs := []input{
+		{[]int{1,2,3}, 2},
+		{[]int{1,1,1,1}, 2},
+		{[]int{2,3,4,5}, 1},
+	}
+
+	expected_outputs := []int64{
+		int64(4),
+		int64(1),
+		int64(5),
+	}
+
+	f := func(i input) int64 {
+		return maximumHappinessSum(i.happiness, i.k)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

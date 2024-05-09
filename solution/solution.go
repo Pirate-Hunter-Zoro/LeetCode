@@ -3364,7 +3364,25 @@ Link:
 https://leetcode.com/problems/stone-game-viii/description/
 */
 func stoneGameVIII(stones []int) int {
-	return 0
+	if len(stones) == 2 {
+		return stones[0] + stones[1]
+	}
+	// Find the sum
+	sum := 0
+	for _, v := range stones {
+		sum += v
+	}
+	// Given how many stones have been removed, return the greatest difference you can achieve
+	records := make([]int, len(stones)+1)
+	records[len(stones)] = 0
+	// If you decide to pick up ALL remaining stones, you lead by (accumulated left sum) + right sum
+	// Otherwise, you pick some stones, and merge them into the left. The difference you achieve will NOT be affected by the sum of what you picked.
+	// However, the left-most 'concatenation' stone's value WILL be affected.
+	// The concatenation stone won't have any affect on the score DIFFERENCE until the pickup occurs, because then the game ends and the opponent does not follow. 
+	//concatenated_stone := stones[0]
+	
+	
+	return records[0]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3456,3 +3474,33 @@ func doubleIt(head *list_node.ListNode) *list_node.ListNode {
 
 	return to_return
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an array happiness of length n, and a positive integer k.
+
+There are n children standing in a queue, where the ith child has happiness value happiness[i]. You want to select k children from these n children in k turns.
+
+In each turn, when you select a child, the happiness value of all the children that have not been selected till now decreases by 1. Note that the happiness value cannot become negative and gets decremented only if it is positive.
+
+Return the maximum sum of the happiness values of the selected children you can achieve by selecting k children.
+
+Link:
+https://leetcode.com/problems/maximize-happiness-of-selected-children/description/?envType=daily-question&envId=2024-05-09
+*/
+func maximumHappinessSum(happiness []int, k int) int64 {
+	sort.SliceStable(happiness, func(i, j int) bool {
+		return happiness[i] > happiness[j]
+	})
+
+	total := int64(0)
+	for round := 0; round < k; round ++ {
+		total += max(int64(0), int64(happiness[round] - round))
+	}
+
+	return int64(total)
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
