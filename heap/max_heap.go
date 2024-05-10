@@ -5,13 +5,18 @@ import "cmp"
 // MaxHeap struct has a slice that holds the array
 type MaxHeap[K cmp.Ordered] struct {
 	array []K
+	count int
+}
+
+func NewMaxHeap[K cmp.Ordered]() *MaxHeap[K] {
+	return &MaxHeap[K]{count:  0}
 }
 
 // Insert adds an element to the heap
 func (h *MaxHeap[K]) Insert(key K) {
 	h.array = append(h.array, key)
 	h.maxHeapifyUp(len(h.array) - 1)
-
+	h.count++
 }
 
 // Helps to fix the heap after inserting a value at the bottom
@@ -33,8 +38,17 @@ func (h *MaxHeap[K]) swap(i1, i2 int) {
 	h.array[i1], h.array[i2] = h.array[i2], h.array[i1]
 }
 
+// Determine if the heap is empty
+func (h *MaxHeap[K]) Empty() bool {
+	return h.count == 0
+}
+
 // Extract returns the largest key, and removes it from the heap
 func (h *MaxHeap[K]) Extract() K {
+	if h.count > 0 {
+		h.count--
+	}
+
 	v := h.array[0]
 	last := len(h.array) - 1
 

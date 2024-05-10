@@ -1447,3 +1447,28 @@ func TestMaximumHappinessSum(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestKthSmallestPrimeFraction(t *testing.T) {
+	type input struct {
+		arr []int
+		k 	int
+	}
+
+	inputs := []input{
+		{[]int{1,2,3,5}, 3},
+		{[]int{1,7}, 1},
+		{[]int{1,13,17,59}, 6},
+	}
+
+	expected_outputs := [][]int{
+		{2,5},
+		{1,7},
+		{13,17},
+	}
+
+	f := func(i input) []int {
+		return kthSmallestPrimeFraction(i.arr, i.k)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

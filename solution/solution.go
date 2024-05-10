@@ -3504,3 +3504,36 @@ func maximumHappinessSum(happiness []int, k int) int64 {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+You are given a sorted integer array arr containing 1 and prime numbers, where all the integers of arr are unique. You are also given an integer k.
+
+For every i and j where 0 <= i < j < arr.length, we consider the fraction arr[i] / arr[j].
+
+Return the kth smallest fraction considered. Return your answer as an array of integers of size 2, where answer[0] == arr[i] and answer[1] == arr[j].
+
+Link:
+https://leetcode.com/problems/k-th-smallest-prime-fraction/description/?envType=daily-question&envId=2024-05-10
+*/
+func kthSmallestPrimeFraction(arr []int, k int) []int {
+	fractions := make(map[float64][]int)
+	floats := heap.NewMinHeap[float64]()
+	for i:=0; i<len(arr)-1; i++ {
+		// By the constraints of k (<= len(arr) choose 2), we know the numerator will ALWAYS be less than the denominator for fractions 1 through k
+		for j:=i; j<len(arr); j++ {
+			val := float64(float64(arr[i]) / float64(arr[j]))
+			floats.Insert(val)
+			fractions[val] = []int{arr[i], arr[j]}
+		}
+	}
+
+	extracted := 0
+	for extracted < k-1 {
+		floats.Extract()
+		extracted++
+	}
+	// Now for the kth fraction
+	return fractions[floats.Extract()]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
