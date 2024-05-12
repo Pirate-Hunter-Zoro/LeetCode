@@ -3560,7 +3560,7 @@ func mincostToHireWorkers(quality []int, wage []int, k int) float64 {
 
 	lowest_quality := heap.NewCustomMaxHeap[[]float64](
 		func(first, second []float64) bool {
-			return first[0] > second[0]
+			return first[1] > second[1]
 		},
 	)
 
