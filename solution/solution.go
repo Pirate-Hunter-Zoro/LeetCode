@@ -3537,3 +3537,50 @@ func kthSmallestPrimeFraction(arr []int, k int) []int {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+There are n workers. You are given two integer arrays quality and wage where quality[i] is the quality of the ith worker and wage[i] is the minimum wage expectation for the ith worker.
+
+We want to hire exactly k workers to form a paid group. To hire a group of k workers, we must pay them according to the following rules:
+
+Every worker in the paid group must be paid at least their minimum wage expectation.
+In the group, each worker's pay must be directly proportional to their quality. This means if a worker’s quality is double that of another worker in the group, then they must be paid twice as much as the other worker.
+Given the integer k, return the least amount of money needed to form a paid group satisfying the above conditions. Answers within 10-5 of the actual answer will be accepted.
+
+Link:
+https://leetcode.com/problems/minimum-cost-to-hire-k-workers/description/?envType=daily-question&envId=2024-05-11
+*/
+func mincostToHireWorkers(quality []int, wage []int, k int) float64 {
+    sort_by_wage_over_quality := make([][]float64, len(quality))
+	for i:=0; i<len(quality); i++ {
+		sort_by_wage_over_quality[i] = []float64{float64(wage[i]), float64(quality[i])}
+	}
+	sort.SliceStable(sort_by_wage_over_quality, func(i, j int) bool {
+		return (sort_by_wage_over_quality[i][0] / sort_by_wage_over_quality[i][1]) < (sort_by_wage_over_quality[j][0] / sort_by_wage_over_quality[j][1])
+	})
+
+	lowest_quality := heap.NewCustomMaxHeap[[]float64](
+		func(first, second []float64) bool {
+			return first[0] > second[0]
+		},
+	)
+
+	quality_sum := float64(0)
+	for i:=0; i<k; i++ {
+		lowest_quality.Insert(sort_by_wage_over_quality[i])
+		quality_sum += sort_by_wage_over_quality[i][1]
+	}
+	ratio := sort_by_wage_over_quality[k-1][0] / sort_by_wage_over_quality[k-1][1]
+	record := quality_sum * ratio
+	for i:=k; i<len(sort_by_wage_over_quality); i++ {
+		ratio = sort_by_wage_over_quality[i][0] / sort_by_wage_over_quality[i][1]
+		quality_sum -= lowest_quality.Extract()[1]
+		lowest_quality.Insert(sort_by_wage_over_quality[i])
+		quality_sum += sort_by_wage_over_quality[i][1]
+		price := quality_sum * ratio
+		record = math.Min(record, price)
+	}
+
+	return record
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

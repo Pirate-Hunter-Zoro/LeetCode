@@ -10,7 +10,9 @@ Apply Djikstra's algorithm to find the length of the shortest path from start to
 */
 func Djikstra(nodes []*Node, start int, target int) int {
 	nodes[start].Cost = 0
-	node_heap := heap.CustomMinHeap[Node]{}
+	node_heap := heap.NewCustomMinHeap[*Node](func(first, second *Node) bool {
+		return first.Cost < second.Cost
+	})
 	node_heap.Insert(nodes[start])
 	for !node_heap.Empty() {
 		for !node_heap.Empty() && node_heap.Peek().IsVisited {

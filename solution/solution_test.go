@@ -2,12 +2,24 @@ package solution
 
 import (
 	"fmt"
+	"math"
 	"leetcode/binary_tree"
 	"leetcode/list_node"
 	"reflect"
 	"sort"
 	"testing"
 )
+
+/*
+Helper function to round a float
+
+Source:
+https://gosamples.dev/round-float/
+*/
+func roundFloat(val float64, precision uint) float64 {
+    ratio := math.Pow(10, float64(precision))
+    return math.Round(val*ratio) / ratio
+}
 
 /*
 Helper method to test the results from the given method
@@ -1468,6 +1480,31 @@ func TestKthSmallestPrimeFraction(t *testing.T) {
 
 	f := func(i input) []int {
 		return kthSmallestPrimeFraction(i.arr, i.k)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMincostToHireWorkers(t *testing.T) {
+	type input struct {
+		quality []int
+		wage 	[]int
+		k 		int
+	}
+	inputs := []input{
+		{[]int{10,20,5}, []int{70,50,30}, 2},
+		{[]int{3,1,10,10,1}, []int{4,8,2,2,7}, 3},
+		{[]int{2,1,5}, []int{17,6,4}, 2},
+	}
+
+	expected_outputs := []float64{
+		roundFloat(float64(105), 5),
+		roundFloat(float64(30) + float64(2)/float64(3), 5),
+		roundFloat(25.5, 5),
+	}
+
+	f := func(i input) float64 {
+		return roundFloat(mincostToHireWorkers(i.quality, i.wage, i.k), 5)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
