@@ -3362,27 +3362,29 @@ Given an integer array stones of length n where stones[i] represents the value o
 
 Link:
 https://leetcode.com/problems/stone-game-viii/description/
+
+Inspiration:
+https://leetcode.com/problems/stone-game-viii/solutions/1224658/python-cumulative-sums-oneliner-explained/
 */
 func stoneGameVIII(stones []int) int {
-	if len(stones) == 2 {
-		return stones[0] + stones[1]
+	sums := make([]int, len(stones)-1)
+	sums[0] = stones[0] + stones[1]
+	// Given a,b,c,d,e
+	// We need a+b, a+b+c, a+b+c+d, a+b+c+d+e
+	for i:=1; i<len(sums); i++ {
+		sums[i] = sums[i-1] + stones[i+1]
 	}
-	// Find the sum
-	sum := 0
-	for _, v := range stones {
-		sum += v
+	// Now we play the optimization game - if we pick a certain a certain pile sum, then our opponent can follow that up with any later pile sum.
+
+	// If we take the sum with index i, how much can we win by?
+	record := sums[len(sums)-1] // If we are ONLY allowed to pick up the last sum, that means all but one stone has been removed (concatenated into the left stone), and we just have to grab both of those stones - no choice.
+	for i:=len(sums)-2; i>=0; i-- {
+		// Say we don't immediately pick up all stones - we only pick up the first (i+2) stones
+		// What's the best we can achieve if we do that?
+		// Well, that's just going to be that sum of stone values, MINUS the previous record which is what our opponent will be stuck with doing.
+		record = max(record, sums[i] - record)
 	}
-	// Given how many stones have been removed, return the greatest difference you can achieve
-	records := make([]int, len(stones)+1)
-	records[len(stones)] = 0
-	// If you decide to pick up ALL remaining stones, you lead by (accumulated left sum) + right sum
-	// Otherwise, you pick some stones, and merge them into the left. The difference you achieve will NOT be affected by the sum of what you picked.
-	// However, the left-most 'concatenation' stone's value WILL be affected.
-	// The concatenation stone won't have any affect on the score DIFFERENCE until the pickup occurs, because then the game ends and the opponent does not follow. 
-	//concatenated_stone := stones[0]
-	
-	
-	return records[0]
+	return record
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3584,3 +3586,38 @@ func mincostToHireWorkers(quality []int, wage []int, k int) float64 {
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an m x n binary matrix grid.
+
+A move consists of choosing any row or column and toggling each value in that row or column (i.e., changing all 0's to 1's, and all 1's to 0's).
+
+Every row of the matrix is interpreted as a binary number, and the score of the matrix is the sum of these numbers.
+
+Return the highest possible score after making any number of moves (including zero moves).
+
+Link:
+https://leetcode.com/problems/score-after-flipping-matrix/description/?envType=daily-question&envId=2024-05-13
+*/
+func matrixScore(grid [][]int) int {
+	row_ints := make([]int, len(grid))
+	cols := len(grid[0])
+	record := 0
+	for row := 0; row < len(row_ints); row++ {
+		v := 0
+		for col := 0; col < cols; col++ {
+			v += grid[row][col] << (cols - 1 - col)
+		}
+		row_ints[row] = v
+		record += v
+	}
+
+	// Now we are allowed to toggle any row or any column, any number of times
+	// Brute force is fine given the input constraints...
+	
+
+	return record 
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
