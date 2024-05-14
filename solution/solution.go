@@ -3602,21 +3602,111 @@ https://leetcode.com/problems/score-after-flipping-matrix/description/?envType=d
 func matrixScore(grid [][]int) int {
 	row_ints := make([]int, len(grid))
 	cols := len(grid[0])
-	record := 0
+	total := 0
 	for row := 0; row < len(row_ints); row++ {
 		v := 0
 		for col := 0; col < cols; col++ {
 			v += grid[row][col] << (cols - 1 - col)
 		}
 		row_ints[row] = v
-		record += v
+		total += v
 	}
 
 	// Now we are allowed to toggle any row or any column, any number of times
-	// Brute force is fine given the input constraints...
+	// Note that since we can reflect each row, we KNOW that we can make the left column all 1's, which we obviously want to do
+	// The question is - do we flip the left-most column, and then flip rows until they are all 1's? Or do we just flip rows?
 	
+	// Try flipping the left-most column, and then row-by-row get all 1's in the left-most column
+	first_record := total
+	for i := 0; i < len(row_ints); i++ {
+		first_record -= row_ints[i]
+		row_ints[i] = row_ints[i] ^ (1 << (cols - 1))
+		first_record += row_ints[i]
+	}
+	// Now flip all the rows until you have all 1's in the left-most column
+	for i := 0; i < len(row_ints); i++ {
+		if row_ints[i] < (1 << (cols - 1)) {
+			// Then flip the row
+			first_record -= row_ints[i]
+			row_ints[i] = row_ints[i] ^ ((1 << cols) - 1)
+			first_record += row_ints[i]
+		}
+	}
+	// Now look through each column, and IFF there are more 0's than 1's, flip the column
+	for col := 1; col < cols; col++ {
+		one_count := 0
+		for r := 0; r < len(row_ints); r++ {
+			if (row_ints[r] & (1 << (cols - 1 - col)) == (1 << (cols - 1 - col))) {
+				one_count++
+			}
+		}
+		if one_count <= (len(row_ints) / 2) {
+			// Then flip this column
+			for j := 0; j < len(row_ints); j++ {
+				first_record -= row_ints[j]
+				row_ints[j] = row_ints[j] ^ (1 << (cols - 1 - col))
+				first_record += row_ints[j]
+			}
+		}
+	}
 
-	return record 
+	// Now try to achieve the left most-column being all 1's ONLY by
+	// Refresh our row integers
+	for row := 0; row < len(row_ints); row++ {
+		v := 0
+		for col := 0; col < cols; col++ {
+			v += grid[row][col] << (cols - 1 - col)
+		}
+		row_ints[row] = v
+	} 
+	second_record := total
+	// Flip all the rows until you have all 1's in the left-most column
+	for i := 0; i < len(row_ints); i++ {
+		if row_ints[i] < (1 << (cols - 1)) {
+			// Then flip the row
+			second_record -= row_ints[i]
+			row_ints[i] = row_ints[i] ^ ((1 << cols) - 1)
+			second_record += row_ints[i]
+		}
+	}
+	// Now look through each column, and IFF there are more 0's than 1's, flip the column
+	for col := 1; col < cols; col++ {
+		one_count := 0
+		for r := 0; r < len(row_ints); r++ {
+			if (row_ints[r] & (1 << (cols - 1 - col)) == (1 << (cols - 1 - col))) {
+				one_count++
+			}
+		}
+		if one_count <= (len(row_ints) / 2) {
+			// Then flip this column
+			for j := 0; j < len(row_ints); j++ {
+				second_record -= row_ints[j]
+				row_ints[j] = row_ints[j] ^ (1 << (cols - 1 - col))
+				second_record += row_ints[j]
+			}
+		}
+	}
+
+	return max(first_record, second_record) 
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+In a gold mine grid of size m x n, each cell in this mine has an integer representing the amount of gold in that cell, 0 if it is empty.
+
+Return the maximum amount of gold you can collect under the conditions:
+- Every time you are located in a cell you will collect all the gold in that cell.
+- From your position, you can walk one step to the left, right, up, or down.
+- You can't visit the same cell more than once.
+- Never visit a cell with 0 gold.
+- You can start and stop collecting gold from any position in the grid that has some gold.
+
+Link:
+https://leetcode.com/problems/path-with-maximum-gold/description/?envType=daily-question&envId=2024-05-14
+*/
+func getMaximumGold(grid [][]int) int {
+	return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

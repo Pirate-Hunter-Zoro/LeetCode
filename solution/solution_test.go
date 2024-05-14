@@ -1509,3 +1509,34 @@ func TestMincostToHireWorkers(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMatrixScore(t *testing.T) {
+	type input struct {
+		grid [][]int
+	}
+	inputs := []input{
+		{
+			[][]int{
+				{0, 0, 1, 1},
+				{1, 0, 1, 0},
+				{1, 1, 0, 0},
+			},
+		},
+		{
+			[][]int{
+				{0},
+			},
+		},
+	}
+
+	expected_outputs := []int{
+		39,
+		1,
+	}
+
+	f := func(i input) int {
+		return matrixScore(i.grid)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
