@@ -3706,7 +3706,37 @@ Link:
 https://leetcode.com/problems/path-with-maximum-gold/description/?envType=daily-question&envId=2024-05-14
 */
 func getMaximumGold(grid [][]int) int {
-	return 0;
+	record := 0
+	for row := 0; row < len(grid); row++ {
+		for col := 0; col < len(grid[row]); col++ {
+			record = max(record, exploreFromLocation(row, col, grid))
+		}
+	}
+	return record
+}
+
+func exploreFromLocation(row int, col int, grid [][]int) int {
+	if row < 0 || row >= len(grid) || col < 0 || col >= len(grid[0]) || grid[row][col] == 0 {
+		return 0
+	} else {
+		total := grid[row][col]
+		new_grid := make([][]int, len(grid))
+		for r := 0; r < len(grid); r++ {
+			new_grid[r] = make([]int, len(grid[r]))
+			copy(new_grid[r], grid[r])
+		}
+		new_grid[row][col] = 0
+		best_from_here := 0
+		// Try up
+		best_from_here = max(best_from_here, exploreFromLocation(row-1, col, new_grid))
+		// Try down
+		best_from_here = max(best_from_here, exploreFromLocation(row + 1, col, new_grid))
+		// Try left
+		best_from_here = max(best_from_here, exploreFromLocation(row, col - 1, new_grid))
+		// Try right
+		best_from_here = max(best_from_here, exploreFromLocation(row, col + 1, new_grid))
+		return total + best_from_here
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

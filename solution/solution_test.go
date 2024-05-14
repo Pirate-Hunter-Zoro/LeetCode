@@ -1540,3 +1540,37 @@ func TestMatrixScore(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestGetMaximumGold(t *testing.T) {
+	type input struct {
+		grid [][]int
+	}
+	inputs := []input {
+		{
+			[][]int{
+				{0, 6, 0},
+				{5, 8, 7},
+				{0, 9, 0},
+			},
+		},
+		{
+			[][]int{
+				{1, 0, 7},
+				{2, 0, 6},
+				{3, 4, 5},
+				{0, 3, 0},
+				{9, 0, 20},
+			},
+		},
+	}
+	expected_outputs := []int{
+		24,
+		28,
+	}
+
+	f := func(i input) int {
+		return getMaximumGold(i.grid)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
