@@ -8,9 +8,9 @@ import (
 /*
 Apply Djikstra's algorithm to find the length of the shortest path from start to end
 */
-func Djikstra(nodes []*Node, start int, target int) int {
+func Djikstra(nodes []*GraphNode, start int, target int) int {
 	nodes[start].Cost = 0
-	node_heap := heap.NewCustomMinHeap[*Node](func(first, second *Node) bool {
+	node_heap := heap.NewCustomMinHeap[*GraphNode](func(first, second *GraphNode) bool {
 		return first.Cost < second.Cost
 	})
 	node_heap.Insert(nodes[start])

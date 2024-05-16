@@ -1,11 +1,11 @@
 package graph
 
 type Edge struct {
-	To     *Node
+	To     *GraphNode
 	Weight int
 }
 
-type Node struct {
+type GraphNode struct {
 	Id          int
 	IsVisited   bool
 	Cost        int

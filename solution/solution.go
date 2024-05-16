@@ -3,14 +3,13 @@ package solution
 import (
 	"leetcode/algorithm"
 	"leetcode/binary_tree"
-	"leetcode/disjoint_set"
+	disjointset "leetcode/disjoint_set"
 	"leetcode/euclidean"
 	"leetcode/graph"
 	"leetcode/heap"
+	"leetcode/linked_list"
 	"leetcode/list_node"
 	"leetcode/modulo"
-	"leetcode/queue"
-	"leetcode/stack"
 	"math"
 	"sort"
 	"strconv"
@@ -906,7 +905,7 @@ func findCheapestPrice(n int, flights [][]int, src int, dst int, k int) int {
 	}
 
 	// Now we simply apply breadth-first search from the starting node
-	node_queue := queue.New[int]()
+	node_queue := linked_list.NewQueue[int]()
 	node_queue.Enqueue(src)
 
 	// Keep track of a record cost to get to the destination
@@ -1162,7 +1161,7 @@ https://leetcode.com/problems/minimum-remove-to-make-valid-parentheses/descripti
 */
 func minRemoveToMakeValid(s string) string {
 	to_remove := make(map[int]bool)
-	idx_stack := stack.New[int]()
+	idx_stack := linked_list.NewStack[int]()
 
 	for idx, ch := range s {
 		if ch == '(' {
@@ -1207,7 +1206,7 @@ Link:
 https://leetcode.com/problems/minimum-number-of-swaps-to-make-the-string-balanced/description/
 */
 func minSwaps(s string) int {
-	idx_stack := stack.New[int]()
+	idx_stack := linked_list.NewStack[int]()
 	count := 0
 	for idx, ch := range s {
 		if ch == '[' {
@@ -1772,7 +1771,7 @@ func sumOfDistancesInTree(n int, edges [][]int) []int {
 	num_edges := 0
 	visited := make([]bool, n)
 	visited[0] = true
-	q := queue.New[int]()
+	q := linked_list.NewQueue[int]()
 	q.Enqueue(0)
 	for !q.Empty() {
 		dequeue := q.Length()
@@ -1817,7 +1816,7 @@ func sumOfDistancesInTree(n int, edges [][]int) []int {
 	// This will be DFS-esque
 	sols := make(map[int]map[int]int)
 	visited = make([]bool, n)
-	st := stack.New[int]()
+	st := linked_list.NewStack[int]()
 	visited[0] = true
 	st.Push(0)
 	for !st.Empty() {
@@ -2121,7 +2120,7 @@ func openLock(deadends []string, target string) int {
 	target_num, _ := strconv.Atoi(target)
 
 	type lock_node struct {
-		underlying_node *graph.Node
+		underlying_node *graph.GraphNode
 		lock_values     []int
 	}
 
@@ -2139,7 +2138,7 @@ func openLock(deadends []string, target string) int {
 		_, ok := deadends_set[i]
 		if !ok {
 			lock_nodes[i] = &lock_node{
-				underlying_node: &graph.Node{
+				underlying_node: &graph.GraphNode{
 					Id:          i,
 					Connections: []*graph.Edge{},
 					IsVisited:   false,
@@ -2210,7 +2209,7 @@ func openLock(deadends []string, target string) int {
 		}
 	}
 
-	underlying_nodes := make([]*graph.Node, len(lock_nodes))
+	underlying_nodes := make([]*graph.GraphNode, len(lock_nodes))
 	for idx, lock_node := range lock_nodes {
 		if lock_node != nil {
 			underlying_nodes[idx] = lock_node.underlying_node
@@ -2218,7 +2217,7 @@ func openLock(deadends []string, target string) int {
 	}
 
 	// No need for Djikstra's algorithm here as all edge weights are 1 - BFS will do
-	q := queue.New[*graph.Node]()
+	q := linked_list.NewQueue[*graph.GraphNode]()
 	lock_nodes[0].underlying_node.IsVisited = true
 	q.Enqueue(lock_nodes[0].underlying_node)
 	length := 0
@@ -3241,7 +3240,7 @@ func stoneGameVI(aliceValues []int, bobValues []int) int {
 	sort.SliceStable(sums, func(i, j int) bool {
 		return sums[i][0] > sums[j][0]
 	})
-	
+
 	alice_sum := 0
 	bob_sum := 0
 	for i := 0; i < len(sums); i += 2 {
@@ -3265,11 +3264,11 @@ func stoneGameVI(aliceValues []int, bobValues []int) int {
 /*
 Alice and Bob take turns playing a game, with Alice starting first.
 
-There are n stones arranged in a row. 
-On each player's turn, they can remove either the leftmost stone or the rightmost stone from the row and receive points equal to the sum of the remaining stones' values in the row. 
+There are n stones arranged in a row.
+On each player's turn, they can remove either the leftmost stone or the rightmost stone from the row and receive points equal to the sum of the remaining stones' values in the row.
 The winner is the one with the higher score when there are no stones left to remove.
 
-Bob found that he will always lose this game (poor Bob, he always loses), so he decided to minimize the score's difference. 
+Bob found that he will always lose this game (poor Bob, he always loses), so he decided to minimize the score's difference.
 Alice's goal is to maximize the difference in the score.
 
 Given an array of integers stones where stones[i] represents the value of the ith stone from the left, return the difference in Alice and Bob's score if they both play optimally.
@@ -3279,11 +3278,11 @@ https://leetcode.com/problems/stone-game-vii/description/
 */
 func stoneGameVII(stones []int) int {
 	sums := make([][]int, len(stones))
-	for i:=0; i<len(sums); i++ {
+	for i := 0; i < len(sums); i++ {
 		sums[i] = make([]int, len(stones))
 		sums[i][i] = stones[i]
 	}
-	for row := 0; row < len(stones); row ++ {
+	for row := 0; row < len(stones); row++ {
 		for col := row + 1; col < len(stones); col++ {
 			sums[row][col] = sums[row][col-1] + stones[col]
 		}
@@ -3371,18 +3370,18 @@ func stoneGameVIII(stones []int) int {
 	sums[0] = stones[0] + stones[1]
 	// Given a,b,c,d,e
 	// We need a+b, a+b+c, a+b+c+d, a+b+c+d+e
-	for i:=1; i<len(sums); i++ {
+	for i := 1; i < len(sums); i++ {
 		sums[i] = sums[i-1] + stones[i+1]
 	}
 	// Now we play the optimization game - if we pick a certain a certain pile sum, then our opponent can follow that up with any later pile sum.
 
 	// If we take the sum with index i, how much can we win by?
 	record := sums[len(sums)-1] // If we are ONLY allowed to pick up the last sum, that means all but one stone has been removed (concatenated into the left stone), and we just have to grab both of those stones - no choice.
-	for i:=len(sums)-2; i>=0; i-- {
+	for i := len(sums) - 2; i >= 0; i-- {
 		// Say we don't immediately pick up all stones - we only pick up the first (i+2) stones
 		// What's the best we can achieve if we do that?
 		// Well, that's just going to be that sum of stone values, MINUS the previous record which is what our opponent will be stuck with doing.
-		record = max(record, sums[i] - record)
+		record = max(record, sums[i]-record)
 	}
 	return record
 }
@@ -3457,8 +3456,8 @@ func doubleIt(head *list_node.ListNode) *list_node.ListNode {
 	}
 
 	carry := 0
-	for i:=len(node_values)-1; i>=0; i-- {
-		sum := 2 * node_values[i] + carry
+	for i := len(node_values) - 1; i >= 0; i-- {
+		sum := 2*node_values[i] + carry
 		carry = sum / 10
 		val := sum % 10
 		node_values[i] = val
@@ -3469,7 +3468,7 @@ func doubleIt(head *list_node.ListNode) *list_node.ListNode {
 		to_return.Next = head
 	}
 	current = head
-	for i:=0; i<len(node_values); i++ {
+	for i := 0; i < len(node_values); i++ {
 		current.Val = node_values[i]
 		current = current.Next
 	}
@@ -3497,8 +3496,8 @@ func maximumHappinessSum(happiness []int, k int) int64 {
 	})
 
 	total := int64(0)
-	for round := 0; round < k; round ++ {
-		total += max(int64(0), int64(happiness[round] - round))
+	for round := 0; round < k; round++ {
+		total += max(int64(0), int64(happiness[round]-round))
 	}
 
 	return int64(total)
@@ -3519,9 +3518,9 @@ https://leetcode.com/problems/k-th-smallest-prime-fraction/description/?envType=
 func kthSmallestPrimeFraction(arr []int, k int) []int {
 	fractions := make(map[float64][]int)
 	floats := heap.NewMinHeap[float64]()
-	for i:=0; i<len(arr)-1; i++ {
+	for i := 0; i < len(arr)-1; i++ {
 		// By the constraints of k (<= len(arr) choose 2), we know the numerator will ALWAYS be less than the denominator for fractions 1 through k
-		for j:=i; j<len(arr); j++ {
+		for j := i; j < len(arr); j++ {
 			val := float64(float64(arr[i]) / float64(arr[j]))
 			floats.Insert(val)
 			fractions[val] = []int{arr[i], arr[j]}
@@ -3552,8 +3551,8 @@ Link:
 https://leetcode.com/problems/minimum-cost-to-hire-k-workers/description/?envType=daily-question&envId=2024-05-11
 */
 func mincostToHireWorkers(quality []int, wage []int, k int) float64 {
-    sort_by_wage_over_quality := make([][]float64, len(quality))
-	for i:=0; i<len(quality); i++ {
+	sort_by_wage_over_quality := make([][]float64, len(quality))
+	for i := 0; i < len(quality); i++ {
 		sort_by_wage_over_quality[i] = []float64{float64(wage[i]), float64(quality[i])}
 	}
 	sort.SliceStable(sort_by_wage_over_quality, func(i, j int) bool {
@@ -3567,13 +3566,13 @@ func mincostToHireWorkers(quality []int, wage []int, k int) float64 {
 	)
 
 	quality_sum := float64(0)
-	for i:=0; i<k; i++ {
+	for i := 0; i < k; i++ {
 		lowest_quality.Insert(sort_by_wage_over_quality[i])
 		quality_sum += sort_by_wage_over_quality[i][1]
 	}
 	ratio := sort_by_wage_over_quality[k-1][0] / sort_by_wage_over_quality[k-1][1]
 	record := quality_sum * ratio
-	for i:=k; i<len(sort_by_wage_over_quality); i++ {
+	for i := k; i < len(sort_by_wage_over_quality); i++ {
 		ratio = sort_by_wage_over_quality[i][0] / sort_by_wage_over_quality[i][1]
 		quality_sum -= lowest_quality.Extract()[1]
 		lowest_quality.Insert(sort_by_wage_over_quality[i])
@@ -3615,7 +3614,7 @@ func matrixScore(grid [][]int) int {
 	// Now we are allowed to toggle any row or any column, any number of times
 	// Note that since we can reflect each row, we KNOW that we can make the left column all 1's, which we obviously want to do
 	// The question is - do we flip the left-most column, and then flip rows until they are all 1's? Or do we just flip rows?
-	
+
 	// Try flipping the left-most column, and then row-by-row get all 1's in the left-most column
 	first_record := total
 	for i := 0; i < len(row_ints); i++ {
@@ -3636,7 +3635,7 @@ func matrixScore(grid [][]int) int {
 	for col := 1; col < cols; col++ {
 		one_count := 0
 		for r := 0; r < len(row_ints); r++ {
-			if (row_ints[r] & (1 << (cols - 1 - col)) == (1 << (cols - 1 - col))) {
+			if row_ints[r]&(1<<(cols-1-col)) == (1 << (cols - 1 - col)) {
 				one_count++
 			}
 		}
@@ -3658,7 +3657,7 @@ func matrixScore(grid [][]int) int {
 			v += grid[row][col] << (cols - 1 - col)
 		}
 		row_ints[row] = v
-	} 
+	}
 	second_record := total
 	// Flip all the rows until you have all 1's in the left-most column
 	for i := 0; i < len(row_ints); i++ {
@@ -3673,7 +3672,7 @@ func matrixScore(grid [][]int) int {
 	for col := 1; col < cols; col++ {
 		one_count := 0
 		for r := 0; r < len(row_ints); r++ {
-			if (row_ints[r] & (1 << (cols - 1 - col)) == (1 << (cols - 1 - col))) {
+			if row_ints[r]&(1<<(cols-1-col)) == (1 << (cols - 1 - col)) {
 				one_count++
 			}
 		}
@@ -3687,7 +3686,7 @@ func matrixScore(grid [][]int) int {
 		}
 	}
 
-	return max(first_record, second_record) 
+	return max(first_record, second_record)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3730,14 +3729,137 @@ func exploreFromLocation(row int, col int, grid [][]int) int {
 		// Try up
 		best_from_here = max(best_from_here, exploreFromLocation(row-1, col, new_grid))
 		// Try down
-		best_from_here = max(best_from_here, exploreFromLocation(row + 1, col, new_grid))
+		best_from_here = max(best_from_here, exploreFromLocation(row+1, col, new_grid))
 		// Try left
-		best_from_here = max(best_from_here, exploreFromLocation(row, col - 1, new_grid))
+		best_from_here = max(best_from_here, exploreFromLocation(row, col-1, new_grid))
 		// Try right
-		best_from_here = max(best_from_here, exploreFromLocation(row, col + 1, new_grid))
+		best_from_here = max(best_from_here, exploreFromLocation(row, col+1, new_grid))
 		return total + best_from_here
 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+You are given a 0-indexed 2D matrix grid of size n x n, where (r, c) represents:
+
+A cell containing a thief if grid[r][c] = 1
+An empty cell if grid[r][c] = 0
+You are initially positioned at cell (0, 0). In one move, you can move to any adjacent cell in the grid, including cells containing thieves.
+
+The safeness factor of a path on the grid is defined as the minimum manhattan distance from any cell in the path to any thief in the grid.
+
+Return the maximum safeness factor of all paths leading to cell (n - 1, n - 1).
+
+An adjacent cell of cell (r, c), is one of the cells (r, c + 1), (r, c - 1), (r + 1, c) and (r - 1, c) if it exists.
+
+The Manhattan distance between two cells (a, b) and (x, y) is equal to |a - x| + |b - y|, where |val| denotes the absolute value of val.
+
+Link:
+https://leetcode.com/problems/find-the-safest-path-in-a-grid/description/?envType=daily-question&envId=2024-05-15
+
+NOTE:
+I could not have figured this out without the editorial - and the binary search option was too slow - had to use Djikstra
+*/
+func maximumSafenessFactor(grid [][]int) int {
+	if grid[0][0] == 1 {
+		return 0
+	}
+
+	n := len(grid)
+	thieves := [][]int{}
+	for r := 0; r < n; r++ {
+		for c := 0; c < n; c++ {
+			if grid[r][c] == 1 {
+				thieves = append(thieves, []int{r, c})
+			}
+		}
+	}
+
+	visited := make([][]bool, n)
+	distances := make([][]int, n)
+	for i := 0; i < n; i++ {
+		visited[i] = make([]bool, n)
+		distances[i] = make([]int, n)
+	}
+
+	bfs := linked_list.NewQueue[[]int]()
+	for _, thief := range thieves {
+		visited[thief[0]][thief[1]] = true
+		bfs.Enqueue(thief)
+	}
+	dist := 0
+	for !bfs.Empty() {
+		num := bfs.Length()
+		for i := 0; i < num; i++ {
+			posn := bfs.Dequeue()
+			distances[posn[0]][posn[1]] = dist
+			// Now enqueue the neighbors
+			if posn[0] > 0 && !visited[posn[0]-1][posn[1]] {
+				// Look up
+				visited[posn[0]-1][posn[1]] = true
+				bfs.Enqueue([]int{posn[0] - 1, posn[1]})
+			}
+			if posn[0] < n-1 && !visited[posn[0]+1][posn[1]] {
+				// Look down
+				visited[posn[0]+1][posn[1]] = true
+				bfs.Enqueue([]int{posn[0] + 1, posn[1]})
+			}
+			if posn[1] > 0 && !visited[posn[0]][posn[1]-1] {
+				// Look left
+				visited[posn[0]][posn[1]-1] = true
+				bfs.Enqueue([]int{posn[0], posn[1] - 1})
+			}
+			if posn[1] < n-1 && !visited[posn[0]][posn[1]+1] {
+				// Look right
+				visited[posn[0]][posn[1]+1] = true
+				bfs.Enqueue([]int{posn[0], posn[1] + 1})
+			}
+		}
+		dist++
+	}
+
+	// Use Djikstra's Algorithm to find the best path from the top left to bottom right
+	for i := 0; i < n; i++ {
+		// Refresh visited matrix
+		visited[i] = make([]bool, n)
+	}
+	cell_heap := heap.NewCustomMaxHeap[[]int](func(first, second []int) bool {
+		return distances[first[0]][first[1]] > distances[second[0]][second[1]]
+	})
+	visited[0][0] = true
+	cell_heap.Insert([]int{0,0})
+	min_safety := math.MaxInt
+	for !cell_heap.Empty() {
+		next_cell := cell_heap.Extract()
+		r := next_cell[0]
+		c := next_cell[1]
+		min_safety = min(min_safety, distances[r][c])
+		if r == n - 1 && c == n - 1 {
+			return min_safety
+		}
+		// Now throw the neighbors onto the heap
+		if r > 0 && !visited[r - 1][c] {
+			// Look up
+			visited[r-1][c] = true
+			cell_heap.Insert([]int{r-1,c})
+		}
+		if r < n-1 && !visited[r + 1][c] {
+			// Look down
+			visited[r+1][c] = true
+			cell_heap.Insert([]int{r + 1, c})
+		}
+		if c > 0 && !visited[r][c - 1] {
+			// Look left
+			visited[r][c-1] = true
+			cell_heap.Insert([]int{r, c - 1})
+		}
+		if c < n-1 && !visited[r][c + 1] {
+			// Look right
+			visited[r][c+1] = true
+			cell_heap.Insert([]int{r, c + 1})
+		}
+	}
+
+	return 0
+}
