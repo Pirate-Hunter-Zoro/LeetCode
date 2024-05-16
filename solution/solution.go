@@ -3389,6 +3389,121 @@ func stoneGameVIII(stones []int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
+Alice and Bob continue their games with stones. 
+There is a row of n stones, and each stone has an associated value. 
+You are given an integer array stones, where stones[i] is the value of the ith stone.
+
+Alice and Bob take turns, with Alice starting first. 
+On each turn, the player may remove any stone from stones. 
+The player who removes a stone loses if the sum of the values of all removed stones is divisible by 3. 
+Bob will win automatically if there are no remaining stones (even if it is Alice's turn).
+
+Assuming both players play optimally, return true if Alice wins and false if Bob wins.
+
+Link:
+https://leetcode.com/problems/stone-game-ix/description/
+*/
+func stoneGameIX(stones []int) bool {
+	num_0 := 0
+	num_1 := 0
+	num_2 := 0
+	for _, stone := range stones {
+		mod := stone % 3
+		if mod == 0 {
+			num_0++
+		} else if mod == 1 {
+			num_1++
+		} else {
+			num_2++
+		}
+	}
+	// If at any point a person removes a stone, and that leaves (removed_1 + 2*removed_2) % 3 == 0, then that person loses
+	// What's Alice going to start with? She could try removing a 1 or she could try removing a 2
+	if (num_1 == 0 && num_2 == 0) || (num_1 + num_2 < 2) || (num_1 + 2 * num_2 < 3) {
+		// Alice is screwed
+		return false
+	} else if num_1 == 1 && num_2 == 1 {
+		// Bob is screwed unless num_0 saves him
+		return num_0 % 2 == 0
+	} else {
+		// Can each player avoid making (removed_1 + 2*removed_2) % 3 == 0?
+		// Assuming we were at 1, we CAN'T pick 2. We must pick a 3 or a 1.
+		// Assuming we were at 2, we CAN'T pick 1. We must pick a 3 or a 2.
+		// If we don't think about the 3's yet, that's this kind of picking sequence:
+			// 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, ... 
+				// If we end in a 1, that means num_1 = num_2 + 2
+				// If we end in a 2, that means num_1 = num_2 + 1
+			// OR
+			// 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, ...
+				// If we end in a 2, that means num_2 = num_1 + 2
+				// If we end in a 1, that means num_2 = num_1 + 1
+		if !(num_1 == num_2 + 2 || num_1 == num_2 + 1 || num_2 == num_1 + 2 || num_2 == num_1 + 1) {
+			// Then it won't come down to 3's - the 1's and 2's will eventually total something divisible by 3
+			// Who's going to be the unlucky one?
+			// Play as if there are no num_0's. 
+			// Then if there are an even number of num_0's the result holds. 
+			// If there are an odd number of num_0's the result switches.
+			// SOMEONE is going to have to pick up a stone that will break the pattern - who?
+			if num_1 >= 1 {
+				// Alice can try starting a 1,1,2,1,2,1,...
+				if num_2 >= num_1 {
+					// Ends in a 2,2 - an even number of stones at that point, so Bob loses
+					// UNLESS num_0 is odd
+					if num_0 % 2 == 0 {
+						return true
+					}
+				} else {
+					// Ends in a 1,1 - that implies an odd number of stones
+					// Alice loses unless there are an odd number of num_0's
+					if num_0 % 2 == 1 {
+						return true
+					}
+				}
+			}
+			if num_2 >= 1 {
+				// Alice can try starting a 2,2,1,2,1,2,...
+				if num_1 >= num_2 {
+					// Ends in a 1,1 - an even number of stones at that point, so Bob loses
+					// UNLESS num_0 is odd
+					if num_0 % 2 == 0 {
+						return true
+					}
+				} else {
+					// Ends in a 2,2 - that implies an odd number of stones
+					// Alice loses unless there are an odd number of num_0's
+					if num_0 % 2 == 1 {
+						return true
+					}
+				}
+			}
+			// Bob wins
+			return false
+		} else {
+			// Then it COULD come down to 3's and eventually the stones will run out, so Bob would win
+			// However, maybe that's if we have a 2,2,1,2,1,2,1,... pattern
+			// Maybe Alice can mess that up with a 1,1,2,1,... starter pattern and screw Bob over
+			if num_1 > num_2 {
+				// Then Alice should see what she can do with a 2,2,1,2,1,2,1,... pattern
+				// Someone will be forced to hit a 1,1, which happens on an even number, screwing over Bob
+				if num_0 % 2 == 0 {
+					// Bob can't counter
+					return true
+				}
+			} else if num_2 > num_1 {
+				// Similarly, Alice should see if she can win with a 1,1,2,1,2,1,... pattern
+				if num_0 % 2 == 0 {
+					// Again, Bob can't counter
+					return true
+				}
+			} 
+			return false
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
 You are given an array people where people[i] is the weight of the ith person, and an infinite number of boats where each boat can carry a maximum weight of limit.
 Each boat carries at most two people at the same time, provided the sum of the weight of those people is at most limit.
 
@@ -3863,3 +3978,6 @@ func maximumSafenessFactor(grid [][]int) int {
 
 	return 0
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

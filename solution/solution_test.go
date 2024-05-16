@@ -1388,6 +1388,43 @@ func TestStoneGameVIII(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
 }
 
+func TestStoneGameIX(t *testing.T) {
+	type input struct {
+		stones []int
+	}
+	inputs := []input{
+		{[]int{2,1}},
+		{[]int{2}},
+		{[]int{5,1,2,4,3}},
+		{[]int{2,3}},
+		{[]int{2,2,2,3}},
+		{[]int{20,3,20,17,2,12,15,17,4}},
+		{[]int{19,2,17,20,7,17}},
+		{[]int{1,11,12,17,6}},
+		{[]int{7,10,1,9,19,17,1,9,19}},
+		{[]int{4,1}},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+		false,
+		false,
+		true,
+		true,
+		true,
+		true,
+		true,
+		false,
+	}
+
+	f := func(i input) bool {
+		return stoneGameIX(i.stones)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
 func TestNumRescueBoats(t *testing.T) {
 	type input struct {
 		people []int
