@@ -3981,3 +3981,65 @@ func maximumSafenessFactor(grid [][]int) int {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+Given a binary tree root and an integer target, delete all the leaf nodes with value target.
+
+Note that once you delete a leaf node with value target, if its parent node becomes a leaf node and has the value target, it should also be deleted (you need to continue doing that until you cannot).
+
+Link:
+https://leetcode.com/problems/delete-leaves-with-a-given-value/description/?envType=daily-question&envId=2024-05-17
+*/
+func removeLeafNodes(root *binary_tree.TreeNode, target int) *binary_tree.TreeNode {
+    parents := make(map[*binary_tree.TreeNode]*binary_tree.TreeNode)
+	leaves := &[]*binary_tree.TreeNode{}
+	traverseTree(root, parents, leaves)
+
+	for _, leaf := range *leaves {
+		deleteLeaf(leaf, target, parents)
+	}
+
+	if root.Left == nil && root.Right == nil && root.Val == target {
+		return nil
+	} else {
+		return root
+	}
+}
+
+/*
+Helper function to create the map of nodes to their parents and make a list of root nodes
+*/
+func traverseTree(root *binary_tree.TreeNode, parents map[*binary_tree.TreeNode]*binary_tree.TreeNode, leaves *[]*binary_tree.TreeNode) {
+	if root.Left == nil && root.Right == nil {
+		*leaves = append(*leaves, root)
+	} else {
+		if root.Left != nil {
+			parents[root.Left] = root
+			traverseTree(root.Left, parents, leaves)
+		}
+		if root.Right != nil {
+			parents[root.Right] = root
+			traverseTree(root.Right, parents, leaves)
+		}
+	}
+}
+
+/*
+Helper function to delete the leaf of a binary tree if it has the given value
+*/
+func deleteLeaf(leaf *binary_tree.TreeNode, target int, parents map[*binary_tree.TreeNode]*binary_tree.TreeNode) {
+	if leaf.Val == target {
+		parent, ok := parents[leaf]
+		if ok {
+			if parent.Left == leaf {
+				parent.Left = nil
+			} else {
+				parent.Right = nil
+			}
+			if parent.Left == nil && parent.Right == nil {
+				deleteLeaf(parent, target, parents)
+			}
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

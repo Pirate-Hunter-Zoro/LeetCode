@@ -1714,3 +1714,36 @@ func TestMaximumSafenessFactor(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestRemoveLeafNodes(t *testing.T) {
+	type input struct {
+		root 	*binary_tree.TreeNode
+		target 	int
+	}
+	inputs := []input{
+		{
+			binary_tree.New([]int{1,2,3,2,binary_tree.NULL,2,4}),
+			2,
+		},
+		{
+			binary_tree.New([]int{1,3,3,3,2}),
+			3,
+		},
+		{
+			binary_tree.New([]int{1,2,binary_tree.NULL,2,binary_tree.NULL,2}),
+			2,
+		},
+	}
+
+	expected_outputs := []*binary_tree.TreeNode{
+		binary_tree.New([]int{1, binary_tree.NULL, 3, binary_tree.NULL, 4}),
+		binary_tree.New([]int{1, 3, binary_tree.NULL, binary_tree.NULL, 2}),
+		binary_tree.New([]int{1}),
+	}
+
+	f := func(i input) *binary_tree.TreeNode {
+		return removeLeafNodes(i.root, i.target)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
