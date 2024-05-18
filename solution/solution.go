@@ -3389,13 +3389,13 @@ func stoneGameVIII(stones []int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-Alice and Bob continue their games with stones. 
-There is a row of n stones, and each stone has an associated value. 
+Alice and Bob continue their games with stones.
+There is a row of n stones, and each stone has an associated value.
 You are given an integer array stones, where stones[i] is the value of the ith stone.
 
-Alice and Bob take turns, with Alice starting first. 
-On each turn, the player may remove any stone from stones. 
-The player who removes a stone loses if the sum of the values of all removed stones is divisible by 3. 
+Alice and Bob take turns, with Alice starting first.
+On each turn, the player may remove any stone from stones.
+The player who removes a stone loses if the sum of the values of all removed stones is divisible by 3.
 Bob will win automatically if there are no remaining stones (even if it is Alice's turn).
 
 Assuming both players play optimally, return true if Alice wins and false if Bob wins.
@@ -3419,29 +3419,29 @@ func stoneGameIX(stones []int) bool {
 	}
 	// If at any point a person removes a stone, and that leaves (removed_1 + 2*removed_2) % 3 == 0, then that person loses
 	// What's Alice going to start with? She could try removing a 1 or she could try removing a 2
-	if (num_1 == 0 && num_2 == 0) || (num_1 + num_2 < 2) || (num_1 + 2 * num_2 < 3) {
+	if (num_1 == 0 && num_2 == 0) || (num_1+num_2 < 2) || (num_1+2*num_2 < 3) {
 		// Alice is screwed
 		return false
 	} else if num_1 == 1 && num_2 == 1 {
 		// Bob is screwed unless num_0 saves him
-		return num_0 % 2 == 0
+		return num_0%2 == 0
 	} else {
 		// Can each player avoid making (removed_1 + 2*removed_2) % 3 == 0?
 		// Assuming we were at 1, we CAN'T pick 2. We must pick a 3 or a 1.
 		// Assuming we were at 2, we CAN'T pick 1. We must pick a 3 or a 2.
 		// If we don't think about the 3's yet, that's this kind of picking sequence:
-			// 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, ... 
-				// If we end in a 1, that means num_1 = num_2 + 2
-				// If we end in a 2, that means num_1 = num_2 + 1
-			// OR
-			// 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, ...
-				// If we end in a 2, that means num_2 = num_1 + 2
-				// If we end in a 1, that means num_2 = num_1 + 1
-		if !(num_1 == num_2 + 2 || num_1 == num_2 + 1 || num_2 == num_1 + 2 || num_2 == num_1 + 1) {
+		// 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, ...
+		// If we end in a 1, that means num_1 = num_2 + 2
+		// If we end in a 2, that means num_1 = num_2 + 1
+		// OR
+		// 2, 2, 1, 2, 1, 2, 1, 2, 1, 2, ...
+		// If we end in a 2, that means num_2 = num_1 + 2
+		// If we end in a 1, that means num_2 = num_1 + 1
+		if !(num_1 == num_2+2 || num_1 == num_2+1 || num_2 == num_1+2 || num_2 == num_1+1) {
 			// Then it won't come down to 3's - the 1's and 2's will eventually total something divisible by 3
 			// Who's going to be the unlucky one?
-			// Play as if there are no num_0's. 
-			// Then if there are an even number of num_0's the result holds. 
+			// Play as if there are no num_0's.
+			// Then if there are an even number of num_0's the result holds.
 			// If there are an odd number of num_0's the result switches.
 			// SOMEONE is going to have to pick up a stone that will break the pattern - who?
 			if num_1 >= 1 {
@@ -3449,13 +3449,13 @@ func stoneGameIX(stones []int) bool {
 				if num_2 >= num_1 {
 					// Ends in a 2,2 - an even number of stones at that point, so Bob loses
 					// UNLESS num_0 is odd
-					if num_0 % 2 == 0 {
+					if num_0%2 == 0 {
 						return true
 					}
 				} else {
 					// Ends in a 1,1 - that implies an odd number of stones
 					// Alice loses unless there are an odd number of num_0's
-					if num_0 % 2 == 1 {
+					if num_0%2 == 1 {
 						return true
 					}
 				}
@@ -3465,13 +3465,13 @@ func stoneGameIX(stones []int) bool {
 				if num_1 >= num_2 {
 					// Ends in a 1,1 - an even number of stones at that point, so Bob loses
 					// UNLESS num_0 is odd
-					if num_0 % 2 == 0 {
+					if num_0%2 == 0 {
 						return true
 					}
 				} else {
 					// Ends in a 2,2 - that implies an odd number of stones
 					// Alice loses unless there are an odd number of num_0's
-					if num_0 % 2 == 1 {
+					if num_0%2 == 1 {
 						return true
 					}
 				}
@@ -3485,17 +3485,17 @@ func stoneGameIX(stones []int) bool {
 			if num_1 > num_2 {
 				// Then Alice should see what she can do with a 2,2,1,2,1,2,1,... pattern
 				// Someone will be forced to hit a 1,1, which happens on an even number, screwing over Bob
-				if num_0 % 2 == 0 {
+				if num_0%2 == 0 {
 					// Bob can't counter
 					return true
 				}
 			} else if num_2 > num_1 {
 				// Similarly, Alice should see if she can win with a 1,1,2,1,2,1,... pattern
-				if num_0 % 2 == 0 {
+				if num_0%2 == 0 {
 					// Again, Bob can't counter
 					return true
 				}
-			} 
+			}
 			return false
 		}
 	}
@@ -3943,33 +3943,33 @@ func maximumSafenessFactor(grid [][]int) int {
 		return distances[first[0]][first[1]] > distances[second[0]][second[1]]
 	})
 	visited[0][0] = true
-	cell_heap.Insert([]int{0,0})
+	cell_heap.Insert([]int{0, 0})
 	min_safety := math.MaxInt
 	for !cell_heap.Empty() {
 		next_cell := cell_heap.Extract()
 		r := next_cell[0]
 		c := next_cell[1]
 		min_safety = min(min_safety, distances[r][c])
-		if r == n - 1 && c == n - 1 {
+		if r == n-1 && c == n-1 {
 			return min_safety
 		}
 		// Now throw the neighbors onto the heap
-		if r > 0 && !visited[r - 1][c] {
+		if r > 0 && !visited[r-1][c] {
 			// Look up
 			visited[r-1][c] = true
-			cell_heap.Insert([]int{r-1,c})
+			cell_heap.Insert([]int{r - 1, c})
 		}
-		if r < n-1 && !visited[r + 1][c] {
+		if r < n-1 && !visited[r+1][c] {
 			// Look down
 			visited[r+1][c] = true
 			cell_heap.Insert([]int{r + 1, c})
 		}
-		if c > 0 && !visited[r][c - 1] {
+		if c > 0 && !visited[r][c-1] {
 			// Look left
 			visited[r][c-1] = true
 			cell_heap.Insert([]int{r, c - 1})
 		}
-		if c < n-1 && !visited[r][c + 1] {
+		if c < n-1 && !visited[r][c+1] {
 			// Look right
 			visited[r][c+1] = true
 			cell_heap.Insert([]int{r, c + 1})
@@ -3990,7 +3990,7 @@ Link:
 https://leetcode.com/problems/delete-leaves-with-a-given-value/description/?envType=daily-question&envId=2024-05-17
 */
 func removeLeafNodes(root *binary_tree.TreeNode, target int) *binary_tree.TreeNode {
-    parents := make(map[*binary_tree.TreeNode]*binary_tree.TreeNode)
+	parents := make(map[*binary_tree.TreeNode]*binary_tree.TreeNode)
 	leaves := &[]*binary_tree.TreeNode{}
 	traverseTree(root, parents, leaves)
 
@@ -4053,8 +4053,117 @@ Link:
 https://leetcode.com/problems/binary-tree-cameras/description/
 */
 func minCameraCover(root *binary_tree.TreeNode) int {
-	return math.MaxInt
+	put_camera := make(map[*binary_tree.TreeNode]int)
+	no_camera := make(map[*binary_tree.TreeNode]int)
+	if isLeaf(root) { // We plain have to have a camera
+		return 1
+	} else { // Try putting a camera on the root, and try not putting a camera on the root
+		return min(topDownPutCamera(root, put_camera, no_camera), topDownNoCamera(root, put_camera, no_camera))
+	}
+}
+
+func topDownPutCamera(root *binary_tree.TreeNode, put_camera map[*binary_tree.TreeNode]int, no_camera map[*binary_tree.TreeNode]int) int {
+	_, ok := put_camera[root]
+	if !ok {
+		// Need to solve this problem
+		cameras := 1
+		if root.Right != nil && !isLeaf(root.Right) {
+			// Think about the right side
+			// We can try giving the right a camera
+			record := topDownPutCamera(root.Right, put_camera, no_camera)
+			// We can try covering the right WITHOUT giving it a camera
+			record = min(record, topDownNoCamera(root.Right, put_camera, no_camera))
+			// We can try not covering the right since the root's camera covers it, and making sure the right's children are covered
+			other_record := 0
+			if root.Right.Left != nil {
+				if isLeaf(root.Right.Left) {
+					other_record++
+				} else {
+					other_record += min(topDownPutCamera(root.Right.Left, put_camera, no_camera), topDownNoCamera(root.Right.Left, put_camera, no_camera))
+				}
+			}
+			if root.Right.Right != nil {
+				if isLeaf(root.Right.Right) {
+					other_record++
+				} else {
+					other_record += min(topDownPutCamera(root.Right.Right, put_camera, no_camera), topDownNoCamera(root.Right.Right, put_camera, no_camera))
+				}
+			}
+			record = min(record, other_record)
+			cameras += record
+		} 
+		if root.Left != nil && !isLeaf(root.Left) {
+			// Think about the left side
+			record := topDownPutCamera(root.Left, put_camera, no_camera)
+			record = min(record, topDownNoCamera(root.Left, put_camera, no_camera))
+			other_record := 0
+			if root.Left.Left != nil {
+				if isLeaf(root.Left.Left) {
+					other_record++
+				} else {
+					other_record += min(topDownPutCamera(root.Left.Left, put_camera, no_camera), topDownNoCamera(root.Left.Left, put_camera, no_camera))
+				}
+			}
+			if root.Left.Right != nil {
+				if isLeaf(root.Left.Right) {
+					other_record++
+				} else {
+					other_record += min(topDownPutCamera(root.Left.Right, put_camera, no_camera), topDownNoCamera(root.Left.Right, put_camera, no_camera))
+				}
+			}
+			record = min(record, other_record)
+			cameras += record
+		}
+		put_camera[root] = cameras
+	}
+	return put_camera[root]
+}
+
+func topDownNoCamera(root *binary_tree.TreeNode, put_camera map[*binary_tree.TreeNode]int, no_camera map[*binary_tree.TreeNode]int) int {
+	_, ok := no_camera[root]
+	if !ok {
+		// Need to solve this problem
+		cameras := 0 // For root nodes this would return 0, but we will NEVER call this function on a root node
+		if root.Right == nil {
+			// Left is not nil
+			// Camera must go on the left
+			cameras += topDownPutCamera(root.Left, put_camera, no_camera)
+		} else if root.Left == nil {
+			// Right it not nil
+			// Camera must go on the right
+			cameras += topDownPutCamera(root.Right, put_camera, no_camera)
+		} else {
+			// Both children are not nil
+			// For each child, if they are a root, they HAVE to have a camera
+			// Otherwise, they get to pick if they have a camera
+			// AT LEAST one of the children must have a camera regardless
+			if isLeaf(root.Left) && isLeaf(root.Right) {
+				cameras += 2
+			} else if isLeaf(root.Left) {
+				// Right child has a choice on if it gets a camera
+				cameras += 1 + min(topDownPutCamera(root.Right, put_camera, no_camera), topDownNoCamera(root.Right, put_camera, no_camera))
+			} else if isLeaf(root.Right) {
+				// Left child has a choice on if it gets a camera
+				cameras += 1 + min(topDownPutCamera(root.Left, put_camera, no_camera), topDownNoCamera(root.Left, put_camera, no_camera))
+			} else {
+				// At least one child must have a camera, but as long as one of them has a camera, the other can choose whether or not it gets a camera
+				// Try putting a camera on the left child and giving the right child freedom
+				additional := topDownPutCamera(root.Left, put_camera, no_camera) + min(topDownPutCamera(root.Right, put_camera, no_camera), topDownNoCamera(root.Right, put_camera, no_camera))
+				// Try putting a camera on the right child and giving the left child freedom
+				additional = min(additional, topDownPutCamera(root.Right, put_camera, no_camera) + min(topDownPutCamera(root.Left, put_camera, no_camera), topDownNoCamera(root.Left, put_camera, no_camera)))
+				cameras += additional
+			}
+		}
+		no_camera[root] = cameras
+	}
+	return no_camera[root]
+}
+
+/*
+Helper function to determine if a node is a leaf node
+*/
+func isLeaf(root *binary_tree.TreeNode) bool {
+	return root.Left == nil && root.Right == nil
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
