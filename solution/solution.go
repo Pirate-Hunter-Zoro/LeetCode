@@ -4043,3 +4043,18 @@ func deleteLeaf(leaf *binary_tree.TreeNode, target int, parents map[*binary_tree
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given the root of a binary tree. We install cameras on the tree nodes where each camera at a node can monitor its parent, itself, and its immediate children.
+
+Return the minimum number of cameras needed to monitor all nodes of the tree.
+
+Link:
+https://leetcode.com/problems/binary-tree-cameras/description/
+*/
+func minCameraCover(root *binary_tree.TreeNode) int {
+	return math.MaxInt
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
