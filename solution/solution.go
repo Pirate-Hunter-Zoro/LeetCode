@@ -4360,3 +4360,116 @@ func maximizeSum(nums []int, xors []int, root int, connections [][]int, visited 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+The following data structure will be helpful in the preceding problem.
+*/
+type node struct {
+	id					int
+	cost 				int
+	visited				bool
+	neighbors 			[]*node
+	subtree_records 	[]int
+}
+
+/*
+You are given an undirected tree with n nodes labeled from 0 to n - 1, and rooted at node 0. You are given a 2D integer array edges of length n - 1, where edges[i] = [ai, bi] indicates that there is an edge between nodes ai and bi in the tree.
+
+You are also given a 0-indexed integer array cost of length n, where cost[i] is the cost assigned to the ith node.
+
+You need to place some coins on every node of the tree. 
+The number of coins to be placed at node i can be calculated as:
+
+- If size of the subtree of node i is less than 3, place 1 coin.
+- Otherwise, place an amount of coins equal to the maximum product of cost values assigned to 3 distinct nodes in the subtree of node i. 
+	If this product is negative, place 0 coins.
+	Return an array coin of size n such that coin[i] is the number of coins placed at node i.
+
+Link:
+https://leetcode.com/problems/find-number-of-coins-to-place-in-tree-nodes/description/
+*/
+func placedCoins(edges [][]int, cost []int) []int64 {
+	nodes := make([]*node, len(cost))
+	for idx, c := range cost {
+		nodes[idx] = &node{id: idx, cost: c}
+	}
+
+	for _, edge := range edges {
+		first := edge[0]
+		second := edge[1]
+		nodes[first].neighbors = append(nodes[first].neighbors, nodes[second])
+		nodes[second].neighbors = append(nodes[second].neighbors, nodes[first])
+	}
+
+	coin_assignments := &[]int64{}
+	for i:=0; i<len(cost); i++ {
+		(*coin_assignments) = append(*coin_assignments, -1)
+	}
+	assignCoins(nodes[0], coin_assignments)
+
+	return *coin_assignments
+}
+
+/*
+Helper function to solve the preceding problem recursively
+*/
+func assignCoins(root *node, coin_assignments *[]int64) {
+	// Visit all 'children' of this node first
+	root.visited = true
+	lowest_values := heap.NewMinHeap[int]()
+	highest_values := heap.NewMaxHeap[int]()
+	lowest_values.Insert(root.cost)
+	highest_values.Insert(root.cost)
+	for _, n := range root.neighbors {
+		if !n.visited {
+			assignCoins(n, coin_assignments)
+			for _, v := range n.subtree_records {
+				lowest_values.Insert(v)
+				highest_values.Insert(v)
+			}
+		}
+	}
+
+	// Obtain all the new extreme values - 3 lowest and 3 highest
+	if lowest_values.Size() > 6 {
+		// This will take some finagling...
+		for i:=0; i<3; i++ {
+			root.subtree_records = append(root.subtree_records, lowest_values.Extract())
+		}
+		for i:=0; i<3; i++ {
+			root.subtree_records = append(root.subtree_records, highest_values.Extract())
+		}
+		// Switch the 4th and 6th elements to preserve orders
+		root.subtree_records[3], root.subtree_records[5] = root.subtree_records[5], root.subtree_records[3]
+	} else {
+		// We just need to empty the increasing heap
+		for !lowest_values.Empty() {
+			root.subtree_records = append(root.subtree_records, lowest_values.Extract())
+		}
+	}
+
+	// Now update the value assigned to this tree
+	if len(root.subtree_records) >= 3 {
+		// Several things to try
+		// Top 3
+		top_3 := int64(root.subtree_records[len(root.subtree_records)-1]) * int64(root.subtree_records[len(root.subtree_records)-2]) * int64(root.subtree_records[len(root.subtree_records)-3])
+		// Bottom 3 
+		bottom_3 := int64(root.subtree_records[0]) * int64(root.subtree_records[1]) * int64(root.subtree_records[2])
+		// Bottom 2 and top
+		bottom_2_top := int64(root.subtree_records[0]) * int64(root.subtree_records[1]) * int64(root.subtree_records[len(root.subtree_records)-1])
+		// Bottom and top 2
+		bottom_top_2 := int64(root.subtree_records[0]) * int64(root.subtree_records[len(root.subtree_records)-2]) * int64(root.subtree_records[len(root.subtree_records)-1])
+
+		(*coin_assignments)[root.id] = max(
+			0,
+			top_3,
+			bottom_3,
+			bottom_2_top,
+			bottom_top_2,
+		)
+	} else {
+		(*coin_assignments)[root.id] = 1
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

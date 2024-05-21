@@ -12,6 +12,11 @@ func NewMaxHeap[K cmp.Ordered]() *MaxHeap[K] {
 	return &MaxHeap[K]{count:  0}
 }
 
+// Return size of the underlying array
+func (h *MaxHeap[K]) Size() int {
+	return len(h.array)
+}
+
 // Insert adds an element to the heap
 func (h *MaxHeap[K]) Insert(key K) {
 	h.array = append(h.array, key)

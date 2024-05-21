@@ -1756,8 +1756,8 @@ func TestMinCameraCover(t *testing.T) {
 	inputs := []input{
 		{binary_tree.New([]int{0, 0, binary_tree.NULL, 0, 0})},
 		{binary_tree.New([]int{0, 0, binary_tree.NULL, 0, binary_tree.NULL, 0, binary_tree.NULL, binary_tree.NULL, 0})},
-		{binary_tree.New([]int{0,0,0,binary_tree.NULL,0,binary_tree.NULL,0})},
-		{binary_tree.New([]int{0,0,binary_tree.NULL,binary_tree.NULL,0,0,binary_tree.NULL,binary_tree.NULL,0,0})},
+		{binary_tree.New([]int{0, 0, 0, binary_tree.NULL, 0, binary_tree.NULL, 0})},
+		{binary_tree.New([]int{0, 0, binary_tree.NULL, binary_tree.NULL, 0, 0, binary_tree.NULL, binary_tree.NULL, 0, 0})},
 	}
 
 	expected_outputs := []int{
@@ -1776,30 +1776,30 @@ func TestMinCameraCover(t *testing.T) {
 
 func TestMaximumValueSum(t *testing.T) {
 	type input struct {
-		nums 	[]int
-		k 		int
-		edges 	[][]int
+		nums  []int
+		k     int
+		edges [][]int
 	}
 	inputs := []input{
 		{
-			[]int{1,2,1},
+			[]int{1, 2, 1},
 			3,
-			[][]int{{0,1},{0,2}},
+			[][]int{{0, 1}, {0, 2}},
 		},
 		{
-			[]int{2,3},
+			[]int{2, 3},
 			7,
-			[][]int{{0,1}},
+			[][]int{{0, 1}},
 		},
 		{
-			[]int{7,7,7,7,7,7},
+			[]int{7, 7, 7, 7, 7, 7},
 			3,
-			[][]int{{0,1},{0,2},{0,3},{0,4},{0,5}},
+			[][]int{{0, 1}, {0, 2}, {0, 3}, {0, 4}, {0, 5}},
 		},
 		{
-			[]int{24,78,1,97,44},
+			[]int{24, 78, 1, 97, 44},
 			6,
-			[][]int{{0,2},{1,2},{4,2},{3,4}},
+			[][]int{{0, 2}, {1, 2}, {4, 2}, {3, 4}},
 		},
 	}
 
@@ -1812,6 +1812,79 @@ func TestMaximumValueSum(t *testing.T) {
 
 	f := func(i input) int64 {
 		return maximumValueSum(i.nums, i.k, i.edges)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestPlacedCoins(t *testing.T) {
+	type input struct {
+		edges [][]int
+		cost  []int
+	}
+
+	inputs := []input{
+		{
+			[][]int{
+				{0, 1},
+				{0, 2},
+				{0, 3},
+				{0, 4},
+				{0, 5},
+			},
+			[]int{
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+			},
+		},
+		{
+			[][]int{
+				{0, 1},
+				{0, 2},
+				{1, 3},
+				{1, 4},
+				{1, 5},
+				{2, 6},
+				{2, 7},
+				{2, 8},
+			},
+			[]int{
+				1,
+				4,
+				2,
+				3,
+				5,
+				7,
+				8,
+				-4,
+				2,
+			},
+		},
+		{
+			[][]int{
+				{0, 1},
+				{0, 2},
+			},
+			[]int{
+				1,
+				2,
+				-2,
+			},
+		},
+	}
+
+	expected_outputs := [][]int64{
+		{120,1,1,1,1,1},
+		{280,140,32,1,1,1,1,1,1},
+		{0,1,1},
+	}
+
+	f := func(i input) []int64{
+		return placedCoins(i.edges, i.cost)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

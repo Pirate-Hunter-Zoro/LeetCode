@@ -14,6 +14,11 @@ func NewMinHeap[K cmp.Ordered]() *MinHeap[K] {
 	return &MinHeap[K]{count: 0}
 }
 
+// Return size of the underlying array
+func (h *MinHeap[K]) Size() int {
+	return len(h.array)
+}
+
 // Insert adds an element to the heap
 func (h *MinHeap[K]) Insert(key K) {
 	h.array = append(h.array, key)
