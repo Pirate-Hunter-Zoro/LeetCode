@@ -1773,3 +1773,46 @@ func TestMinCameraCover(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMaximumValueSum(t *testing.T) {
+	type input struct {
+		nums 	[]int
+		k 		int
+		edges 	[][]int
+	}
+	inputs := []input{
+		{
+			[]int{1,2,1},
+			3,
+			[][]int{{0,1},{0,2}},
+		},
+		{
+			[]int{2,3},
+			7,
+			[][]int{{0,1}},
+		},
+		{
+			[]int{7,7,7,7,7,7},
+			3,
+			[][]int{{0,1},{0,2},{0,3},{0,4},{0,5}},
+		},
+		{
+			[]int{24,78,1,97,44},
+			6,
+			[][]int{{0,2},{1,2},{4,2},{3,4}},
+		},
+	}
+
+	expected_outputs := []int64{
+		6,
+		9,
+		42,
+		260,
+	}
+
+	f := func(i input) int64 {
+		return maximumValueSum(i.nums, i.k, i.edges)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

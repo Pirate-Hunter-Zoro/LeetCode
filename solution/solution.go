@@ -4191,8 +4191,8 @@ func maximumValueSum(nums []int, k int, edges [][]int) int64 {
 	dp[0] = make([]int64, n)
 	dp[1] = make([]int64, n)
 	for i:=0; i<n; i++ {
-		dp[0][i] = math.MinInt64
-		dp[1][i] = math.MinInt64
+		dp[0][i] = int64(math.MinInt64)
+		dp[1][i] = int64(math.MinInt64)
 	}
 
 	// Determine how much each of our nodes changes if we xor it
@@ -4200,61 +4200,159 @@ func maximumValueSum(nums []int, k int, edges [][]int) int64 {
 	for idx, val := range nums {
 		xors[idx] = val ^ k
 	}
-	differences := make([]int64, n)
-	for idx := range nums {
-		// Store original value minus XOR
-		differences[idx] = int64(nums[idx]) - int64(xors[idx])
-	}
 
-	// Now keep track of all the children_by_parent of our nodes
+	// Now keep track of all the connections of our nodes
 	// Creating a graph based off the edges will yield exactly one node not having a parent - we'll make that node our starting point
-	children_by_parent := make([][]int, n)
-	have_parent := make([]bool, n)
+	connections := make([][]int, n)
 	for _, edge := range edges {
-		children_by_parent[edge[0]] = append(children_by_parent[edge[0]], edge[1])
-		have_parent[edge[1]] = true
-	}
-	// Sort all children by how much they decrease by XORing - so values at the front gain MORE from being XORed
-	for _, children := range children_by_parent {
-		sort.SliceStable(children, func(i, j int) bool {
-			return differences[children[i]] < differences[children[j]]
-		})
+		connections[edge[0]] = append(connections[edge[0]], edge[1])
+		connections[edge[1]] = append(connections[edge[1]], edge[0])
 	}
 
-	// We need to find the root - which has no root
+	// Find some node with only one connection - they can be our parent
 	root := 0
-	for idx, has_parent := range have_parent {
-		if !has_parent {
+	for idx, children := range connections {
+		if len(children) == 1 {
 			root = idx
 			break
 		}
 	}
 
-	// Now we need to solve the problem
-	maximizeSum(nums, xors, root, children_by_parent, have_parent, dp)
+	// Now we need to solve the problem - just make the root 0
+	visited := make([]bool, n)
+	maximizeSum(nums, xors, root, connections, visited, dp)
 	return dp[0][root] // equal to dp[1][root] because root has no parent
 }
 
 /*
 Top-down helper method to maximize the sum of a sub-tree
 */
-func maximizeSum(nums []int, xors []int, root int, children_by_parent [][]int, have_parent []bool, dp [][]int64) {
-	if dp[0][root] == math.MinInt64 {
+func maximizeSum(nums []int, xors []int, root int, connections [][]int, visited []bool, dp [][]int64) {
+	if dp[0][root] == int64(math.MinInt64) {
 		// Need to solve this problem
-		if !have_parent[root] {
-			// dp[0][root] == dp[1][root]
-			if len(children_by_parent[root]) == 0 { // No XORing possible...
+		visited[root] = true
+		children := []int{}
+		for _, connection := range connections[root] {
+			// That firstly entails solving it for all children
+			if !visited[connection] {
+				maximizeSum(nums, xors, connection, connections, visited, dp)
+				children = append(children, connection)
+			}
+		}
+		// Sort the children such that children at the beginning benefit more from XORing
+		sort.SliceStable(children, func(i, j int) bool {
+			xor_i := dp[1][children[i]]
+			no_xor_i := dp[0][children[i]]
+			diff_i := no_xor_i - xor_i
+
+			xor_j := dp[1][children[j]]
+			no_xor_j := dp[0][children[j]]
+			diff_j := no_xor_j - xor_j
+
+			return diff_i < diff_j
+		})
+		// How many children benefit from xoring?
+		differences := make([]int64, len(children))
+		for idx, child := range children {
+			xor_i := dp[1][child]
+			no_xor_i := dp[0][child]
+			diff_i := no_xor_i - xor_i
+			differences[idx] = diff_i
+		}
+		num_children_want_xor := algorithm.BinarySearchMeetOrLower(differences, 0) + 1
+		// First, assume that everyone who wants to be xored - including the root - gets xored - and we'll subtract as needed
+		dp[0][root] = int64(max(nums[root], xors[root]))
+		dp[1][root] = int64(max(nums[root], xors[root]))
+		for i := range differences {
+			if differences[i] >= 0 {
+				// Go with non-xoring
+				dp[0][root] += dp[0][children[i]]
+				dp[1][root] += dp[0][children[i]]
+			} else {
+				// Go with xoring
+				dp[0][root] += dp[1][children[i]]
+				dp[1][root] += dp[1][children[i]]
+			}
+		}
+		if len(children) == 1 && !visited[children[0]] { // NO PARENT
+			// Then dp[0][root] == dp[1][root]
+			if len(children) == 0 { // No XORing possible...
 				dp[0][root] = int64(nums[root])
 				dp[1][root] = int64(nums[root])
 			} else { // Only XORing by the children possible...
-
+				// If we xor an even number of edges, root's value stays the same
+				// Otherwise, root's value goes to its xor
+				child_loss := int64(0)
+				node_loss := int64(0)
+				if (num_children_want_xor % 2 == 0) && nums[root] < xors[root] {
+					// We're going to need to decide - should we stop one of our children from getting xored when they want to, force an extra one to be xored, or force the root to NOT be xored?
+					child_loss_prevent_xor := int64(math.MaxInt64)
+					if num_children_want_xor > 0 {
+						child_loss_prevent_xor = dp[1][children[num_children_want_xor-1]] - dp[0][children[num_children_want_xor-1]]
+					}
+					child_loss_force_extra_xor := int64(math.MaxInt64)
+					if num_children_want_xor < len(children) {
+						child_loss_force_extra_xor = dp[0][children[num_children_want_xor]] - dp[1][children[num_children_want_xor]]
+					}
+					child_loss = min(child_loss_prevent_xor, child_loss_force_extra_xor)
+					node_loss = int64(xors[root]) - int64(nums[root])
+				} else if (num_children_want_xor % 2 == 1) && xors[root] < nums[root] {
+					// Then decide - should we stop one of our children from getting xored, force an extra to be xored, or force our root to be xored?
+					child_loss_prevent_xor := dp[1][children[num_children_want_xor-1]] - dp[0][children[num_children_want_xor-1]]
+					child_loss_force_extra_xor := int64(math.MaxInt64)
+					if num_children_want_xor < len(children) {
+						child_loss_force_extra_xor = dp[0][children[num_children_want_xor]] - dp[1][children[num_children_want_xor]]
+					}
+					child_loss = min(child_loss_prevent_xor, child_loss_force_extra_xor)
+					node_loss = int64(nums[root]) - int64(xors[root])
+				}
+				dp[0][root] -= min(child_loss, node_loss)
+				dp[1][root] -= min(child_loss, node_loss)
 			}
-		} else {
-			if len(children_by_parent[root]) == 0 { // No children - only XORing by parent possible
+		} else { // The root does have a parent
+			child_loss_prevent_xor := int64(math.MaxInt64)
+			if num_children_want_xor > 0 {
+				child_loss_prevent_xor = dp[1][children[num_children_want_xor-1]] - dp[0][children[num_children_want_xor-1]]
+			}
+			child_loss_force_extra_xor := int64(math.MaxInt64)
+			if num_children_want_xor < len(children) {
+				child_loss_force_extra_xor = dp[0][children[num_children_want_xor]] - dp[1][children[num_children_want_xor]]
+			}
+			child_loss := min(child_loss_prevent_xor, child_loss_force_extra_xor)
+			node_loss := int64(max(nums[root], xors[root]) - min(nums[root], xors[root]))
+			if len(children) > 0 { // XORing by the parent AND by children possible
+				// Suppose we decide we WILL xor the root with its parent
+				// Xoring an EVEN number of children will leave the root xored - we could add or take away a child xor to change that
+				old_node_loss := node_loss
+				old_child_loss := child_loss
+				if (num_children_want_xor % 2 == 0) && (xors[root] > nums[root]) {
+					// Then no use exploring forcing the root or any children to be xored/not-xored against its wishes
+					node_loss = 0
+					child_loss = 0
+				} else if (num_children_want_xor % 2 == 1) && (nums[root] > xors[root]) {
+					// Same
+					node_loss = 0
+					child_loss = 0
+				}
+				dp[1][root] -= int64(min(node_loss, child_loss))
+
+				node_loss = old_node_loss
+				child_loss = old_child_loss
+				// Similarly, if we will NOT xor the root with its parent
+				// Xoring an ODD number of children will leave the root xored - we could add or take away a child xor to change that
+				if (num_children_want_xor % 2 == 1) && (xors[root] > nums[root]) {
+					// Then no use exploring forcing the root or any children to be xored/not-xored against its wishes
+					node_loss = 0
+					child_loss = 0
+				} else if (num_children_want_xor % 2 == 0) && (nums[root] > xors[root]) {
+					// Same
+					node_loss = 0
+					child_loss = 0
+				}
+				dp[0][root] -= int64(min(node_loss, child_loss))
+			} else { // No children
 				dp[0][root] = int64(nums[root])
 				dp[1][root] = int64(xors[root])
-			} else { // XORing by the parent AND by children possible
-				
 			}
 		}
 	}
