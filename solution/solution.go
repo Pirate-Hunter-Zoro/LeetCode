@@ -4182,7 +4182,83 @@ Link:
 https://leetcode.com/problems/find-the-maximum-sum-of-node-values/description/?envType=daily-question&envId=2024-05-19
 */
 func maximumValueSum(nums []int, k int, edges [][]int) int64 {
-	return 0
+	n := len(nums)
+
+	// From the hint:
+	// Let dp[b][i] be the best subtree sum we can achieve starting at node i, given that we either HAVE XORed the edge to the parent (b=1) or have not (b=0)
+	// This is a tree, so we can make any node the root node
+	dp := make([][]int64, 2)
+	dp[0] = make([]int64, n)
+	dp[1] = make([]int64, n)
+	for i:=0; i<n; i++ {
+		dp[0][i] = math.MinInt64
+		dp[1][i] = math.MinInt64
+	}
+
+	// Determine how much each of our nodes changes if we xor it
+	xors := make([]int, n)
+	for idx, val := range nums {
+		xors[idx] = val ^ k
+	}
+	differences := make([]int64, n)
+	for idx := range nums {
+		// Store original value minus XOR
+		differences[idx] = int64(nums[idx]) - int64(xors[idx])
+	}
+
+	// Now keep track of all the children_by_parent of our nodes
+	// Creating a graph based off the edges will yield exactly one node not having a parent - we'll make that node our starting point
+	children_by_parent := make([][]int, n)
+	have_parent := make([]bool, n)
+	for _, edge := range edges {
+		children_by_parent[edge[0]] = append(children_by_parent[edge[0]], edge[1])
+		have_parent[edge[1]] = true
+	}
+	// Sort all children by how much they decrease by XORing - so values at the front gain MORE from being XORed
+	for _, children := range children_by_parent {
+		sort.SliceStable(children, func(i, j int) bool {
+			return differences[children[i]] < differences[children[j]]
+		})
+	}
+
+	// We need to find the root - which has no root
+	root := 0
+	for idx, has_parent := range have_parent {
+		if !has_parent {
+			root = idx
+			break
+		}
+	}
+
+	// Now we need to solve the problem
+	maximizeSum(nums, xors, root, children_by_parent, have_parent, dp)
+	return dp[0][root] // equal to dp[1][root] because root has no parent
+}
+
+/*
+Top-down helper method to maximize the sum of a sub-tree
+*/
+func maximizeSum(nums []int, xors []int, root int, children_by_parent [][]int, have_parent []bool, dp [][]int64) {
+	if dp[0][root] == math.MinInt64 {
+		// Need to solve this problem
+		if !have_parent[root] {
+			// dp[0][root] == dp[1][root]
+			if len(children_by_parent[root]) == 0 { // No XORing possible...
+				dp[0][root] = int64(nums[root])
+				dp[1][root] = int64(nums[root])
+			} else { // Only XORing by the children possible...
+
+			}
+		} else {
+			if len(children_by_parent[root]) == 0 { // No children - only XORing by parent possible
+				dp[0][root] = int64(nums[root])
+				dp[1][root] = int64(xors[root])
+			} else { // XORing by the parent AND by children possible
+				
+			}
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
