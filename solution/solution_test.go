@@ -1953,3 +1953,42 @@ func TestCollectTheCoins(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestBeautifulSubsets(t *testing.T) {
+	type input struct {
+		nums []int
+		k 	 int
+	}
+
+	inputs := []input{
+		{
+			[]int{2,4,6},
+			2,
+		},
+		{
+			[]int{1},
+			1,
+		},
+		{
+			[]int{10,4,5,7,2,1},
+			3,
+		},
+	}
+
+	expected_outputs := []int{
+		4,
+		1,
+		23,
+	}
+
+	f := func(i input) int {
+		return beautifulSubsets(i.nums, i.k)
+	}
+
+	fast_f := func(i input) int {
+		return countBeautifulSubsets(i.nums, i.k)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+	testResults(t, fast_f, inputs, expected_outputs)
+}

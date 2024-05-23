@@ -4578,13 +4578,106 @@ A subset of nums is beautiful if it does not contain two integers with an absolu
 
 Return the number of non-empty beautiful subsets of the array nums.
 
-A subset of nums is an array that can be obtained by deleting some (possibly none) elements from nums. Two subsets are different if and only if the chosen indices to delete are different.
+A subset of nums is an array that can be obtained by deleting some (possibly none) elements from nums. 
+Two subsets are different if and only if the chosen indices to delete are different.
 
 Link:
 https://leetcode.com/problems/the-number-of-beautiful-subsets/description/?envType=daily-question&envId=2024-05-23
 */
 func beautifulSubsets(nums []int, k int) int {
-	return 0
+	// You COULD generate all possible subsets - the input size is small enough to do this and LeetCode accepts it
+	n := len(nums)
+	set_counter := 0
+	beautiful_count := 0
+	for set_counter < ((1 << n)-1) { // 2^n
+		set_counter++
+		set := make(map[int]bool)
+		for i:=0; i<n; i++ {
+			if ((1 << (i)) & (set_counter)) == (1 << (i)) {
+				// element i IS in our current subset
+				_, ok := set[nums[i]]
+				if !ok {
+					set[nums[i]] = true
+				}
+			}
+		}
+		// Now that we have out subset, see if it is beautiful
+		beautiful := true
+		for v := range set {
+			lower := v - k
+			upper := v + k
+			_, ok := set[lower]
+			if !ok {
+				_, ok := set[upper]
+				if ok {
+					beautiful = false
+					break
+				}
+			} else {
+				beautiful = false
+				break
+			}
+		}
+		if beautiful {
+			beautiful_count++
+		}
+	}
+	return beautiful_count
+}
+
+/*
+BUT the editorial on LeetCode gave a much better and faster solution technique that I'm going to implement here...
+*/
+func countBeautifulSubsets(nums []int, k int) int {
+	// Look at each element in nums, and group them all by remainder when dividing by k.
+	// Further, within each remainder group, keep a count of how many of each element are present
+	nums_by_count_group_mod_k := [][]int{}
+	group_by_mod := make(map[int]map[int]int)
+	for _, num := range nums {
+		mod := num % k
+		_, ok := group_by_mod[mod]
+		if !ok {
+			group_by_mod[mod] = make(map[int]int)
+		}
+		_, ok = group_by_mod[mod][num]
+		if !ok {
+			group_by_mod[mod][num] = 1
+		} else {
+			group_by_mod[mod][num]++
+		}
+	}
+	for _, num_map := range group_by_mod {
+		this_mod := [][]int{}
+		for num, count := range num_map {
+			this_mod = append(this_mod, []int{num, count})
+		}
+		sort.SliceStable(this_mod, func(i, j int) bool {
+			return this_mod[i][0] < this_mod[j][0]
+		})
+		nums_by_count_group_mod_k = append(nums_by_count_group_mod_k, this_mod...)
+	}
+	// Now we have elements and their counts stored in an array, with elements of the same modulus k group next to each other
+	n := len(nums_by_count_group_mod_k)
+	counts := make([]int, n)
+	counts[n-1] = (1 << nums_by_count_group_mod_k[n-1][1]) - 1 // However many of that last element there are, we can pick any NON-EMPTY subset
+	if n > 1 {
+		counts[n-2] = (1 << nums_by_count_group_mod_k[n-2][1]) - 1 + counts[n-1] // ONLY include this element, or completely exclude it.
+		if max(nums_by_count_group_mod_k[n-1][0], nums_by_count_group_mod_k[n-2][0]) - min(nums_by_count_group_mod_k[n-1][0], nums_by_count_group_mod_k[n-2][0]) != k {
+			// Include ANY non-empty number of both this element and non-empty number of the one before it.
+			counts[n-2] += ((1 << nums_by_count_group_mod_k[n-2][1]) - 1) * counts[n-1]
+		}
+		for i := n-3; i>=0; i-- {
+			counts[i] = (1 << nums_by_count_group_mod_k[i][1]) - 1 + counts[i+1] // Either ONLY include this element, or completely exclude it.
+			if max(nums_by_count_group_mod_k[i][0], nums_by_count_group_mod_k[i+1][0]) - min(nums_by_count_group_mod_k[i][0], nums_by_count_group_mod_k[i+1][0]) != k {
+				// Include ANY non-empty number of both this element and non-empty number of the one before it.
+				counts[i] += ((1 << nums_by_count_group_mod_k[i][1]) - 1) * counts[i+1]
+			} else {
+				// Then this number is NOT compatible with the preceding number, so since the numbers grouped by mod k are SORTED per mod, it IS compatible with the NEXT preceding number
+				counts[i] += ((1 << nums_by_count_group_mod_k[i][1]) - 1) * counts[i+2]
+			}
+		}
+	}
+	return counts[0]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
