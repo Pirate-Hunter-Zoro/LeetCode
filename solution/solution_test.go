@@ -1889,3 +1889,67 @@ func TestPlacedCoins(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestCollectTheCoins(t *testing.T) {
+	type input struct {
+		coins 	[]int
+		edges 	[][]int
+	}
+
+	inputs := []input{
+		{
+			[]int{1,0,0,0,0,1},
+			[][]int{
+				{0,1},
+				{1,2},
+				{2,3},
+				{3,4},
+				{4,5},
+			},
+		},
+		{
+			[]int{0,0,0,1,1,0,0,1},
+			[][]int{
+				{0,1},
+				{0,2},
+				{1,3},
+				{1,4},
+				{2,5},
+				{5,6},
+				{5,7},
+			},
+		},
+		{
+			[]int{1,0,1,1,1,0,0,1,1,0,1,1,0,0,0,0},
+			[][]int{
+				{0,1},
+				{1,2},
+				{1,3},
+				{3,4},
+				{3,5},
+				{4,6},
+				{2,7},
+				{7,8},
+				{3,9},
+				{8,10},
+				{8,11},
+				{6,12},
+				{7,13},
+				{11,14},
+				{10,15},
+			},
+		},
+	}
+
+	expected_outputs := []int{
+		2,
+		2,
+		4,
+	}
+
+	f := func(i input) int {
+		return collectTheCoins(i.coins, i.edges)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

@@ -4491,7 +4491,82 @@ Link:
 https://leetcode.com/problems/collect-coins-in-a-tree/description/
 */
 func collectTheCoins(coins []int, edges [][]int) int {
-    return 0
+	// The hints on LeetCode were very helpful...
+	// Firstly, any leaf node (one connection) without a coin is redundant. Remove them.
+	// Secondly, in the resulting graph we have our leaf nodes and MAYBE their parents (if and only if that parent is connected to <2 non-leaf nodes) to remove, because those nodes still do not need to be reached directly.
+	// All remaining nodes MUST be reached, which means all such edges in that subtree (# remaining nodes - 1) must be traversed twice.
+	// So once you obtain the resulting graph, RETURN max(0, num_nodes-1)*2
+
+	graph := make(map[int]map[int]bool) // An adjacency list of children
+	// Keep track of the nodes you will need to delete from adjacency lists from which nodes
+	to_delete := make(map[int]map[int]bool)
+	for i:=0; i<=len(edges); i++ {
+		graph[i] = make(map[int]bool)
+		to_delete[i] = make(map[int]bool)
+	}
+	for _, edge := range edges {
+		graph[edge[0]][edge[1]] = true
+		graph[edge[1]][edge[0]] = true
+	}
+
+	// First remove all redundant nodes - which needs to be done iteratively
+	// I timed out without using this queue idea - which I got from the following source:
+	// https://leetcode.com/problems/collect-coins-in-a-tree/solutions/3343497/easy-bfs-intuition-explained-o-n-tc-and-sc-trim-c-java/
+	leaf_queue := linked_list.NewQueue[int]()
+	for node, neighbors := range graph {
+		if len(neighbors) == 1 && coins[node] == 0 {
+			leaf_queue.Enqueue(node)
+		}
+	}
+	for !leaf_queue.Empty() {
+		leaf := leaf_queue.Dequeue()
+		for parent := range graph[leaf] {
+			// There will only be one parent
+			delete(graph[parent], leaf)
+			if len(graph[parent]) == 1 && coins[parent] == 0 {
+				leaf_queue.Enqueue(parent)
+			}
+		}
+		delete(graph, leaf)
+	}
+
+	// Now delete all leaf nodes and their respective parent IF AND ONLY IF that parent is connected to <2 NON-LEAF nodes
+	parent_for_removal := make(map[int]bool)
+	for node, neighbors := range graph {
+		if len(neighbors) == 1 {
+			for parent := range neighbors {
+				// There will only be one parent 
+				// The parent MAY ALSO need to be deleted
+				_, ok := parent_for_removal[parent]
+				if !ok {
+					// We need to see if this node should be deleted - does it have less than 2 non-node neighbors?
+					non_leaves := 0
+					for other_neighbor := range graph[parent] {
+						if len(graph[other_neighbor]) > 1 {
+							non_leaves++
+							if non_leaves > 1 {
+								break
+							}
+						}
+					}
+					parent_for_removal[parent] = non_leaves < 2
+					// We're NOT actually going to have to remove parent from ITS remaining neighbors' lists.
+					// That's because this is the last phase of removal we will do and afterwards will only care about the number of nodes.
+				}
+			}
+			delete(graph, node)
+		}
+	}
+
+	// delete all parents marked for removal
+	for node, delete_it := range parent_for_removal {
+		if delete_it {
+			delete(graph, node)
+		}
+	}
+
+	// Now return the number of remaining edges times 2
+    return max(0, len(graph) - 1) * 2
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
