@@ -1992,3 +1992,41 @@ func TestBeautifulSubsets(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
 	testResults(t, fast_f, inputs, expected_outputs)
 }
+
+func TestMaxScoreWords(t *testing.T) {
+	type input struct {
+		words 	[]string
+		letters []byte
+		score 	[]int
+	}
+
+	inputs := []input{
+		{
+			[]string{"dog","cat","dad","good"},
+			[]byte{'a','a','c','d','d','d','g','o','o'},
+			[]int{1,0,9,5,0,0,3,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0},
+		},
+		{
+			[]string{"xxxz","ax","bx","cx"},
+			[]byte{'z','a','b','c','x','x','x'},
+			[]int{4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,10},
+		},
+		{
+			[]string{"leetcode"},
+			[]byte{'l','e','t','c','o','d'},
+			[]int{0,0,1,1,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0},
+		},
+	}
+
+	expected_outputs := []int{
+		23, // "dad" and "good"
+		27, // "ax", "bx", and "cx"
+		0, // No words can be formed
+	}
+
+	f := func(i input) int {
+		return maxScoreWords(i.words, i.letters, i.score)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

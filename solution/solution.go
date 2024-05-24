@@ -4682,3 +4682,120 @@ func countBeautifulSubsets(nums []int, k int) int {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+Given a list of words, list of  single letters (might be repeating) and score of every character.
+
+Return the maximum score of any valid set of words formed by using the given letters (words[i] cannot be used two or more times).
+
+It is not necessary to use all characters in letters and each letter can only be used once. 
+Score of letters 'a', 'b', 'c', ... ,'z' is given by score[0], score[1], ... , score[25] respectively.
+
+Link:
+https://leetcode.com/problems/maximum-score-words-formed-by-letters/description/?envType=daily-question&envId=2024-05-24
+*/
+func maxScoreWords(words []string, letters []byte, score []int) int {
+	// Find all of words that we can match
+	char_counts := make(map[byte]int)
+	for _, b := range letters {
+		_, ok := char_counts[b]
+		if !ok {
+			char_counts[b] = 1
+		} else {
+			char_counts[b]++
+		}
+	}
+	matchable_words := []string{}
+	for _, str := range words {
+		this_word := make(map[byte]int)
+		for i:=0; i<len(str); i++ {
+			b := str[i]
+			_, ok := this_word[b]
+			if !ok {
+				this_word[b] = 1
+			} else {
+				this_word[b]++
+			}
+		}
+		can_match := true
+		for ch, count := range this_word {
+			available, ok := char_counts[ch]
+			if !ok || available < count {
+				can_match = false
+				break
+			}
+		}
+		if can_match {
+			matchable_words = append(matchable_words, str)
+		}
+	}
+	
+	n := len(matchable_words)
+	word_values := make([]int, n)
+	for idx, word := range matchable_words {
+		value := 0
+		for i:=0; i<len(word); i++ {
+			ascii := word[i]
+			value += score[ascii - 97] // ASCII conversion
+		}
+		word_values[idx] = value
+	}
+
+	return recMaxScoreWords((1 << n) - 1, word_values, matchable_words, char_counts)
+}
+
+/*
+Brute force
+*/
+func recMaxScoreWords(available int, word_values []int, words []string, char_counts map[byte]int) int {
+	// Every '1' bit in available corresponds to a word we can select, try selecting that word, and removing all now non-available words
+	record := 0
+	for i:=0; i<len(word_values); i++ {
+		if (1 << i) & available == (1 << i) {
+			// That word is available to pick - try picking it
+			new_char_counts := make(map[byte]int)
+			for key, value := range char_counts {
+				new_char_counts[key] = value
+			}
+			pick := word_values[i]
+			for j:=0; j<len(words[i]); j++ {
+				new_char_counts[words[i][j]]--
+				if new_char_counts[words[i][j]] == 0 {
+					delete(new_char_counts, words[i][j])
+				}
+			}
+			new_available := available ^ (1 << i)
+			// Now that we have updated our available characters, cut out all other strings we can no longer match
+			for k := 0; k < len(words); k++ {
+				if k == i || ((1 << k) & available == 0) {
+					continue;
+				}
+				this_word := make(map[byte]int)
+				str := words[k]
+				for i:=0; i<len(str); i++ {
+					b := str[i]
+					_, ok := this_word[b]
+					if !ok {
+						this_word[b] = 1
+					} else {
+						this_word[b]++
+					}
+				}
+				// Cut out this string if we can no longer match it
+				for ch, count := range this_word {
+					available, ok := new_char_counts[ch]
+					if !ok || available < count {
+						new_available = new_available ^ (1 << k)
+						break
+					}
+				}
+			}
+			pick += recMaxScoreWords(new_available, word_values, words, new_char_counts)
+			record = max(record, pick)
+		}
+	}
+
+	return record
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
