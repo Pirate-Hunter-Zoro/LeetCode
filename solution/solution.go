@@ -4799,3 +4799,51 @@ func recMaxScoreWords(available int, word_values []int, words []string, char_cou
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+Suppose you have n integers labeled 1 through n. A permutation of those n integers perm (1-indexed) is considered a beautiful arrangement if for every i (1 <= i <= n), either of the following is true:
+
+perm[i] is divisible by i.
+i is divisible by perm[i].
+Given an integer n, return the number of the beautiful arrangements that you can construct.
+
+Source for Inspiration:
+https://leetcode.com/problems/beautiful-arrangement/solutions/1000132/python-dp-bitmasks-explained
+*/
+func countArrangement(n int) int {
+	// Bitmask for the bits that need placement
+	need_placement := (1 << n) - 1
+	sols := make(map[int]map[int]int)
+	for i:=1; i<n; i++ {
+		sols[i] = make(map[int]int)
+	}
+    return topDownCountArrangements(n, need_placement, n-1, sols)
+}
+
+/*
+Top-down recursive helper method
+*/
+func topDownCountArrangements(n int, need_placement int, posn int, sols map[int]map[int]int) int {
+	if posn == 0 {
+		return 1
+	} else {
+		_, ok := sols[posn][need_placement]
+		if !ok {
+			// We need to solve this problem
+			arrangements_found := 0
+			for value := 1; value <= n; value++ {
+				if (need_placement & (1 << (value-1))) == (1 << (value-1)) {
+					// We need to place value - try placing it
+					if (value % (posn + 1) == 0) || ((posn + 1) % value == 0) {
+						// We can place this value here
+						new_need_placement := need_placement ^ (1 << (value-1))
+						arrangements_found += topDownCountArrangements(n, new_need_placement, posn-1, sols)
+					}
+				}
+			}
+			sols[posn][need_placement] = arrangements_found
+		}
+		return sols[posn][need_placement]
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

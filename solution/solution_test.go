@@ -2030,3 +2030,25 @@ func TestMaxScoreWords(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestCountArrangements(t *testing.T) {
+	type input struct {
+		n 	int
+	}
+
+	inputs := []input{
+		{2},
+		{1},
+	}
+
+	expected_outputs := []int{
+		2,
+		1,
+	}
+
+	f := func(i input) int {
+		return countArrangement(i.n)
+	}
+	
+	testResults(t, f, inputs, expected_outputs)
+}
