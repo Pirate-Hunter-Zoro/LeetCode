@@ -4847,3 +4847,98 @@ func topDownCountArrangements(n int, need_placement int, posn int, sols map[int]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+An attendance record for a student can be represented as a string where each character signifies whether the student was absent, late, or present on that day. The record only contains the following three characters:
+
+'A': Absent.
+'L': Late.
+'P': Present.
+Any student is eligible for an attendance award if they meet both of the following criteria:
+
+The student was absent ('A') for strictly fewer than 2 days total.
+The student was never late ('L') for 3 or more consecutive days.
+Given an integer n, return the number of possible attendance records of length n that make a student eligible for an attendance award. The answer may be very large, so return it modulo 109 + 7.
+
+Link:
+https://leetcode.com/problems/student-attendance-record-ii/description/?envType=daily-question&envId=2024-05-26
+*/
+func checkRecord(n int) int {
+    num_ways := 0
+	// Either you have an absent, or you do not
+
+	// Suppose you do have an absent
+	// It could be in any place from posn 1 to posn n
+	noThreeInRowSols := make(map[int]int)
+	for i:=1; i<=n/2 + (n % 2); i++ {
+		placement := 1
+		num_left := i-1
+		num_right := n-i
+		// To the left and the right, we just have to have no 3 'L's in a row 
+		multiplier := 1
+		if i <= n/2 {
+			multiplier++
+		}
+		num_ways = modulo.ModularAdd(num_ways, 
+				modulo.ModularMultiply(multiplier,
+					modulo.ModularMultiply(
+						modulo.ModularMultiply(placement, 
+							numNoThreeLateInRow(num_left, noThreeInRowSols),
+						),
+						numNoThreeLateInRow(num_right, noThreeInRowSols),
+					),
+				),
+			)
+	}
+
+	// Suppose you have no absent
+	// Then you just need to not have 3 lates in a row
+	num_ways = modulo.ModularAdd(num_ways, numNoThreeLateInRow(n, noThreeInRowSols))
+
+	return num_ways
+}
+
+/*
+Helper function to count the number of records that do not have 3 'L's in a row when using only 'L' and 'P'
+*/
+func numNoThreeLateInRow(n int, noThreeInRowSols map[int]int) int {
+	if n < 3 {
+		// You have total freedom placing the 'L's and 'P's because you don't have enough spots to HAVE 3 'L's in a row
+		return modulo.ModularPow(2, n)
+	} else if n < 4 {
+		return 7
+	} else if n < 5 {
+		return 13
+	} else {
+		_, ok := noThreeInRowSols[n]
+		if !ok {
+			// Need to solve this problem
+			// For our starting sequence in the attendance record, we could have:
+			// LLP -> n-3
+			// LPP -> n-3
+			// PPP -> n-3
+			// PLP -> n-3
+			// LPLLP -> n-5
+			// LPLP -> n-4
+			// PLLP -> n-4
+			// PPLLP -> n-5
+			// PPLP -> n-4
+			num_ways := modulo.ModularAdd(modulo.ModularMultiply(4, 
+								numNoThreeLateInRow(n-3, noThreeInRowSols),
+								),
+								modulo.ModularAdd(modulo.ModularMultiply(3,
+											numNoThreeLateInRow(n-4, noThreeInRowSols),
+										),
+										modulo.ModularMultiply(2,
+											numNoThreeLateInRow(n-5, noThreeInRowSols),
+											),
+									),
+						)
+			noThreeInRowSols[n] = num_ways
+		}
+		return noThreeInRowSols[n]
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

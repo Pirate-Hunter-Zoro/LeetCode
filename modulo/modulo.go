@@ -25,3 +25,22 @@ func ModularSubtract(a int, b int) int {
 		return int((a_long + (mod - b_long)) % mod)
 	}
 }
+
+func ModularPow(base int, power int) int {
+	if power == 0 {
+		return 1
+	}
+	base_long := int64(base)
+	if power == 1 {
+		return int(base_long % mod)
+	} else {
+		half_power := power / 2
+		square_root := ModularPow(base, half_power)
+
+		if power % 2 == 1 {
+			return ModularMultiply(ModularMultiply(square_root, square_root), base)
+		} else {
+			return ModularMultiply(square_root, square_root)
+		}
+	}
+}

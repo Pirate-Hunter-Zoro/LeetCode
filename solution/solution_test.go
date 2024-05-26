@@ -2052,3 +2052,29 @@ func TestCountArrangements(t *testing.T) {
 	
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestCheckRecord(t *testing.T) {
+	type input struct {
+		n 	int
+	}
+
+	inputs := []input{
+		{3},
+		{2},
+		{1},
+		{10101},
+	}
+
+	expected_outputs := []int{
+		19,
+		8,
+		3,
+		183236316,
+	}
+
+	f := func(i input) int {
+		return checkRecord(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
