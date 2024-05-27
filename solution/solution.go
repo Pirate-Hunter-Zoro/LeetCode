@@ -4942,3 +4942,57 @@ func numNoThreeLateInRow(n int, noThreeInRowSols map[int]int) int {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+You are given several boxes with different colors represented by different positive numbers.
+
+You may experience several rounds to remove boxes until there is no box left. Each time you can choose some continuous boxes with the same color (i.e., composed of k boxes, k >= 1), remove them and get k * k points.
+
+Return the maximum points you can get.
+
+Link:
+https://leetcode.com/problems/remove-boxes/description/
+
+Inspiration:
+https://leetcode.com/problems/remove-boxes/solutions/101310/java-top-down-and-bottom-up-dp-solutions
+*/
+func removeBoxes(boxes []int) int {
+	n := len(boxes)
+    dp := make([][][]int, n)
+	for i:=0; i<n; i++ {
+		dp[i] = make([][]int, n)
+		for j:=0; j<n; j++ {
+			dp[i][j] = make([]int, n)
+		}
+	}
+
+	return topDownRemoveBoxes(0, n-1, 0, boxes, dp)
+}
+
+/*
+Top-down recursive helper method to solve the removing boxes problem
+*/
+func topDownRemoveBoxes(start, end, num_left int, boxes []int, dp [][][]int) int {
+	if end < start {
+		return 0
+	} else {
+		if dp[start][end][num_left] == 0 {
+			// Need to solve this problem
+			if start == end {
+				// Then we will be removing (num_left + 1) boxes
+				dp[start][end][num_left] = (num_left + 1) * (num_left + 1)
+			} else {
+				// We CAN remove the concatenated left-most (num_left + 1) boxes - but that may not be our only option
+				record := (num_left + 1) * (num_left + 1) + topDownRemoveBoxes(start+1, end, 0, boxes, dp)
+				// OR we can try finding the next box of the same color at index m, picking up all boxes from start+1 to m-1, and then we have one additional box of the start color to the left, with a new starting position
+				for m:=start+1; m<=end; m++ {
+					// We need to try this for ALL occurrences of the starting color in our range
+					if boxes[m] == boxes[start] {
+						record = max(record, topDownRemoveBoxes(start+1, m-1, 0, boxes, dp) + topDownRemoveBoxes(m, end, num_left + 1, boxes, dp))
+					}
+				}
+				dp[start][end][num_left] = record
+			}
+		}
+		return dp[start][end][num_left]
+	}
+}
