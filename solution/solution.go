@@ -5080,3 +5080,88 @@ func recordTree(col, row int, root *binary_tree.TreeNode, column_row_pairs *[][]
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+Given the binary representation of an integer as a string s, return the number of steps to reduce it to 1 under the following rules:
+
+If the current number is even, you have to divide it by 2.
+
+If the current number is odd, you have to add 1 to it.
+
+It is guaranteed that you can always reach one for all test cases.
+
+Link:
+https://leetcode.com/problems/number-of-steps-to-reduce-a-number-in-binary-representation-to-one/description/?envType=daily-question&envId=2024-05-29
+*/
+func numSteps(s string) int {
+	binary_rep := make([]bool, len(s))
+	for i:=0; i<len(s); i++ {
+		if s[i] == '1' {
+			binary_rep[i] = true
+		}
+	}
+
+	return countNumSteps(binary_rep)
+}
+
+/*
+Helper method to convert the binary number into 1
+*/
+func countNumSteps(binary_rep []bool) int {
+	n := len(binary_rep)
+	lowest_1 := findLowest1(binary_rep)
+	if lowest_1 == n {
+		// 0 - just add 1
+		return 1
+	} else {
+		if lowest_1 == n-1 {
+			// Already 1
+			return 0
+		} else {
+			steps := 0
+			for lowest_1 < n-1 {
+				// If the number is even, divide by 2, which just means shifting every 1 you see one place right
+				if !binary_rep[n-1] {
+					for i:=n-2; i>=lowest_1; i-- {
+						if binary_rep[i] {
+							binary_rep[i+1] = true
+							binary_rep[i] = false
+						}
+					}
+					lowest_1++
+				} else { // The number is odd - so add 1
+					carry := true
+					binary_rep[n-1] = false
+					posn := n-2
+					for carry {
+						if !binary_rep[posn] {
+							carry = false
+						}
+						binary_rep[posn] = !binary_rep[posn]
+						posn--
+						if posn < lowest_1 && carry {
+							lowest_1--
+							binary_rep[lowest_1] = true
+							break
+						}
+					}
+				}
+				steps++
+			}
+			return steps
+		}
+	}
+}
+
+/*
+Helper method to verify the highest present in a binary representation
+*/
+func findLowest1(binary_rep []bool) int {
+	highest_1 := len(binary_rep)
+	for i := 0; i < len(binary_rep); i++ {
+		if binary_rep[i] {
+			highest_1 = i
+			break
+		}
+	}
+	return highest_1
+}

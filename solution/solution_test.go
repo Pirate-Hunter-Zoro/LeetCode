@@ -2128,3 +2128,26 @@ func TestVerticalTraversal(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestNumSteps(t *testing.T) {
+	type input struct {
+		s string
+	}
+	inputs := []input{
+		{"1101"},
+		{"10"},
+		{"1"},
+	}
+
+	expected_outputs := []int{
+		6,
+		1,
+		0,
+	}
+
+	f := func(i input) int {
+		return numSteps(i.s)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
