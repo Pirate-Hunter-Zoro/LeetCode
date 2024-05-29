@@ -2103,3 +2103,28 @@ func TestRemoveBoxes(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestVerticalTraversal(t *testing.T) {
+	type input struct {
+		root *binary_tree.TreeNode
+	}
+	inputs := []input{
+		{binary_tree.New([]int{3,9,20,binary_tree.NULL,binary_tree.NULL,15,7})},
+		{binary_tree.New([]int{1,2,3,4,5,6,7})},
+		{binary_tree.New([]int{1,2,3,4,6,5,7})},
+		{binary_tree.New([]int{1,2,3,4,6,5,7})},
+	}
+
+	expected_outputs := [][][]int{
+		{{9},{3,15},{20},{7}},
+		{{4},{2},{1,5,6},{3},{7}},
+		{{4},{2},{1,5,6},{3},{7}},
+		{{4},{2},{1,5,6},{3},{7}},
+	}
+
+	f := func(i input) [][]int {
+		return verticalTraversal(i.root)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

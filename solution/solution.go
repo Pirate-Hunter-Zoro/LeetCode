@@ -5012,7 +5012,64 @@ Link:
 https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/description/
 */
 func verticalTraversal(root *binary_tree.TreeNode) [][]int {
-    return [][]int{}
+	column_row_values := make(map[int]map[int][]int)
+	columns_addr := &[]int{}
+	recordTree(0, 0, root, columns_addr, column_row_values)
+	columns := *columns_addr
+	for _, row := range column_row_values {
+		for _, node_values := range row {
+			sort.SliceStable(node_values, func(i, j int) bool {
+				return node_values[i] < node_values[j]
+			})
+		}
+	}
+
+	sort.SliceStable(columns, func(i, j int) bool {
+		return columns[i] < columns[j]
+	})
+	unique_columns := []int{columns[0]}
+	for idx := 1; idx < len(columns); idx++ {
+		if columns[idx] != columns[idx-1] {
+			unique_columns = append(unique_columns, columns[idx])
+		}
+	}
+
+	// TODO - fix not going by row when column same...
+
+	node_values := [][]int{}
+	for _, col := range unique_columns {
+		col_values := []int{}
+		for _, values := range column_row_values[col] {
+			col_values = append(col_values, values...)
+		}
+		node_values = append(node_values, col_values)
+	}
+
+    return node_values
+}
+
+/*
+Helper function to record a tree in a map
+*/
+func recordTree(col, row int, root *binary_tree.TreeNode, columns_addr *[]int, column_row_values map[int]map[int][]int) {
+	if root == nil {
+		return
+	}
+
+	_, ok := column_row_values[col]
+	if !ok {
+		column_row_values[col] = make(map[int][]int)
+	}
+	_, ok = column_row_values[col][row]
+	if !ok {
+		column_row_values[col][row] = []int{}
+	}
+
+	*columns_addr = append(*columns_addr, col)
+
+	column_row_values[col][row] = append(column_row_values[col][row], root.Val)
+	recordTree(col-1, row+1, root.Left, columns_addr, column_row_values)
+	recordTree(col+1, row+1, root.Right, columns_addr, column_row_values)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
