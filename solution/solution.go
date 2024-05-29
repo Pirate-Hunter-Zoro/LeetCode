@@ -5013,9 +5013,9 @@ https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/descript
 */
 func verticalTraversal(root *binary_tree.TreeNode) [][]int {
 	column_row_values := make(map[int]map[int][]int)
-	columns_addr := &[]int{}
-	recordTree(0, 0, root, columns_addr, column_row_values)
-	columns := *columns_addr
+	column_row_pairs := &[][]int{}
+	recordTree(0, 0, root, column_row_pairs, column_row_values)
+	columns_and_rows := *column_row_pairs
 	for _, row := range column_row_values {
 		for _, node_values := range row {
 			sort.SliceStable(node_values, func(i, j int) bool {
@@ -5024,25 +5024,31 @@ func verticalTraversal(root *binary_tree.TreeNode) [][]int {
 		}
 	}
 
-	sort.SliceStable(columns, func(i, j int) bool {
-		return columns[i] < columns[j]
+	sort.SliceStable(columns_and_rows, func(i, j int) bool {
+		if columns_and_rows[i][0] != columns_and_rows[j][0] {
+			return columns_and_rows[i][0] < columns_and_rows[j][0]
+		} else {
+			return columns_and_rows[i][1] < columns_and_rows[j][1]
+		}
 	})
-	unique_columns := []int{columns[0]}
-	for idx := 1; idx < len(columns); idx++ {
-		if columns[idx] != columns[idx-1] {
-			unique_columns = append(unique_columns, columns[idx])
+	unique_columns_and_rows := [][]int{columns_and_rows[0]}
+	for idx := 1; idx < len(columns_and_rows); idx++ {
+		if !(columns_and_rows[idx][0] == columns_and_rows[idx-1][0] && columns_and_rows[idx][1] == columns_and_rows[idx-1][1]) {
+			unique_columns_and_rows = append(unique_columns_and_rows, columns_and_rows[idx])
 		}
 	}
 
-	// TODO - fix not going by row when column same...
-
 	node_values := [][]int{}
-	for _, col := range unique_columns {
-		col_values := []int{}
-		for _, values := range column_row_values[col] {
-			col_values = append(col_values, values...)
+	last_col := math.MinInt
+	idx := -1
+	for _, col_row := range unique_columns_and_rows {
+		if col_row[0] != last_col {
+			idx++
+			last_col = col_row[0]
+			node_values = append(node_values, column_row_values[col_row[0]][col_row[1]])
+		} else {
+			node_values[idx] = append(node_values[idx], column_row_values[col_row[0]][col_row[1]]...)
 		}
-		node_values = append(node_values, col_values)
 	}
 
     return node_values
@@ -5051,7 +5057,7 @@ func verticalTraversal(root *binary_tree.TreeNode) [][]int {
 /*
 Helper function to record a tree in a map
 */
-func recordTree(col, row int, root *binary_tree.TreeNode, columns_addr *[]int, column_row_values map[int]map[int][]int) {
+func recordTree(col, row int, root *binary_tree.TreeNode, column_row_pairs *[][]int, column_row_values map[int]map[int][]int) {
 	if root == nil {
 		return
 	}
@@ -5065,11 +5071,11 @@ func recordTree(col, row int, root *binary_tree.TreeNode, columns_addr *[]int, c
 		column_row_values[col][row] = []int{}
 	}
 
-	*columns_addr = append(*columns_addr, col)
+	*column_row_pairs = append(*column_row_pairs, []int{col, row})
 
 	column_row_values[col][row] = append(column_row_values[col][row], root.Val)
-	recordTree(col-1, row+1, root.Left, columns_addr, column_row_values)
-	recordTree(col+1, row+1, root.Right, columns_addr, column_row_values)
+	recordTree(col-1, row+1, root.Left, column_row_pairs, column_row_values)
+	recordTree(col+1, row+1, root.Right, column_row_pairs, column_row_values)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
