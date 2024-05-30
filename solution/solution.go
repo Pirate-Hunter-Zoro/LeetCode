@@ -5171,7 +5171,8 @@ func findLowest1(binary_rep []bool) int {
 /*
 You are given an integer array nums of length n.
 
-Assume arrk to be an array obtained by rotating nums by k positions clock-wise. We define the rotation function F on nums as follow:
+Assume arrk to be an array obtained by rotating nums by k positions clock-wise. 
+We define the rotation function F on nums as follow:
 
 F(k) = 0 * arrk[0] + 1 * arrk[1] + ... + (n - 1) * arrk[n - 1].
 Return the maximum value of F(0), F(1), ..., F(n-1).
@@ -5182,7 +5183,73 @@ Link:
 https://leetcode.com/problems/rotate-function/description/
 */
 func maxRotateFunction(nums []int) int {
-    return 0
+    weighted_sum := 0
+	total := 0
+	for idx, v := range nums {
+		weighted_sum += idx * v
+		total += v
+	}
+	record := weighted_sum
+	n := len(nums)
+	for front := n-1; front > 0; front-- {
+		weighted_sum += total
+		weighted_sum -= n * nums[front]
+		record = max(record, weighted_sum)
+	}
+
+	return record
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an array of intervals intervals where intervals[i] = [starti, endi], return the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping.
+
+Link:
+https://leetcode.com/problems/non-overlapping-intervals/
+*/
+func eraseOverlapIntervals(intervals [][]int) int {
+	n := len(intervals)
+
+	sort.SliceStable(intervals, func(i, j int) bool {
+		return intervals[i][1] < intervals[j][1]
+	})
+
+	last_kept := 0
+	removed := 0
+	for idx:=1; idx<n; idx++ {
+		if intervals[idx][0] < intervals[last_kept][1] {
+			removed++
+		} else {
+			last_kept = idx
+		}
+	}
+
+	return removed
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are playing a variation of the game Zuma.
+
+In this variation of Zuma, there is a single row of colored balls on a board, where each ball can be colored red 'R', yellow 'Y', blue 'B', green 'G', or white 'W'. You also have several colored balls in your hand.
+
+Your goal is to clear all of the balls from the board. On each turn:
+
+Pick any ball from your hand and insert it in between two balls in the row or on either end of the row.
+If there is a group of three or more consecutive balls of the same color, remove the group of balls from the board.
+If this removal causes more groups of three or more of the same color to form, then continue removing each group until there are none left.
+If there are no more balls on the board, then you win the game.
+Repeat this process until you either win or do not have any more balls in your hand.
+Given a string board, representing the row of balls on the board, and a string hand, representing the balls in your hand, return the minimum number of balls you have to insert to clear all the balls from the board. If you cannot clear all the balls from the board using the balls in your hand, return -1.
+
+Link:
+https://leetcode.com/problems/zuma-game/description/
+*/
+func findMinStep(board string, hand string) int {
+	return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+

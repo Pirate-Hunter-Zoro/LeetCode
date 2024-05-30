@@ -2153,3 +2153,71 @@ func TestNumSteps(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMaxRotateFunction(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{4,3,2,6,}},
+		{[]int{100}},
+	}
+	
+	expected_outputs := []int{
+		26,
+		0,
+	}
+
+	f := func(i input) int {
+		return maxRotateFunction(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestEraseOverlapIntervals(t *testing.T) {
+	type input struct {
+		intervals [][]int
+	}
+	inputs := []input{
+		{[][]int{{1,2},{2,3},{3,4},{1,3}}},
+		{[][]int{{1,2},{1,2},{1,2}}},
+		{[][]int{{1,2},{2,3}}},
+	}
+
+	expected_outputs := []int{
+		1,
+		2,
+		0,
+	}
+
+	f := func(i input) int {
+		return eraseOverlapIntervals(i.intervals)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestFindMinStep(t *testing.T) {
+	type input struct {
+		board string
+		hand  string
+	}
+	inputs := []input{
+		{"WRRBBW", "RB"},
+		{"WWRRBBWW", "WRBRW"},
+		{"G", "GGGGG"},
+	}
+
+	expected_outputs := []int{
+		-1,
+		2,
+		2,
+	}
+
+	f := func(i input) int {
+		return findMinStep(i.board, i.board)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
