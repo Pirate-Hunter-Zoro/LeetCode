@@ -2137,12 +2137,14 @@ func TestNumSteps(t *testing.T) {
 		{"1101"},
 		{"10"},
 		{"1"},
+		{"111"},
 	}
 
 	expected_outputs := []int{
 		6,
 		1,
 		0,
+		4,
 	}
 
 	f := func(i input) int {

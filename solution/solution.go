@@ -5093,10 +5093,10 @@ Link:
 https://leetcode.com/problems/number-of-steps-to-reduce-a-number-in-binary-representation-to-one/description/?envType=daily-question&envId=2024-05-29
 */
 func numSteps(s string) int {
-	binary_rep := make([]bool, len(s))
+	binary_rep := make([]bool, len(s) + 1)
 	for i:=0; i<len(s); i++ {
 		if s[i] == '1' {
-			binary_rep[i] = true
+			binary_rep[i+1] = true
 		}
 	}
 
@@ -5165,3 +5165,6 @@ func findLowest1(binary_rep []bool) int {
 	}
 	return highest_1
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
