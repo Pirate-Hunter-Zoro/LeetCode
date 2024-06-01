@@ -1,6 +1,7 @@
 package solution
 
 import (
+	"bytes"
 	"leetcode/algorithm"
 	"leetcode/binary_tree"
 	disjointset "leetcode/disjoint_set"
@@ -5248,7 +5249,93 @@ Link:
 https://leetcode.com/problems/zuma-game/description/
 */
 func findMinStep(board string, hand string) int {
-	return 0
+	var board_buffer bytes.Buffer
+	var hand_buffer bytes.Buffer
+	hand_buffer.WriteString(hand)
+
+	if len(board) < 3 {
+		board_buffer.WriteString(board)
+	} else {
+		for i:=0; i<len(board)-2; i++ {
+			if board[i] != board[i+1] || board[i] != board[i+2] {
+				board_buffer.WriteByte(board[i])
+				if i == len(board) - 3 {
+					board_buffer.WriteByte(board[i+1])
+					board_buffer.WriteByte(board[i+2])
+				}
+			}
+		}
+	}
+
+	sols := make(map[string]map[string]int)
+
+	return topDownFindMinStep(board_buffer, hand_buffer, sols)
+}
+
+/*
+Top down helper method to solve the findMinStep problem
+*/
+func topDownFindMinStep(board_buffer bytes.Buffer, hand_buffer bytes.Buffer, sols map[string]map[string]int) int {
+	board := board_buffer.String()
+	hand := hand_buffer.String()
+	_, ok := sols[board]
+	if !ok {
+		sols[board] = make(map[string]int)
+	}
+	_, ok = sols[board][hand]
+	if !ok {
+		// Need to solve this problem
+		if len(hand) == 0 && len(board) > 0 {
+			sols[board][hand] = -1
+		} else if len(board) == 0 {
+			sols[board][hand] = 0
+		} else {
+			// For every possible character in the hand, we can place it anywhere on the board and see what happens
+			record := math.MaxInt
+			for i:=0; i<len(hand); i++ {
+				// Each character in hand
+				for j:=0; j<=len(board); j++ {
+					// Position to place the character in the new board_buffer
+					var new_board_buffer bytes.Buffer
+					var new_hand_buffer bytes.Buffer
+					for k:=0; k<len(hand); k++ {
+						if k != i {
+							new_hand_buffer.WriteByte(hand[k])
+						}
+						for l := 0; l < len(board); l++ {
+							if l == j {
+								new_board_buffer.WriteByte(hand[i])
+							} else {
+								new_board_buffer.WriteByte(hand[l])
+							}
+						}
+						if j == len(board) {
+							new_board_buffer.WriteByte(hand[i])
+						}
+					}
+					var reduced_board_buffer bytes.Buffer
+					new_board := new_board_buffer.String()
+					if len(new_board) < 3 {
+						reduced_board_buffer.WriteString(new_board)
+					} else {
+						for n:=0; n<len(new_board)-2; n++ {
+							if new_board[n] != new_board[n+1] || new_board[n] != new_board[n+2] {
+								reduced_board_buffer.WriteByte(new_board[n])
+								if n == len(new_board) - 3 {
+									reduced_board_buffer.WriteByte(new_board[n+1])
+									reduced_board_buffer.WriteByte(new_board[n+2])
+								}
+							}
+						}
+					}
+					record = min(record, topDownFindMinStep(reduced_board_buffer, new_hand_buffer, sols))
+				}
+			}
+			sols[board][hand] = record
+		}
+	}
+
+	return sols[board][hand]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
