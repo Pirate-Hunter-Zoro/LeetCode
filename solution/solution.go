@@ -5247,35 +5247,27 @@ Given a string board, representing the row of balls on the board, and a string h
 
 Link:
 https://leetcode.com/problems/zuma-game/description/
+
+Inspiration for Optimization:
+https://leetcode.com/problems/zuma-game/solutions/1568450/python-easy-bfs-solution-with-explain/
 */
 func findMinStep(board string, hand string) int {
 	var board_buffer bytes.Buffer
 	var hand_buffer bytes.Buffer
 	hand_buffer.WriteString(hand)
 
-	if len(board) < 3 {
-		board_buffer.WriteString(board)
-	} else {
-		for i:=0; i<len(board)-2; i++ {
-			if board[i] != board[i+1] || board[i] != board[i+2] {
-				board_buffer.WriteByte(board[i])
-				if i == len(board) - 3 {
-					board_buffer.WriteByte(board[i+1])
-					board_buffer.WriteByte(board[i+2])
-				}
-			}
-		}
-	}
-
 	sols := make(map[string]map[string]int)
+	reductions := make(map[string]string)
 
-	return topDownFindMinStep(board_buffer, hand_buffer, sols)
+	board_buffer.WriteString(reduce(board, reductions))
+
+	return topDownFindMinStep(board_buffer, hand_buffer, sols, reductions)
 }
 
 /*
 Top down helper method to solve the findMinStep problem
 */
-func topDownFindMinStep(board_buffer bytes.Buffer, hand_buffer bytes.Buffer, sols map[string]map[string]int) int {
+func topDownFindMinStep(board_buffer bytes.Buffer, hand_buffer bytes.Buffer, sols map[string]map[string]int, reductions map[string]string) int {
 	board := board_buffer.String()
 	hand := hand_buffer.String()
 	_, ok := sols[board]
@@ -5292,50 +5284,86 @@ func topDownFindMinStep(board_buffer bytes.Buffer, hand_buffer bytes.Buffer, sol
 		} else {
 			// For every possible character in the hand, we can place it anywhere on the board and see what happens
 			record := math.MaxInt
-			for i:=0; i<len(hand); i++ {
-				// Each character in hand
+			for i:=0; i<len(hand); i++ { // Look at each character in hand
+				// Skip contiguous characters in the hand
+				if i > 0 && hand[i] == hand[i-1] {
+					continue
+				}
 				for j:=0; j<=len(board); j++ {
 					// Position to place the character in the new board_buffer
+					// Skip contiguous characters in the board if said character matches the character in our hand
+					if j > 0 && j < len(board) && board[j] == board[j-1] && board[j] == hand[i] {
+						continue
+					}
 					var new_board_buffer bytes.Buffer
 					var new_hand_buffer bytes.Buffer
 					for k:=0; k<len(hand); k++ {
 						if k != i {
 							new_hand_buffer.WriteByte(hand[k])
 						}
-						for l := 0; l < len(board); l++ {
-							if l == j {
-								new_board_buffer.WriteByte(hand[i])
-							} else {
-								new_board_buffer.WriteByte(hand[l])
-							}
-						}
-						if j == len(board) {
+					}
+					for l := 0; l < len(board); l++ {
+						if l == j {
 							new_board_buffer.WriteByte(hand[i])
 						}
+						new_board_buffer.WriteByte(board[l])
+					}
+					if j == len(board) {
+						new_board_buffer.WriteByte(hand[i])
 					}
 					var reduced_board_buffer bytes.Buffer
 					new_board := new_board_buffer.String()
-					if len(new_board) < 3 {
-						reduced_board_buffer.WriteString(new_board)
-					} else {
-						for n:=0; n<len(new_board)-2; n++ {
-							if new_board[n] != new_board[n+1] || new_board[n] != new_board[n+2] {
-								reduced_board_buffer.WriteByte(new_board[n])
-								if n == len(new_board) - 3 {
-									reduced_board_buffer.WriteByte(new_board[n+1])
-									reduced_board_buffer.WriteByte(new_board[n+2])
-								}
-							}
-						}
+					reduced_board_buffer.WriteString(reduce(new_board, reductions))
+					sub_record := topDownFindMinStep(reduced_board_buffer, new_hand_buffer, sols, reductions)
+					if sub_record != -1 {
+						record = min(record, 1 + sub_record)
 					}
-					record = min(record, topDownFindMinStep(reduced_board_buffer, new_hand_buffer, sols))
 				}
 			}
-			sols[board][hand] = record
+			if record != math.MaxInt {
+				sols[board][hand] = record
+			} else {
+				sols[board][hand] = -1
+			}
 		}
 	}
 
 	return sols[board][hand]
+}
+
+/*
+Helper function to collapse a board string - any 3 or more in a row disappear
+*/
+func reduce(board string, reductions map[string]string) string {
+	_, ok := reductions[board]
+	if !ok {
+		// Need to solve this problem
+		var board_buffer bytes.Buffer
+		for i:=0; i<len(board); i++ {
+			if i < len(board) - 2 && (board[i] != board[i+1] || board[i] != board[i+2]) {
+				board_buffer.WriteByte(board[i])
+			} else if i < len(board) - 2 {
+				// Skip ALL of this character
+				j := i
+				for board[j] == board[i] {
+					j++
+					if j == len(board) {
+						break
+					}
+				}
+				i = j-1
+			} else {
+				board_buffer.WriteByte(board[i])
+			}
+		}
+		new_board := board_buffer.String()
+		if len(new_board) == len(board) {
+			reductions[board] = new_board
+		} else { // Reduction could happen again now that some cancellation of characters has occurred
+			reductions[board] = reduce(board_buffer.String(), reductions)
+		}
+	}
+	return reductions[board]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

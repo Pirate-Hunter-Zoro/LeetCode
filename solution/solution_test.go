@@ -2207,16 +2207,20 @@ func TestFindMinStep(t *testing.T) {
 		{"WRRBBW", "RB"},
 		{"WWRRBBWW", "WRBRW"},
 		{"G", "GGGGG"},
+		{"WR", "WWRR"},
+		{"RRGGBBYYWWRRGGBB", "RGBYW"},
 	}
 
 	expected_outputs := []int{
 		-1,
 		2,
 		2,
+		4,
+		-1,
 	}
 
 	f := func(i input) int {
-		return findMinStep(i.board, i.board)
+		return findMinStep(i.board, i.hand)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
