@@ -5243,7 +5243,8 @@ If there is a group of three or more consecutive balls of the same color, remove
 If this removal causes more groups of three or more of the same color to form, then continue removing each group until there are none left.
 If there are no more balls on the board, then you win the game.
 Repeat this process until you either win or do not have any more balls in your hand.
-Given a string board, representing the row of balls on the board, and a string hand, representing the balls in your hand, return the minimum number of balls you have to insert to clear all the balls from the board. If you cannot clear all the balls from the board using the balls in your hand, return -1.
+Given a string board, representing the row of balls on the board, and a string hand, representing the balls in your hand, return the minimum number of balls you have to insert to clear all the balls from the board. 
+If you cannot clear all the balls from the board using the balls in your hand, return -1.
 
 Link:
 https://leetcode.com/problems/zuma-game/description/
@@ -5298,7 +5299,7 @@ func findMinStep(board string, hand string) int {
 					// X -> XX
 					// XX -> XYX
 					// NOTE - XZ -> XYZ is NEVER going to be helpful - there is no reason to do that
-					if !((board[j] == hand[i]) || (j < len(board)-1 && board[j] == board[j+1] && board[j] != hand[i])) {
+					if !((board[j] == hand[i]) || (j > 0 && board[j] == board[j-1] && board[j] != hand[i])) {
 						continue
 					}
 					var new_board_buffer bytes.Buffer
@@ -5319,6 +5320,9 @@ func findMinStep(board string, hand string) int {
 					}
 					new_board := reduce(new_board_buffer.String(), reductions)
 					new_hand := new_hand_buffer.String()
+					if len(new_board) > 0 && len(new_hand) == 0 {
+						continue
+					}
 					_, ok := visited[new_board]
 					if ok {
 						_, ok = visited[new_board][new_hand]
