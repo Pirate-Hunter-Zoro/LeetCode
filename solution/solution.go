@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"leetcode/algorithm"
 	"leetcode/binary_tree"
-	disjointset "leetcode/disjoint_set"
+	"leetcode/disjoint_set"
 	"leetcode/euclidean"
 	"leetcode/graph"
 	"leetcode/heap"
@@ -12,6 +12,7 @@ import (
 	"leetcode/list_node"
 	"leetcode/modulo"
 	"math"
+	"regexp"
 	"sort"
 	"strconv"
 )
@@ -5373,6 +5374,209 @@ func reduce(board string, reductions map[string]string) string {
 		}
 	}
 	return reductions[board]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given a string expression representing a Lisp-like expression to return the integer value of.
+
+The syntax for these expressions is given as follows.
+- An expression is either an integer, let expression, add expression, mult expression, or an assigned variable. 
+- Expressions always evaluate to a single integer. (An integer could be positive or negative.)
+- A let expression takes the form "(let v1 e1 v2 e2 ... vn en expr)", where let is always the string "let"
+	- Then there are one or more pairs of alternating variables and expressions, meaning that the first variable v1 is assigned the value of the expression e1
+		- The second variable v2 is assigned the value of the expression e2, and so on sequentially 
+	- The value of this let expression is the value of the expression expr.
+- An add expression takes the form "(add e1 e2)" where add is always the string "add", there are always two expressions e1, e2 and the result is the addition of the evaluation of e1 and the evaluation of e2.
+- A mult expression takes the form "(mult e1 e2)" where mult is always the string "mult", there are always two expressions e1, e2 and the result is the multiplication of the evaluation of e1 and the evaluation of e2.
+- For this question, we will use a smaller subset of variable names. 
+	- A variable starts with a lowercase letter, then zero or more lowercase letters or digits. 
+- Additionally, for your convenience, the names "add", "let", and "mult" are protected and will never be used as variable names.
+- Finally, there is the concept of scope. 
+	- When an expression of a variable name is evaluated, within the context of that evaluation, the innermost scope (in terms of parentheses) is checked first for the value of that variable, and then outer scopes are checked sequentially. 
+	- It is guaranteed that every expression is legal. 
+	- Please see the examples for more details on the scope.
+
+Link:
+https://leetcode.com/problems/parse-lisp-expression/description/
+*/
+func evaluate(expression string) int {
+    values := make(map[string]int)
+	// Knock off the parentheses and go to town
+	if expression[0] == '(' {
+		return parseExpression(expression[1:len(expression)-1], values)
+	} else {
+		return parseExpression(expression, values)
+	}
+}
+
+/*
+Recursive helper function to parse the expression
+*/
+func parseExpression(expression string, values map[string]int) int {
+	// The parentheses have been knocked off.
+	// Now we need to see if we are doing a let, add, or mult
+	first_space := 0
+	for expression[first_space] != ' ' {
+		first_space++
+		if first_space >= len(expression) {
+			parseLiteral(expression, values)
+		}
+	}
+	operation := expression[:first_space]
+	if operation == "let" {
+		return parseLetExpression(expression[4:], values)
+	} else if operation == "add" {
+		return parseAddExpression(expression[4:], values)
+	} else {
+		return parseMultExpression(expression[5:], values)
+	}
+}
+
+/*
+Helper function to parse a let expression - this will call 'parseExpression' if necessary.
+*/
+func parseLetExpression(expression string, values map[string]int) int {
+	// name1 exp1 name2 exp2 name3 exp3 exp
+	// First, let's get our hands on the last expression 'exp'
+	end_scanning_idx := -1
+	if expression[len(expression) - 1] == ')' {
+		// Then we need to find the CORRESPONDING closing parentheses
+		st := linked_list.NewStack[int]()
+		st.Push(len(expression)-1)
+		idx := len(expression)-2
+		for !st.Empty() {
+			if expression[idx] == '(' {
+				st.Pop()
+			} else if expression[idx] == ')' {
+				st.Push(idx)
+			}
+			idx--
+		}
+		end_scanning_idx = (idx+1) - 2
+	} else {
+		// Just find the last space
+		last_space := len(expression) - 1
+		for expression[last_space] != ' ' {
+			last_space--
+		}
+		end_scanning_idx = last_space - 1
+	}
+
+	// Now we are ready to scan for 'name1 exp1 name2 exp2 name3 exp3'
+	index := 0
+	for index < end_scanning_idx {
+		// Parse a name, and parse an expression
+		next_space := index
+		for expression[next_space] != ' ' {
+			next_space++
+		}
+		end_exp := -1
+		expr_value := -1
+		if expression[next_space + 1] == '(' {
+			st := linked_list.NewStack[int]()
+			st.Push(next_space + 1)
+			idx := next_space + 2
+			for !st.Empty() {
+				if expression[idx] == ')' {
+					st.Pop()
+				} else if expression[idx] == '(' {
+					st.Push(idx)
+				}
+				idx++
+			}
+			end_exp = idx-1 // WHERE the final closing parentheses was
+			// Remember to knock of the parentheses
+			expr_value = parseExpression(expression[idx+1:end_exp-1], values)
+		} else {
+			// Just find the following space
+			following_space := next_space + 1
+			for expression[following_space] != ' ' {
+				following_space++
+			}
+			end_exp = following_space
+			expr_value = parseExpression(expression[next_space+1:end_exp], values)
+		}
+		values[expression[index:next_space]] = expr_value
+		index = end_exp + 1
+	}
+
+	return parseExpression(expression[end_scanning_idx+1:], values)
+}
+
+/*
+Helper function to parse an add expression - this will call 'parseExpression' if necessary.
+*/
+func parseAddExpression(expression string, values map[string]int) int {
+	first_value, second_value := parseTwoValues(expression, values)
+	return first_value + second_value
+}
+
+/*
+Helper function to parse a mult expression - this will call 'parseExpression' if necessary.
+*/
+func parseMultExpression(expression string, values map[string]int) int {
+	first_value, second_value := parseTwoValues(expression, values)
+	return first_value * second_value
+}
+
+/*
+Helper function to parse the two values that come in the form 'exp1 exp2'
+*/
+func parseTwoValues(expression string, values map[string]int) (int, int) {
+	first_value := -1
+	start_of_second_exp := -1
+	if expression[0] == '(' {
+		// Then we need to find the CORRESPONDING closing parentheses
+		st := linked_list.NewStack[int]()
+		st.Push(0)
+		idx := 1
+		for !st.Empty() {
+			if expression[idx] == ')' {
+				st.Pop()
+			} else if expression[idx] == '(' {
+				st.Push(idx)
+			}
+			idx++
+		}
+		closing_paren := idx-1
+		first_value = parseExpression(expression[1:closing_paren], values)
+		start_of_second_exp = closing_paren + 2
+	} else {
+		// Then there is no closing parentheses to find - just find the next space
+		first_space := 0
+		for expression[first_space] != ' ' {
+			first_space++
+		}
+		first_value = parseExpression(expression[:first_space], values)
+		start_of_second_exp = first_space + 1
+	}
+
+	second_value := -1 
+	if expression[start_of_second_exp] == '(' {
+		// Knock off the start and end parentheses and go to town
+		second_value = parseExpression(expression[start_of_second_exp+1:len(expression)-1], values)
+	} else {
+		// No parentheses to knock off
+		second_value = parseExpression(expression[start_of_second_exp:], values)
+	}
+
+	return first_value, second_value
+}
+
+/*
+Helper function to parse a literal expression - either a named variable or just a plain number
+*/
+func parseLiteral(expression string, values map[string]int) int {
+	if !regexp.MustCompile(`\d+`).MatchString(expression) {
+		// Not a number - our map must have the values
+		return values[expression]
+	} else {
+		// Is a number
+		value, _ := strconv.Atoi(expression)
+		return value
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

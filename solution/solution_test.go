@@ -2229,3 +2229,25 @@ func TestFindMinStep(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestEvaluate(t *testing.T) {
+	type input struct {
+		expression string
+	}
+	inputs := []input{
+		{"(let x 2 (mult x (let x 3 y 4 (add x y))))"},
+		{"(let x 3 x 2 x)"},
+		{"(let x 1 y 2 x (add x y) (add x y))"},
+	}
+	expected_outputs := []int{
+		14,
+		2,
+		5,
+	}
+
+	f := func(i input) int {
+		return evaluate(i.expression)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
