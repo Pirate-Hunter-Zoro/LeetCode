@@ -5252,47 +5252,53 @@ Inspiration for Optimization:
 https://leetcode.com/problems/zuma-game/solutions/1568450/python-easy-bfs-solution-with-explain/
 */
 func findMinStep(board string, hand string) int {
-	var board_buffer bytes.Buffer
-	var hand_buffer bytes.Buffer
-	hand_buffer.WriteString(hand)
-
-	sols := make(map[string]map[string]int)
+	visited := make(map[string]map[string]bool)
 	reductions := make(map[string]string)
 
-	board_buffer.WriteString(reduce(board, reductions))
-
-	return topDownFindMinStep(board_buffer, hand_buffer, sols, reductions)
-}
-
-/*
-Top down helper method to solve the findMinStep problem
-*/
-func topDownFindMinStep(board_buffer bytes.Buffer, hand_buffer bytes.Buffer, sols map[string]map[string]int, reductions map[string]string) int {
-	board := board_buffer.String()
-	hand := hand_buffer.String()
-	_, ok := sols[board]
-	if !ok {
-		sols[board] = make(map[string]int)
+	board = reduce(board, reductions)
+	type subproblem struct {
+		board string
+		hand  string
 	}
-	_, ok = sols[board][hand]
-	if !ok {
-		// Need to solve this problem
-		if len(hand) == 0 && len(board) > 0 {
-			sols[board][hand] = -1
-		} else if len(board) == 0 {
-			sols[board][hand] = 0
-		} else {
-			// For every possible character in the hand, we can place it anywhere on the board and see what happens
-			record := math.MaxInt
+	subproblem_queue := linked_list.NewQueue[subproblem]()
+	subproblem_queue.Enqueue(subproblem{board: board, hand: hand})
+	visited[board] = make(map[string]bool)
+	visited[board][hand] = true
+	moves := -1
+	for !subproblem_queue.Empty() {
+		n := subproblem_queue.Length()
+		moves++
+		for count := 0; count < n; count++ {
+			board_hand := subproblem_queue.Dequeue()
+			board := board_hand.board
+			hand := board_hand.hand
+			_, ok := visited[board]
+			if !ok {
+				visited[board] = make(map[string]bool)
+			}
+			visited[board][hand] = true
+			if len(board) == 0 {
+				return moves
+			}
 			for i:=0; i<len(hand); i++ { // Look at each character in hand
 				// Skip contiguous characters in the hand
 				if i > 0 && hand[i] == hand[i-1] {
 					continue
 				}
-				for j:=0; j<=len(board); j++ {
+				for j:=0; j<len(board); j++ {
 					// Position to place the character in the new board_buffer
-					// Skip contiguous characters in the board if said character matches the character in our hand
-					if j > 0 && j < len(board) && board[j] == board[j-1] && board[j] == hand[i] {
+					// Only insert a character from the end at the beginning of a contiguous set of the same characters in the board
+					if j > 0 && board[j-1] == hand[i] {
+						continue
+					}
+					// Further, only insert a character under the conditions:
+					// The character to insert matches the character at position j in the board
+					// OR 
+					// The place before insertion and the place after insertion in the board match, and the character you want to insert DOES NOT match
+					// X -> XX
+					// XX -> XYX
+					// NOTE - XZ -> XYZ is NEVER going to be helpful - there is no reason to do that
+					if !((board[j] == hand[i]) || (j < len(board)-1 && board[j] == board[j+1] && board[j] != hand[i])) {
 						continue
 					}
 					var new_board_buffer bytes.Buffer
@@ -5311,24 +5317,23 @@ func topDownFindMinStep(board_buffer bytes.Buffer, hand_buffer bytes.Buffer, sol
 					if j == len(board) {
 						new_board_buffer.WriteByte(hand[i])
 					}
-					var reduced_board_buffer bytes.Buffer
-					new_board := new_board_buffer.String()
-					reduced_board_buffer.WriteString(reduce(new_board, reductions))
-					sub_record := topDownFindMinStep(reduced_board_buffer, new_hand_buffer, sols, reductions)
-					if sub_record != -1 {
-						record = min(record, 1 + sub_record)
+					new_board := reduce(new_board_buffer.String(), reductions)
+					new_hand := new_hand_buffer.String()
+					_, ok := visited[new_board]
+					if ok {
+						_, ok = visited[new_board][new_hand]
+						if !ok {
+							subproblem_queue.Enqueue(subproblem{board: new_board, hand: new_hand})
+						}
+					} else {
+						subproblem_queue.Enqueue(subproblem{board: new_board, hand: new_hand})
 					}
 				}
-			}
-			if record != math.MaxInt {
-				sols[board][hand] = record
-			} else {
-				sols[board][hand] = -1
 			}
 		}
 	}
 
-	return sols[board][hand]
+	return -1
 }
 
 /*
