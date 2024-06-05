@@ -5378,6 +5378,19 @@ func reduce(board string, reductions map[string]string) string {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// We will need the following data structure for the preceding program
+type Environment struct {
+	definitions map[string]int
+	parent *Environment
+}
+func (e *Environment) get(key string) int {
+	v, ok := e.definitions[key]
+	if ok {
+		return v
+	}
+	return e.parent.get(key)
+}
+
 /*
 You are given a string expression representing a Lisp-like expression to return the integer value of.
 
@@ -5402,14 +5415,14 @@ Link:
 https://leetcode.com/problems/parse-lisp-expression/description/
 */
 func evaluate(expression string) int {
-    values := make(map[string]int)
+    values := &Environment{definitions: make(map[string]int), parent: nil}
 	return parseExpression(expression, values)
 }
 
 /*
 Recursive helper function to parse the expression
 */
-func parseExpression(expression string, values map[string]int) int {
+func parseExpression(expression string, values *Environment) int {
 	// Knock off the outer parentheses if we have not already
 	if expression[0] == '(' {
 		return parseExpression(expression[1:len(expression)-1], values)
@@ -5436,9 +5449,10 @@ func parseExpression(expression string, values map[string]int) int {
 /*
 Helper function to parse a let expression - this will call 'parseExpression' if necessary.
 */
-func parseLetExpression(expression string, values map[string]int) int {
+func parseLetExpression(expression string, values *Environment) int {
 	// name1 exp1 name2 exp2 name3 exp3 exp
 	// First, let's get our hands on the last expression 'exp'
+	new_values := &Environment{definitions: make(map[string]int), parent: values}
 	end_scanning_idx := -1
 	if expression[len(expression) - 1] == ')' {
 		// Then we need to find the CORRESPONDING closing parentheses
@@ -5486,8 +5500,8 @@ func parseLetExpression(expression string, values map[string]int) int {
 				idx++
 			} // WHERE the final closing parentheses was
 			// Remember to knock of the parentheses
-			end_exp = idx - 1
-			expr_value = parseExpression(expression[next_space+1:end_exp+1], values)
+			end_exp = idx
+			expr_value = parseExpression(expression[next_space+1:end_exp], new_values)
 		} else {
 			// Just find the following space
 			following_space := next_space + 1
@@ -5495,19 +5509,19 @@ func parseLetExpression(expression string, values map[string]int) int {
 				following_space++
 			}
 			end_exp = following_space
-			expr_value = parseExpression(expression[next_space+1:end_exp], values)
+			expr_value = parseExpression(expression[next_space+1:end_exp], new_values)
 		}
-		values[expression[index:next_space]] = expr_value
+		new_values.definitions[expression[index:next_space]] = expr_value
 		index = end_exp + 1
 	}
 
-	return parseExpression(expression[end_scanning_idx+2:], values)
+	return parseExpression(expression[end_scanning_idx+2:], new_values)
 }
 
 /*
 Helper function to parse an add expression - this will call 'parseExpression' if necessary.
 */
-func parseAddExpression(expression string, values map[string]int) int {
+func parseAddExpression(expression string, values *Environment) int {
 	first_value, second_value := parseTwoValues(expression, values)
 	return first_value + second_value
 }
@@ -5515,7 +5529,7 @@ func parseAddExpression(expression string, values map[string]int) int {
 /*
 Helper function to parse a mult expression - this will call 'parseExpression' if necessary.
 */
-func parseMultExpression(expression string, values map[string]int) int {
+func parseMultExpression(expression string, values *Environment) int {
 	first_value, second_value := parseTwoValues(expression, values)
 	return first_value * second_value
 }
@@ -5523,7 +5537,7 @@ func parseMultExpression(expression string, values map[string]int) int {
 /*
 Helper function to parse the two values that come in the form 'exp1 exp2'
 */
-func parseTwoValues(expression string, values map[string]int) (int, int) {
+func parseTwoValues(expression string, values *Environment) (int, int) {
 	first_value := -1
 	start_of_second_exp := -1
 	if expression[0] == '(' {
@@ -5560,10 +5574,10 @@ func parseTwoValues(expression string, values map[string]int) (int, int) {
 /*
 Helper function to parse a literal expression - either a named variable or just a plain number
 */
-func parseLiteral(expression string, values map[string]int) int {
-	if !regexp.MustCompile(`\d+`).MatchString(expression) {
+func parseLiteral(expression string, values *Environment) int {
+	if !regexp.MustCompile(`^-?\d+`).MatchString(expression) {
 		// Not a number - our map must have the values
-		return values[expression]
+		return values.get(expression)
 	} else {
 		// Is a number
 		value, _ := strconv.Atoi(expression)
