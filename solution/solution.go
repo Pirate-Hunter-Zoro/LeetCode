@@ -5403,25 +5403,24 @@ https://leetcode.com/problems/parse-lisp-expression/description/
 */
 func evaluate(expression string) int {
     values := make(map[string]int)
-	// Knock off the parentheses and go to town
-	if expression[0] == '(' {
-		return parseExpression(expression[1:len(expression)-1], values)
-	} else {
-		return parseExpression(expression, values)
-	}
+	return parseExpression(expression, values)
 }
 
 /*
 Recursive helper function to parse the expression
 */
 func parseExpression(expression string, values map[string]int) int {
+	// Knock off the outer parentheses if we have not already
+	if expression[0] == '(' {
+		return parseExpression(expression[1:len(expression)-1], values)
+	}
 	// The parentheses have been knocked off.
 	// Now we need to see if we are doing a let, add, or mult
 	first_space := 0
 	for expression[first_space] != ' ' {
 		first_space++
 		if first_space >= len(expression) {
-			parseLiteral(expression, values)
+			return parseLiteral(expression, values)
 		}
 	}
 	operation := expression[:first_space]
@@ -5485,10 +5484,10 @@ func parseLetExpression(expression string, values map[string]int) int {
 					st.Push(idx)
 				}
 				idx++
-			}
-			end_exp = idx-1 // WHERE the final closing parentheses was
+			} // WHERE the final closing parentheses was
 			// Remember to knock of the parentheses
-			expr_value = parseExpression(expression[idx+1:end_exp-1], values)
+			end_exp = idx - 1
+			expr_value = parseExpression(expression[next_space+1:end_exp+1], values)
 		} else {
 			// Just find the following space
 			following_space := next_space + 1
@@ -5502,7 +5501,7 @@ func parseLetExpression(expression string, values map[string]int) int {
 		index = end_exp + 1
 	}
 
-	return parseExpression(expression[end_scanning_idx+1:], values)
+	return parseExpression(expression[end_scanning_idx+2:], values)
 }
 
 /*
@@ -5553,14 +5552,7 @@ func parseTwoValues(expression string, values map[string]int) (int, int) {
 		start_of_second_exp = first_space + 1
 	}
 
-	second_value := -1 
-	if expression[start_of_second_exp] == '(' {
-		// Knock off the start and end parentheses and go to town
-		second_value = parseExpression(expression[start_of_second_exp+1:len(expression)-1], values)
-	} else {
-		// No parentheses to knock off
-		second_value = parseExpression(expression[start_of_second_exp:], values)
-	}
+	second_value := parseExpression(expression[start_of_second_exp:], values)
 
 	return first_value, second_value
 }
