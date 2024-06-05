@@ -2259,3 +2259,26 @@ func TestEvaluate(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestCountOfAtoms(t *testing.T) {
+	type input struct {
+		formula string
+	}
+	inputs := []input{
+		{"H2O"},
+		{"Mg(OH)2"},
+		{"K4(ON(SO3)2)2"},
+	}
+
+	expected_outputs := []string{
+		"H2O",
+		"H2MgO2",
+		"K4N2O14S4",
+	}
+
+	f := func(i input) string {
+		return countOfAtoms(i.formula)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
