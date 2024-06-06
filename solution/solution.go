@@ -5609,7 +5609,126 @@ Link:
 https://leetcode.com/problems/number-of-atoms/description/
 */
 func countOfAtoms(formula string) string {
-    return ""
+    atomCounts := atomsByCount(formula)
+	atoms := []string{}
+	for atom := range atomCounts {
+		atoms = append(atoms, atom)
+	}
+	sort.SliceStable(atoms, func(i, j int) bool {
+		return atoms[i] < atoms[j]
+	})
+	var new_formula bytes.Buffer
+	for _, atom := range atoms {
+		new_formula.WriteString(atom)
+		if atomCounts[atom] > 1 {
+			new_formula.WriteString(strconv.Itoa(atomCounts[atom]))
+		}
+	}
+
+	return new_formula.String()
+}
+
+/*
+Helper method to return the map of a set of basic molecules by count for a given string
+*/
+func atomsByCount(formula string) map[string]int {
+	if formula[0] == '(' {
+		st := linked_list.NewStack[int]()
+		st.Push(0)
+		idx := 1
+		for !st.Empty() {
+			if formula[idx] == ')' {
+				st.Pop()
+			} else if formula[idx] == '(' {
+				st.Push(idx)
+			} 
+			idx++
+		}
+		if idx == len(formula) {
+			return atomsByCount(formula[1:len(formula)-1])
+		} else {
+			inner_counts := atomsByCount(formula[1:idx-1])
+			coeff_start := idx
+			for idx < len(formula) &&  regexp.MustCompile(`\d`).MatchString(formula[idx:idx+1]) {
+				idx++
+			}
+			coeff, _ := strconv.Atoi(formula[coeff_start:idx])
+			for atom := range inner_counts {
+				inner_counts[atom] *= max(coeff, 1)
+			}
+			if idx < len(formula) {
+				following_counts := atomsByCount(formula[idx:])
+				for atom, count := range following_counts {
+					_, ok := inner_counts[atom]
+					if ok {
+						inner_counts[atom] += count
+					} else {
+						inner_counts[atom] = count
+					}
+				}
+			}
+			return inner_counts
+		}
+	}
+	idx := 0
+	for idx < len(formula) && !regexp.MustCompile(`\d`).MatchString(formula[idx:idx+1]) && formula[idx] != '(' {
+		idx++
+	}
+	for idx < len(formula) && regexp.MustCompile(`\d`).MatchString(formula[idx:idx+1]) {
+		idx++
+	}
+	// Just find the first atom and its count, and the recurse for the rest
+	i := 1
+	var atom_name bytes.Buffer
+	atom_name.WriteByte(formula[0])
+	for i < len(formula) && regexp.MustCompile("[a-z]").MatchString(formula[i:i+1]) {
+		atom_name.WriteByte(formula[i])
+		i++
+	}
+	digit_present := false
+	var count bytes.Buffer
+	for i < len(formula) && regexp.MustCompile(`\d`).MatchString(formula[i:i+1]) {
+		digit_present = true
+		count.WriteByte(formula[i])
+		i++
+	}
+	atom := atom_name.String()
+	next_counts := make(map[string]int)
+	if i < len(formula) {
+		next_counts = atomsByCount(formula[i:])
+	}
+	if !digit_present {
+		_, ok := next_counts[atom]
+		if ok {
+			next_counts[atom]++
+		} else {
+			next_counts[atom] = 1
+		}
+	} else {
+		num, _ := strconv.Atoi(count.String())
+		_, ok := next_counts[atom]
+		if ok {
+			next_counts[atom] += num
+		} else {
+			next_counts[atom] = num
+		}
+	}
+
+	return next_counts
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Alice has some number of cards and she wants to rearrange the cards into groups so that each group is of size groupSize, and consists of groupSize consecutive cards.
+
+Given an integer array hand where hand[i] is the value written on the ith card and an integer groupSize, return true if she can rearrange the cards, or false otherwise.
+
+Link:
+https://leetcode.com/problems/hand-of-straights/description/?envType=daily-question&envId=2024-06-06
+*/
+func isNStraightHand(hand []int, groupSize int) bool {
+	return false
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

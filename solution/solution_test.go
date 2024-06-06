@@ -2268,16 +2268,42 @@ func TestCountOfAtoms(t *testing.T) {
 		{"H2O"},
 		{"Mg(OH)2"},
 		{"K4(ON(SO3)2)2"},
+		{"Be32"},
+		{"Mg(H2O)N"},
 	}
 
 	expected_outputs := []string{
 		"H2O",
 		"H2MgO2",
 		"K4N2O14S4",
+		"Be32",
+		"H2MgNO",
 	}
 
 	f := func(i input) string {
 		return countOfAtoms(i.formula)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestIsNStraightHand(t *testing.T) {
+	type input struct {
+		hand []int
+		size int
+	}
+	inputs := []input{
+		{[]int{1,2,3,6,2,3,4,7,8}, 3},
+		{[]int{1,2,3,4,5}, 4},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+	}
+
+	f := func(i input) bool {
+		return isNStraightHand(i.hand, i.size)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
