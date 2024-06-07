@@ -5728,7 +5728,49 @@ Link:
 https://leetcode.com/problems/hand-of-straights/description/?envType=daily-question&envId=2024-06-06
 */
 func isNStraightHand(hand []int, groupSize int) bool {
-	return false
+	if len(hand) % groupSize != 0 {
+		return false
+	}
+
+	sort.SliceStable(hand, func(i, j int) bool {
+		return hand[i] < hand[j]
+	})
+	unique_values := []int{hand[0]}
+	counts := make(map[int]int)
+	counts[hand[0]] = 1
+	for i:=1; i<len(hand); i++ {
+		_, ok := counts[hand[i]]
+		if !ok {
+			counts[hand[i]] = 1
+			unique_values = append(unique_values, hand[i])
+		} else {
+			counts[hand[i]]++
+		}
+	}
+
+	idx := 0
+	accounted := 0
+	for idx <= len(unique_values) - groupSize {
+		counts[unique_values[idx]]--
+		accounted++
+		for i:=1; i<groupSize; i++ {
+			if unique_values[idx + i] - unique_values[idx + i - 1] != 1 {
+				return false
+			} else if counts[unique_values[idx + i]] == 0 {
+				return false
+			} else {
+				counts[unique_values[idx + i]]--
+				accounted++
+			}
+		}
+		for idx <= len(unique_values) - groupSize && counts[unique_values[idx]] == 0 {
+			idx++
+		}
+		if accounted == len(hand) {
+			break
+		}
+	}
+	return accounted == len(hand)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
