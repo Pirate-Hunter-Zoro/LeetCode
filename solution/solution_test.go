@@ -2341,15 +2341,40 @@ func TestNumberOfArithmeticSubsequences(t *testing.T) {
 	inputs := []input{
 		{[]int{2,4,6,8,10}},
 		{[]int{7,7,7,7,7}},
+		{[]int{2,2,3,4}},
 	}
 
 	expected_outputs := []int{
 		7,
 		16,
+		2,
 	}
 
 	f := func(i input) int {
-		return numberOfArithmeticSlices(i.nums)
+		return numberOfArithmeticSubsequences(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestSubarraysDivByK(t *testing.T) {
+	type input struct {
+		nums []int
+		k 	 int
+	}
+
+	inputs := []input{
+		{[]int{4,5,0,-2,-3,1}, 5},
+		{[]int{5}, 9},
+	}
+
+	expected_outputs := []int{
+		7,
+		0,
+	}
+
+	f := func(i input) int {
+		return subarraysDivByK(i.nums, i.k)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

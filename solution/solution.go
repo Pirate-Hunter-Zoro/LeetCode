@@ -5826,6 +5826,49 @@ Link:
 https://leetcode.com/problems/arithmetic-slices-ii-subsequence/description/
 */
 func numberOfArithmeticSubsequences(nums []int) int {
+	// Ask the question - how many subsequences with a step of x end at index i?
+	n := len(nums)
+	num_end := make(map[int]map[int]int)
+	num_end[0] = make(map[int]int)
+	total := 0
+	for i:=1; i<n; i++ {
+		for j:=0; j<i; j++ {
+			diff := nums[i] - nums[j]
+			_, ok := num_end[i]
+			if !ok {
+				num_end[i] = make(map[int]int)
+			}
+			_, ok = num_end[i][diff]
+			if !ok {
+				// We have now found one subsequence of size 2 that ends at this index with the given difference
+				num_end[i][diff] = 1
+			} else {
+				num_end[i][diff]++
+			}
+			count, ok := num_end[j][diff]
+			if ok {
+				num_end[i][diff] += count
+				total += count // Include these newly found arithmetic subsequences that end in nums[i] with diff of length >= 3
+			}
+			total += 1 // We know we have at least a pair with nums[i] and nums[j], so count that as it has not yet been counted
+		}
+	}
+
+	// Return the total minus all pairs - because the pairs were counted but they don't count
+    return total - n * (n - 1) / 2
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer array nums and an integer k, return the number of non-empty subarrays that have a sum divisible by k.
+
+A subarray is a contiguous part of an array.
+
+Link:
+https://leetcode.com/problems/subarray-sums-divisible-by-k/description/?envType=daily-question&envId=2024-06-09
+*/
+func subarraysDivByK(nums []int, k int) int {
     return 0
 }
 
