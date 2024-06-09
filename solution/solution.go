@@ -5775,3 +5775,59 @@ func isNStraightHand(hand []int, groupSize int) bool {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+An integer array is called arithmetic if it consists of at least three elements and if the difference between any two consecutive elements is the same.
+
+For example, [1,3,5,7,9], [7,7,7,7], and [3,-1,-5,-9] are arithmetic sequences.
+Given an integer array nums, return the number of arithmetic subarrays of nums.
+
+A subarray is a contiguous subsequence of the array.
+
+Link:
+https://leetcode.com/problems/arithmetic-slices/description/
+*/
+func numberOfArithmeticSlices(nums []int) int {
+    count_ending := make([]int, len(nums))
+	count_ending[0] = 1
+	total := 1
+	if len(nums) > 1 {
+		count_ending[1] = 2
+		total += 2
+	}
+	for i:=2; i<len(count_ending); i++ {
+		// How many arithmetic subarrays end at this index?
+		if nums[i] - nums[i-1] == nums[i-1] - nums[i-2] {
+			count_ending[i] = 1 + count_ending[i-1]
+		} else {
+			count_ending[i] = 2
+		}
+		total += count_ending[i]
+	}
+
+	// Return the total, minus every length 1 subsequence, minus every length 2 subsequence
+	return max(0, total - len(nums) - len(nums) + 1)
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer array nums, return the number of all the arithmetic subsequences of nums.
+
+A sequence of numbers is called arithmetic if it consists of at least three elements and if the difference between any two consecutive elements is the same.
+
+For example, [1, 3, 5, 7, 9], [7, 7, 7, 7], and [3, -1, -5, -9] are arithmetic sequences.
+For example, [1, 1, 2, 5, 7] is not an arithmetic sequence.
+A subsequence of an array is a sequence that can be formed by removing some elements (possibly none) of the array.
+
+For example, [2,5,10] is a subsequence of [1,2,1,2,4,1,5,10].
+The test cases are generated so that the answer fits in 32-bit integer.
+
+Link:
+https://leetcode.com/problems/arithmetic-slices-ii-subsequence/description/
+*/
+func numberOfArithmeticSubsequences(nums []int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
