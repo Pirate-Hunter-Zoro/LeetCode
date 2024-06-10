@@ -2366,15 +2366,38 @@ func TestSubarraysDivByK(t *testing.T) {
 	inputs := []input{
 		{[]int{4,5,0,-2,-3,1}, 5},
 		{[]int{5}, 9},
+		{[]int{1,-10,5,}, 9},
 	}
 
 	expected_outputs := []int{
 		7,
 		0,
+		1,
 	}
 
 	f := func(i input) int {
 		return subarraysDivByK(i.nums, i.k)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestCanPartition(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{1,5,11,5}},
+		{[]int{1,2,3,5}},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+	}
+
+	f := func(i input) bool {
+		return canPartition(i.nums)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

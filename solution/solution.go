@@ -5869,7 +5869,54 @@ Link:
 https://leetcode.com/problems/subarray-sums-divisible-by-k/description/?envType=daily-question&envId=2024-06-09
 */
 func subarraysDivByK(nums []int, k int) int {
-    return 0
+	// FROM THE EDITORIAL:
+	// sum(i,j) = 0 (mod k) IFF sum(0,i)=sum(0,j)(mod k)
+	n := len(nums)
+	mods := make([]int, n)
+	for idx, v := range nums {
+		mods[idx] = v % k
+		if mods[idx] < 0 {
+			mods[idx] += k
+		}
+	}
+	// For sum(0,i), we care about the sum modulus k - keep track of the count for how many
+	mod_counts := make(map[int]int)
+	total := 0
+	current_mod := mods[0]
+	mod_counts[current_mod] = 1
+	if current_mod == 0 {
+		total++
+	}
+	for i:=1; i<len(nums); i++ {
+		current_mod = (current_mod + mods[i]) % k
+		// This whole contiguous array counts
+		if current_mod == 0 {
+			total++
+		}
+		count, ok := mod_counts[current_mod]
+		if ok {
+			// Then we have that many previous subarrays with this same modulus
+			// Each of those subarrays' ending point forms a starting point for a new array up to index i which achieves a sum of 0 mod k
+			total += count
+			mod_counts[current_mod]++
+		} else {
+			mod_counts[current_mod] = 1
+		}
+	}
+	
+	return total
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer array nums, return true if you can partition the array into two subsets such that the sum of the elements in both subsets is equal or false otherwise.
+
+Link:
+https://leetcode.com/problems/partition-equal-subset-sum/description/
+*/
+func canPartition(nums []int) bool {
+    return false
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
