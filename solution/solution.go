@@ -5914,9 +5914,68 @@ Given an integer array nums, return true if you can partition the array into two
 
 Link:
 https://leetcode.com/problems/partition-equal-subset-sum/description/
+
+Inspiration:
+https://leetcode.com/problems/partition-equal-subset-sum/solutions/90592/0-1-knapsack-detailed-explanation/
 */
 func canPartition(nums []int) bool {
-    return false
+	// Sort the list and have two outer pointers to gouge out a middle
+	n := len(nums)
+	sum := 0
+	for _, v := range nums {
+		sum += v
+	}
+	if sum % 2 == 1 {
+		return false
+	} else {
+		dp := make([]map[int]bool, n)
+		for end:=0; end<n; end++ {
+			dp[end] = make(map[int]bool)
+		}
+		return canAchieveSubsetSum(n-1, sum / 2, nums, dp)
+	}
+}
+
+/*
+Top down helper method to try to see if it is possible to pick a subset from nums[0:end+1] with a sum equal to the input sum
+*/
+func canAchieveSubsetSum(end int, sum int, nums []int, dp []map[int]bool) bool {
+	if sum == 0 {
+		return true
+	} else if sum < 0 {
+		return false
+	} else if end == 0 {
+		return false
+	} else {
+		_, ok := dp[end][sum]
+		if !ok {
+			// Need to solve this problem - try including the number at nums[end], or NOT including it
+			dp[end][sum] = canAchieveSubsetSum(end-1, sum, nums, dp) || canAchieveSubsetSum(end-1, sum - nums[end], nums, dp)
+		}
+		return dp[end][sum]
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+We define str = [s, n] as the string str which consists of the string s concatenated n times.
+
+For example, str == ["abc", 3] =="abcabcabc".
+We define that string s1 can be obtained from string s2 if we can remove some characters from s2 such that it becomes s1.
+** I.E. -> s1 is a SUBSEQUENCE of s2 - so longest common subsequence between the two IS s1... **
+
+For example, s1 = "abc" can be obtained from s2 = "abdbec" based on our definition by removing 'd', 'b', and 'e'.
+You are given two strings s1 and s2 and two integers n1 and n2. 
+You have the two strings str1 = [s1, n1] and str2 = [s2, n2].
+
+Return the maximum integer m such that str = [str2, m] can be obtained from str1.
+
+Link:
+https://leetcode.com/problems/count-the-repetitions/description/
+*/
+func getMaxRepetitions(s1 string, n1 int, s2 string, n2 int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
