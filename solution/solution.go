@@ -5973,9 +5973,26 @@ Return the maximum integer m such that str = [str2, m] can be obtained from str1
 
 Link:
 https://leetcode.com/problems/count-the-repetitions/description/
+
+Inspiration:
+https://leetcode.com/problems/count-the-repetitions/solutions/4553332/maximising-repetitions-through-iterative-subsequence-matching/
 */
 func getMaxRepetitions(s1 string, n1 int, s2 string, n2 int) int {
-    return 0
+	// First count how many times n1 repetitions of s1 can include all characters of s2
+	count := 0
+	s2_posn := 0
+	for i:=0; i<n1; i++ {
+		for j:=0; j<len(s1); j++ {
+			if s2[s2_posn] == s1[j] {
+				s2_posn++
+			}
+			if s2_posn==len(s2) {
+				count++
+				s2_posn = 0
+			}
+		}
+	}
+    return count / n2
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
