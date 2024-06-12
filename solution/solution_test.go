@@ -2426,3 +2426,26 @@ func TestGetMaxRepetitions(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestFindSubstringInWraproundString(t *testing.T) {
+	type input struct {
+		s string
+	}
+	inputs := []input{
+		{"a"},
+		{"cac"},
+		{"zab"},
+	}
+
+	expected_outputs := []int{
+		1,
+		2,
+		6,
+	}
+
+	f := func(i input) int {
+		return findSubstringInWraproundString(i.s)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
