@@ -5,12 +5,12 @@ import "math"
 var NULL = math.MinInt
 
 type TreeNode struct {
-	Val		int
-	Left	*TreeNode
-	Right 	*TreeNode
+	Val   int
+	Left  *TreeNode
+	Right *TreeNode
 }
 
-func New(values []int) *TreeNode {
+func NewTree(values []int) *TreeNode {
 	return new(values, 0, 0)
 }
 
@@ -19,8 +19,8 @@ func new(values []int, idx int, child_offset int) *TreeNode {
 		return nil
 	} else {
 		current := &TreeNode{Val: values[idx]}
-		left_idx := 2 * idx + 1 - child_offset
-		right_idx := 2 * idx + 2 - child_offset
+		left_idx := 2*idx + 1 - child_offset
+		right_idx := 2*idx + 2 - child_offset
 		additional_offset := 0
 		if left_idx < len(values) && values[left_idx] == NULL {
 			additional_offset += 2

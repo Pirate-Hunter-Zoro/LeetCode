@@ -1091,8 +1091,8 @@ func TestDistributeCoins(t *testing.T) {
 		root *binary_tree.TreeNode
 	}
 	inputs := []input{
-		{binary_tree.New([]int{3, 0, 0})},
-		{binary_tree.New([]int{0, 3, 0})},
+		{binary_tree.NewTree([]int{3, 0, 0})},
+		{binary_tree.NewTree([]int{0, 3, 0})},
 	}
 	expected_outputs := []int{
 		2,
@@ -1190,9 +1190,9 @@ func TestMaxSumBST(t *testing.T) {
 		root *binary_tree.TreeNode
 	}
 	inputs := []input{
-		{binary_tree.New([]int{1, 4, 3, 2, 4, 2, 5, binary_tree.NULL, binary_tree.NULL, binary_tree.NULL, binary_tree.NULL, binary_tree.NULL, binary_tree.NULL, 4, 6})},
-		{binary_tree.New([]int{4, 3, binary_tree.NULL, 1, 2})},
-		{binary_tree.New([]int{-4, -2, -5})},
+		{binary_tree.NewTree([]int{1, 4, 3, 2, 4, 2, 5, binary_tree.NULL, binary_tree.NULL, binary_tree.NULL, binary_tree.NULL, binary_tree.NULL, binary_tree.NULL, 4, 6})},
+		{binary_tree.NewTree([]int{4, 3, binary_tree.NULL, 1, 2})},
+		{binary_tree.NewTree([]int{-4, -2, -5})},
 	}
 	expected_outputs := []int{
 		20,
@@ -1722,23 +1722,23 @@ func TestRemoveLeafNodes(t *testing.T) {
 	}
 	inputs := []input{
 		{
-			binary_tree.New([]int{1, 2, 3, 2, binary_tree.NULL, 2, 4}),
+			binary_tree.NewTree([]int{1, 2, 3, 2, binary_tree.NULL, 2, 4}),
 			2,
 		},
 		{
-			binary_tree.New([]int{1, 3, 3, 3, 2}),
+			binary_tree.NewTree([]int{1, 3, 3, 3, 2}),
 			3,
 		},
 		{
-			binary_tree.New([]int{1, 2, binary_tree.NULL, 2, binary_tree.NULL, 2}),
+			binary_tree.NewTree([]int{1, 2, binary_tree.NULL, 2, binary_tree.NULL, 2}),
 			2,
 		},
 	}
 
 	expected_outputs := []*binary_tree.TreeNode{
-		binary_tree.New([]int{1, binary_tree.NULL, 3, binary_tree.NULL, 4}),
-		binary_tree.New([]int{1, 3, binary_tree.NULL, binary_tree.NULL, 2}),
-		binary_tree.New([]int{1}),
+		binary_tree.NewTree([]int{1, binary_tree.NULL, 3, binary_tree.NULL, 4}),
+		binary_tree.NewTree([]int{1, 3, binary_tree.NULL, binary_tree.NULL, 2}),
+		binary_tree.NewTree([]int{1}),
 	}
 
 	f := func(i input) *binary_tree.TreeNode {
@@ -1754,10 +1754,10 @@ func TestMinCameraCover(t *testing.T) {
 	}
 
 	inputs := []input{
-		{binary_tree.New([]int{0, 0, binary_tree.NULL, 0, 0})},
-		{binary_tree.New([]int{0, 0, binary_tree.NULL, 0, binary_tree.NULL, 0, binary_tree.NULL, binary_tree.NULL, 0})},
-		{binary_tree.New([]int{0, 0, 0, binary_tree.NULL, 0, binary_tree.NULL, 0})},
-		{binary_tree.New([]int{0, 0, binary_tree.NULL, binary_tree.NULL, 0, 0, binary_tree.NULL, binary_tree.NULL, 0, 0})},
+		{binary_tree.NewTree([]int{0, 0, binary_tree.NULL, 0, 0})},
+		{binary_tree.NewTree([]int{0, 0, binary_tree.NULL, 0, binary_tree.NULL, 0, binary_tree.NULL, binary_tree.NULL, 0})},
+		{binary_tree.NewTree([]int{0, 0, 0, binary_tree.NULL, 0, binary_tree.NULL, 0})},
+		{binary_tree.NewTree([]int{0, 0, binary_tree.NULL, binary_tree.NULL, 0, 0, binary_tree.NULL, binary_tree.NULL, 0, 0})},
 	}
 
 	expected_outputs := []int{
@@ -1878,12 +1878,12 @@ func TestPlacedCoins(t *testing.T) {
 	}
 
 	expected_outputs := [][]int64{
-		{120,1,1,1,1,1},
-		{280,140,32,1,1,1,1,1,1},
-		{0,1,1},
+		{120, 1, 1, 1, 1, 1},
+		{280, 140, 32, 1, 1, 1, 1, 1, 1},
+		{0, 1, 1},
 	}
 
-	f := func(i input) []int64{
+	f := func(i input) []int64 {
 		return placedCoins(i.edges, i.cost)
 	}
 
@@ -1892,51 +1892,51 @@ func TestPlacedCoins(t *testing.T) {
 
 func TestCollectTheCoins(t *testing.T) {
 	type input struct {
-		coins 	[]int
-		edges 	[][]int
+		coins []int
+		edges [][]int
 	}
 
 	inputs := []input{
 		{
-			[]int{1,0,0,0,0,1},
+			[]int{1, 0, 0, 0, 0, 1},
 			[][]int{
-				{0,1},
-				{1,2},
-				{2,3},
-				{3,4},
-				{4,5},
+				{0, 1},
+				{1, 2},
+				{2, 3},
+				{3, 4},
+				{4, 5},
 			},
 		},
 		{
-			[]int{0,0,0,1,1,0,0,1},
+			[]int{0, 0, 0, 1, 1, 0, 0, 1},
 			[][]int{
-				{0,1},
-				{0,2},
-				{1,3},
-				{1,4},
-				{2,5},
-				{5,6},
-				{5,7},
+				{0, 1},
+				{0, 2},
+				{1, 3},
+				{1, 4},
+				{2, 5},
+				{5, 6},
+				{5, 7},
 			},
 		},
 		{
-			[]int{1,0,1,1,1,0,0,1,1,0,1,1,0,0,0,0},
+			[]int{1, 0, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0},
 			[][]int{
-				{0,1},
-				{1,2},
-				{1,3},
-				{3,4},
-				{3,5},
-				{4,6},
-				{2,7},
-				{7,8},
-				{3,9},
-				{8,10},
-				{8,11},
-				{6,12},
-				{7,13},
-				{11,14},
-				{10,15},
+				{0, 1},
+				{1, 2},
+				{1, 3},
+				{3, 4},
+				{3, 5},
+				{4, 6},
+				{2, 7},
+				{7, 8},
+				{3, 9},
+				{8, 10},
+				{8, 11},
+				{6, 12},
+				{7, 13},
+				{11, 14},
+				{10, 15},
 			},
 		},
 	}
@@ -1957,12 +1957,12 @@ func TestCollectTheCoins(t *testing.T) {
 func TestBeautifulSubsets(t *testing.T) {
 	type input struct {
 		nums []int
-		k 	 int
+		k    int
 	}
 
 	inputs := []input{
 		{
-			[]int{2,4,6},
+			[]int{2, 4, 6},
 			2,
 		},
 		{
@@ -1970,7 +1970,7 @@ func TestBeautifulSubsets(t *testing.T) {
 			1,
 		},
 		{
-			[]int{10,4,5,7,2,1},
+			[]int{10, 4, 5, 7, 2, 1},
 			3,
 		},
 	}
@@ -1995,33 +1995,33 @@ func TestBeautifulSubsets(t *testing.T) {
 
 func TestMaxScoreWords(t *testing.T) {
 	type input struct {
-		words 	[]string
+		words   []string
 		letters []byte
-		score 	[]int
+		score   []int
 	}
 
 	inputs := []input{
 		{
-			[]string{"dog","cat","dad","good"},
-			[]byte{'a','a','c','d','d','d','g','o','o'},
-			[]int{1,0,9,5,0,0,3,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0},
+			[]string{"dog", "cat", "dad", "good"},
+			[]byte{'a', 'a', 'c', 'd', 'd', 'd', 'g', 'o', 'o'},
+			[]int{1, 0, 9, 5, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		},
 		{
-			[]string{"xxxz","ax","bx","cx"},
-			[]byte{'z','a','b','c','x','x','x'},
-			[]int{4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,0,10},
+			[]string{"xxxz", "ax", "bx", "cx"},
+			[]byte{'z', 'a', 'b', 'c', 'x', 'x', 'x'},
+			[]int{4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 10},
 		},
 		{
 			[]string{"leetcode"},
-			[]byte{'l','e','t','c','o','d'},
-			[]int{0,0,1,1,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1,0,0,0,0,0,0},
+			[]byte{'l', 'e', 't', 'c', 'o', 'd'},
+			[]int{0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
 		},
 	}
 
 	expected_outputs := []int{
 		23, // "dad" and "good"
 		27, // "ax", "bx", and "cx"
-		0, // No words can be formed
+		0,  // No words can be formed
 	}
 
 	f := func(i input) int {
@@ -2033,7 +2033,7 @@ func TestMaxScoreWords(t *testing.T) {
 
 func TestCountArrangements(t *testing.T) {
 	type input struct {
-		n 	int
+		n int
 	}
 
 	inputs := []input{
@@ -2049,13 +2049,13 @@ func TestCountArrangements(t *testing.T) {
 	f := func(i input) int {
 		return countArrangement(i.n)
 	}
-	
+
 	testResults(t, f, inputs, expected_outputs)
 }
 
 func TestCheckRecord(t *testing.T) {
 	type input struct {
-		n 	int
+		n int
 	}
 
 	inputs := []input{
@@ -2084,10 +2084,10 @@ func TestRemoveBoxes(t *testing.T) {
 		boxes []int
 	}
 	inputs := []input{
-		{[]int{1,3,2,2,2,3,4,3,1}},
-		{[]int{1,1,1}},
+		{[]int{1, 3, 2, 2, 2, 3, 4, 3, 1}},
+		{[]int{1, 1, 1}},
 		{[]int{1}},
-		{[]int{1,2,2,1,1,1,2,1,1,2,1,2,1,1,2,2,1,1,2,2,1,1,1,2,2,2,2,1,2,1,1,2,2,1,2,1,2,2,2,2,2,1,2,1,2,2,1,1,1,2,2,1,2,1,2,2,1,2,1,1,1,2,2,2,2,2,1,2,2,2,2,2,1,1,1,1,1,2,2,2,2,2,1,1,1,1,2,2,1,1,1,1,1,1,1,2,1,2,2,1}},
+		{[]int{1, 2, 2, 1, 1, 1, 2, 1, 1, 2, 1, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1, 1, 1, 2, 2, 2, 2, 1, 2, 1, 1, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 1, 1, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1, 1, 1, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 2, 1, 2, 2, 1}},
 	}
 
 	expected_outputs := []int{
@@ -2109,17 +2109,17 @@ func TestVerticalTraversal(t *testing.T) {
 		root *binary_tree.TreeNode
 	}
 	inputs := []input{
-		{binary_tree.New([]int{3,9,20,binary_tree.NULL,binary_tree.NULL,15,7})},
-		{binary_tree.New([]int{1,2,3,4,5,6,7})},
-		{binary_tree.New([]int{1,2,3,4,6,5,7})},
-		{binary_tree.New([]int{1,2,3,4,6,5,7})},
+		{binary_tree.NewTree([]int{3, 9, 20, binary_tree.NULL, binary_tree.NULL, 15, 7})},
+		{binary_tree.NewTree([]int{1, 2, 3, 4, 5, 6, 7})},
+		{binary_tree.NewTree([]int{1, 2, 3, 4, 6, 5, 7})},
+		{binary_tree.NewTree([]int{1, 2, 3, 4, 6, 5, 7})},
 	}
 
 	expected_outputs := [][][]int{
-		{{9},{3,15},{20},{7}},
-		{{4},{2},{1,5,6},{3},{7}},
-		{{4},{2},{1,5,6},{3},{7}},
-		{{4},{2},{1,5,6},{3},{7}},
+		{{9}, {3, 15}, {20}, {7}},
+		{{4}, {2}, {1, 5, 6}, {3}, {7}},
+		{{4}, {2}, {1, 5, 6}, {3}, {7}},
+		{{4}, {2}, {1, 5, 6}, {3}, {7}},
 	}
 
 	f := func(i input) [][]int {
@@ -2159,10 +2159,10 @@ func TestMaxRotateFunction(t *testing.T) {
 		nums []int
 	}
 	inputs := []input{
-		{[]int{4,3,2,6,}},
+		{[]int{4, 3, 2, 6}},
 		{[]int{100}},
 	}
-	
+
 	expected_outputs := []int{
 		26,
 		0,
@@ -2180,9 +2180,9 @@ func TestEraseOverlapIntervals(t *testing.T) {
 		intervals [][]int
 	}
 	inputs := []input{
-		{[][]int{{1,2},{2,3},{3,4},{1,3}}},
-		{[][]int{{1,2},{1,2},{1,2}}},
-		{[][]int{{1,2},{2,3}}},
+		{[][]int{{1, 2}, {2, 3}, {3, 4}, {1, 3}}},
+		{[][]int{{1, 2}, {1, 2}, {1, 2}}},
+		{[][]int{{1, 2}, {2, 3}}},
 	}
 
 	expected_outputs := []int{
@@ -2293,10 +2293,10 @@ func TestIsNStraightHand(t *testing.T) {
 		size int
 	}
 	inputs := []input{
-		{[]int{1,2,3,6,2,3,4,7,8}, 3},
-		{[]int{1,2,3,4,5}, 4},
-		{[]int{9,13,15,23,22,25,4,4,29,15,8,23,12,19,24,17,18,11,22,24,17,17,10,23,21,18,14,18,7,6,3,6,19,11,16,11,12,13,8,26,17,20,13,19,22,21,27,9,20,15,20,27,8,13,25,23,22,15,9,14,20,10,6,5,14,12,7,16,21,18,21,24,23,10,21,16,18,16,18,5,20,19,20,10,14,26,2,9,19,12,28,17,5,7,25,22,16,17,21,11}, 10},
-		{[]int{1,1,2,2,3,3,}, 2},
+		{[]int{1, 2, 3, 6, 2, 3, 4, 7, 8}, 3},
+		{[]int{1, 2, 3, 4, 5}, 4},
+		{[]int{9, 13, 15, 23, 22, 25, 4, 4, 29, 15, 8, 23, 12, 19, 24, 17, 18, 11, 22, 24, 17, 17, 10, 23, 21, 18, 14, 18, 7, 6, 3, 6, 19, 11, 16, 11, 12, 13, 8, 26, 17, 20, 13, 19, 22, 21, 27, 9, 20, 15, 20, 27, 8, 13, 25, 23, 22, 15, 9, 14, 20, 10, 6, 5, 14, 12, 7, 16, 21, 18, 21, 24, 23, 10, 21, 16, 18, 16, 18, 5, 20, 19, 20, 10, 14, 26, 2, 9, 19, 12, 28, 17, 5, 7, 25, 22, 16, 17, 21, 11}, 10},
+		{[]int{1, 1, 2, 2, 3, 3}, 2},
 	}
 
 	expected_outputs := []bool{
@@ -2318,7 +2318,7 @@ func TestNumberOfArithmeticSlices(t *testing.T) {
 		nums []int
 	}
 	inputs := []input{
-		{[]int{1,2,3,4}},
+		{[]int{1, 2, 3, 4}},
 		{[]int{1}},
 	}
 
@@ -2339,9 +2339,9 @@ func TestNumberOfArithmeticSubsequences(t *testing.T) {
 		nums []int
 	}
 	inputs := []input{
-		{[]int{2,4,6,8,10}},
-		{[]int{7,7,7,7,7}},
-		{[]int{2,2,3,4}},
+		{[]int{2, 4, 6, 8, 10}},
+		{[]int{7, 7, 7, 7, 7}},
+		{[]int{2, 2, 3, 4}},
 	}
 
 	expected_outputs := []int{
@@ -2360,13 +2360,13 @@ func TestNumberOfArithmeticSubsequences(t *testing.T) {
 func TestSubarraysDivByK(t *testing.T) {
 	type input struct {
 		nums []int
-		k 	 int
+		k    int
 	}
 
 	inputs := []input{
-		{[]int{4,5,0,-2,-3,1}, 5},
+		{[]int{4, 5, 0, -2, -3, 1}, 5},
 		{[]int{5}, 9},
-		{[]int{1,-10,5,}, 9},
+		{[]int{1, -10, 5}, 9},
 	}
 
 	expected_outputs := []int{
@@ -2387,8 +2387,8 @@ func TestCanPartition(t *testing.T) {
 		nums []int
 	}
 	inputs := []input{
-		{[]int{1,5,11,5}},
-		{[]int{1,2,3,5}},
+		{[]int{1, 5, 11, 5}},
+		{[]int{1, 2, 3, 5}},
 	}
 
 	expected_outputs := []bool{
@@ -2405,10 +2405,10 @@ func TestCanPartition(t *testing.T) {
 
 func TestGetMaxRepetitions(t *testing.T) {
 	type input struct {
-		s1 	string
-		n1 	int
-		s2  string
-		n2  int
+		s1 string
+		n1 int
+		s2 string
+		n2 int
 	}
 	inputs := []input{
 		{"acb", 4, "ab", 2},
@@ -2435,11 +2435,13 @@ func TestFindSubstringInWraproundString(t *testing.T) {
 		{"a"},
 		{"cac"},
 		{"zab"},
+		{"zaba"},
 	}
 
 	expected_outputs := []int{
 		1,
 		2,
+		6,
 		6,
 	}
 

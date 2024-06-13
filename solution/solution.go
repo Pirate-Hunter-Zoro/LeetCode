@@ -5999,15 +5999,66 @@ func getMaxRepetitions(s1 string, n1 int, s2 string, n2 int) int {
 
 /*
 We define the string base to be the infinite wraparound string of "abcdefghijklmnopqrstuvwxyz", so base will look like this:
+"...zabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd..."
 
-"...zabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd....".
 Given a string s, return the number of unique non-empty substrings of s are present in base.
 
 Link:
 https://leetcode.com/problems/unique-substrings-in-wraparound-string/description/
 */
 func findSubstringInWraproundString(s string) int {
-    return 0
+	// This question is essentially asking how many unique substrings of s are there?
+	streaks := make([]int, len(s))
+	streaks[0] = 1
+	for i:=1; i<len(s); i++ {
+		if (s[i-1] == s[i] - 1) || (s[i-1] == 'z' && s[i] == 'a') {
+			streaks[i] = streaks[i-1] + 1
+		} else {
+			streaks[i] = 1
+		}
+	}
+
+	// For every character, we need the longest streak of consecutive characters that start at said character
+	streaks_by_char := make(map[byte]int)
+	for i:=0; i<len(s); i++ {
+		starting_char := findStartingChar(s[i], streaks[i])
+		for jump := 0; jump < min(26, streaks[i]); jump++ {
+			length := streaks[i] - jump
+			char := byte('a')
+			if starting_char + byte(jump) > 'z' {
+				char = 'a' + (starting_char + byte(jump) - 'z') - 1
+			} else {
+				char = starting_char + byte(jump)
+			}
+			_, ok := streaks_by_char[char]
+			if ok {
+				streaks_by_char[char] = max(streaks_by_char[char], length)
+			} else {
+				streaks_by_char[char] = length
+			}
+		}
+	}
+	
+	// Add up all the lengths, because each map entry corresponds to a different starting character.
+	// Therefore, is character ALPHA has length L attached to it, there are L unique consecutive substrings in 's' that START with L
+	total := 0
+	for _, length := range streaks_by_char {
+		total += length
+	}
+
+    return total
+}
+
+/*
+Helper function to find the starting character given the length of a streak of consecutive characters plus the ending character
+*/
+func findStartingChar(ch byte, streak_length int) byte {
+	subtract_length := (streak_length-1) % 26
+	if ch - byte(subtract_length) < 'a' {
+		return 'z' - (byte(subtract_length) - (ch - 97)) + 1
+	} else {
+		return ch - byte(subtract_length)
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
