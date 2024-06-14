@@ -14,18 +14,36 @@ Link:
 https://leetcode.com/problems/binary-search-tree-iterator/description/
 */
 type BSTIterator struct {
+	curr_index  int
+	max_index 	int
+	values 		[]int
 }
 
 func BSTIteratorConstructor(root *TreeNode) BSTIterator {
-	return BSTIterator{}
+	values := inorderTraversal(root)
+	return BSTIterator{0, len(values)-1, values}
+}
+// Helper method to traverse a tree inorder
+func inorderTraversal(root *TreeNode) []int {
+	values := []int{}
+	if root.Left != nil {
+		values = append(values, inorderTraversal(root.Left)...)
+	} 
+	values = append(values, root.Val)
+	if root.Right != nil {
+		values = append(values, inorderTraversal(root.Right)...)
+	}
+	return values
 }
 
-func (this *BSTIterator) Next() int {
-	return 0
+func (it *BSTIterator) Next() int {
+	val := it.values[it.curr_index]
+	it.curr_index++
+	return val
 }
 
-func (this *BSTIterator) HasNext() bool {
-	return false
+func (it *BSTIterator) HasNext() bool {
+	return it.curr_index <= it.max_index
 }
 
 /*

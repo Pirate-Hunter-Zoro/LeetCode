@@ -18,6 +18,14 @@ func TestBSTIterator(t *testing.T) {
 		t.Fatalf("Error - expected %t, but got %t...", !h, h)
 	}
 	v = iterator.Next()
+	if v != 9 {
+		t.Fatalf("Error - expected 9, but got %d...", v)
+	}
+	h = iterator.HasNext()
+	if !h {
+		t.Fatalf("Error - expected %t, but got %t...", !h, h)
+	}
+	v = iterator.Next()
 	if v != 15 {
 		t.Fatalf("Error - expected 15, but got %d...", v)
 	}
