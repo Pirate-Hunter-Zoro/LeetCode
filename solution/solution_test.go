@@ -2451,3 +2451,27 @@ func TestFindSubstringInWraproundString(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestFindMaximizedCapital(t *testing.T) {
+	type input struct {
+		k 		int
+		w 		int
+		profits []int
+		captial []int
+	}
+	inputs := []input{
+		{2, 0, []int{1,2,3}, []int{0,1,1}},
+		{3, 0, []int{1,2,3}, []int{0,1,2}},
+	}
+
+	expected_outputs := []int{
+		4,
+		6,
+	}
+
+	f := func(i input) int {
+		return findMaximizedCapital(i.k, i.w, i.profits, i.captial)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
