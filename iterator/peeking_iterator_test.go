@@ -21,7 +21,7 @@ func TestPeekIterator(t *testing.T) {
 		[]int{1,2,3},
 	}
 
-	peek_iter := &PeekingIterator[int]{iter}
+	peek_iter := PeekingIteratorConstructor[int](iter)
 
 	num_values := []int{}
 	num_values = append(num_values, peek_iter.Next())

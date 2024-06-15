@@ -15,21 +15,31 @@ Link:
 https://leetcode.com/problems/peeking-iterator/description/
 */
 type PeekingIterator[T any] struct {
-    iterator *Iterator[T]
+    next_calls_idx      int
+    values_length       int
+    values              []T
 }
 
 func PeekingIteratorConstructor[T any](iter *Iterator[T]) *PeekingIterator[T] {
-    return &PeekingIterator[T]{iter}
+    n := 0
+    values := []T{}
+    for iter.HasNext() {
+        values = append(values, iter.Next())
+        n++
+    }
+    return &PeekingIterator[T]{0, n, values}
 }
 
 func (pit *PeekingIterator[T]) HasNext() bool {
-    return false
+    return pit.next_calls_idx < pit.values_length
 }
 
 func (pit *PeekingIterator[T]) Next() T {
-    return (*pit.iterator).Next()
+    v := pit.values[pit.next_calls_idx]
+    pit.next_calls_idx++
+    return v
 }
 
 func (pit *PeekingIterator[T]) Peek() T {
-    return (*pit.iterator).Next()
+    return pit.values[pit.next_calls_idx]
 }
