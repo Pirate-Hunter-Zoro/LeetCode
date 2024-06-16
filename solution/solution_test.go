@@ -2457,20 +2457,46 @@ func TestFindMaximizedCapital(t *testing.T) {
 		k 		int
 		w 		int
 		profits []int
-		captial []int
+		capital []int
 	}
 	inputs := []input{
 		{2, 0, []int{1,2,3}, []int{0,1,1}},
 		{3, 0, []int{1,2,3}, []int{0,1,2}},
+		{1, 2, []int{1,2,3}, []int{1,1,2}},
 	}
 
 	expected_outputs := []int{
 		4,
 		6,
+		5,
 	}
 
 	f := func(i input) int {
-		return findMaximizedCapital(i.k, i.w, i.profits, i.captial)
+		return findMaximizedCapital(i.k, i.w, i.profits, i.capital)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMinPatches(t *testing.T) {
+	type input struct {
+		nums []int
+		n 	 int
+	}
+	inputs := []input{
+		{[]int{1,3}, 6},
+		{[]int{1,5,10}, 20},
+		{[]int{1,2,2}, 5},
+	}
+	
+	expected_outputs := []int{
+		1,
+		2,
+		0,
+	}
+
+	f := func(i input) int {
+		return minPatches(i.nums, i.n)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

@@ -6076,8 +6076,53 @@ The answer is guaranteed to fit in a 32-bit signed integer.
 
 Link:
 https://leetcode.com/problems/ipo/description/?envType=daily-question&envId=2024-06-15
+
+Inspiration:
+Discussion posts for the question...
 */
 func findMaximizedCapital(k int, w int, profits []int, capital []int) int {
+	// Sort the capital values and profit values based on increasing capital value
+	tasks := make([][]int, len(profits))
+	for i:=0; i<len(tasks); i++ {
+		tasks[i] = []int{profits[i], capital[i]}
+	}
+	sort.SliceStable(tasks, func(i, j int) bool {
+		return tasks[i][1] < tasks[j][1]
+	})
+	// We need to pick k tasks - note that we need an efficient way to remember the tasks we cannot yet afford but may be able to later
+	total := w
+	picked := 0
+	// Note that we DO NOT lose capital when we invest in a project
+	// Add projects starting with the cheapest ones to do, and put them in a priority queue based on profit
+	h := heap.NewMaxHeap[int]()
+	i:=0
+	for i < len(tasks) && tasks[i][1] <= total {
+		h.Insert(tasks[i][0])
+		i++
+	}
+	for !h.Empty() && picked < k {
+		picked++
+		total += h.Extract()
+		for i < len(tasks) && tasks[i][1] <= total {
+			h.Insert(tasks[i][0])
+			i++
+		}
+	}
+	
+    return total
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a sorted integer array nums and an integer n, add/patch elements to the array such that any number in the range [1, n] inclusive can be formed by the sum of some elements in the array.
+
+Return the minimum number of patches required.
+
+Link:
+https://leetcode.com/problems/patching-array/description/?envType=daily-question&envId=2024-06-16
+*/
+func minPatches(nums []int, n int) int {
     return 0
 }
 
