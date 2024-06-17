@@ -2487,16 +2487,39 @@ func TestMinPatches(t *testing.T) {
 		{[]int{1,3}, 6},
 		{[]int{1,5,10}, 20},
 		{[]int{1,2,2}, 5},
+		{[]int{1,2,32}, 2147483647},
 	}
 	
 	expected_outputs := []int{
 		1,
 		2,
 		0,
+		28,
 	}
 
 	f := func(i input) int {
 		return minPatches(i.nums, i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMaxPoints(t *testing.T) {
+	type input struct {
+		points [][]int
+	}
+	inputs := []input{
+		{[][]int{{1,1},{2,2},{3,3}}},
+		{[][]int{{1,1},{3,2},{5,3},{4,1},{2,3},{1,4}}},
+	}
+
+	expected_outputs := []int{
+		3,
+		4,
+	}
+
+	f := func(i input) int {
+		return maxPoints(i.points)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

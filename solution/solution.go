@@ -6121,8 +6121,52 @@ Return the minimum number of patches required.
 
 Link:
 https://leetcode.com/problems/patching-array/description/?envType=daily-question&envId=2024-06-16
+
+Inspiration:
+Discussion Thread
 */
 func minPatches(nums []int, n int) int {
+	sort.SliceStable(nums, func(i, j int) bool {
+		return nums[i] < nums[j]
+	})
+	patches := 0
+	reached := 0
+	idx := 0
+	for idx < len(nums) && reached < n {
+		if nums[idx] - reached >= 2 {
+			// We are missing the numbers between (reached + 1) and (nums[idx] - 1), INCLUSIVE
+			// Greedily, patch in the number (reached + 1), which now lets us cover up through (2 * reached + 1)
+			// Now reached becomes (2 * reached + 1)
+			// Keep doing this until reached is greater than or equal to nums[idx]
+			for reached < nums[idx] - 1 && reached < n {
+				// The number we are about to patch in is reached + 1 - make sure we don't have that number in our array already
+				patches++
+				reached = 2 * reached + 1
+			}
+		}
+		// Now we make the following change because if we can reach all {1,2,...reached}, then we can add nums[idx] to any of those achievable sums
+		reached += nums[idx]
+
+		idx++
+	}
+	// Finally, we may have run out of elements to to explore in nums, but we still have more numbers we need to reach
+	for reached < n {
+		patches++
+		reached = 2 * reached + 1
+	}
+
+    return patches
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an array of points where points[i] = [xi, yi] represents a point on the X-Y plane, return the maximum number of points that lie on the same straight line.
+
+Link:
+https://leetcode.com/problems/max-points-on-a-line/description/
+*/
+func maxPoints(points [][]int) int {
     return 0
 }
 
