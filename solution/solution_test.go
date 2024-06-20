@@ -4,22 +4,11 @@ import (
 	"fmt"
 	"leetcode/binary_tree"
 	"leetcode/list_node"
-	"math"
+	"leetcode/float_rounding"
 	"reflect"
 	"sort"
 	"testing"
 )
-
-/*
-Helper function to round a float
-
-Source:
-https://gosamples.dev/round-float/
-*/
-func roundFloat(val float64, precision uint) float64 {
-	ratio := math.Pow(10, float64(precision))
-	return math.Round(val*ratio) / ratio
-}
 
 /*
 Helper method to test the results from the given method
@@ -1535,13 +1524,13 @@ func TestMincostToHireWorkers(t *testing.T) {
 	}
 
 	expected_outputs := []float64{
-		roundFloat(float64(105), 5),
-		roundFloat(float64(30)+float64(2)/float64(3), 5),
-		roundFloat(25.5, 5),
+		float_rounding.RoundFloat(float64(105), 5),
+		float_rounding.RoundFloat(float64(30)+float64(2)/float64(3), 5),
+		float_rounding.RoundFloat(25.5, 5),
 	}
 
 	f := func(i input) float64 {
-		return roundFloat(mincostToHireWorkers(i.quality, i.wage, i.k), 5)
+		return float_rounding.RoundFloat(mincostToHireWorkers(i.quality, i.wage, i.k), 5)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
@@ -2511,15 +2500,43 @@ func TestMaxPoints(t *testing.T) {
 	inputs := []input{
 		{[][]int{{1,1},{2,2},{3,3}}},
 		{[][]int{{1,1},{3,2},{5,3},{4,1},{2,3},{1,4}}},
+		{[][]int{{0,1},{0,0}}},
 	}
 
 	expected_outputs := []int{
 		3,
 		4,
+		2,
 	}
 
 	f := func(i input) int {
 		return maxPoints(i.points)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestNumSubmatrixSumTarget(t *testing.T) {
+	type input struct {
+		matrix [][]int
+		target int
+	}
+	inputs := []input{
+		{[][]int{{0,1,0},{1,1,1},{0,1,0},}, 0},
+		{[][]int{{1,-1},{-1,1},}, 0},
+		{[][]int{{904},}, 0},
+		{[][]int{{0,0,0,1,1},{1,1,1,0,1},{1,1,1,1,0},{0,0,0,1,0},{0,0,0,1,1},}, 0},
+	}
+
+	expected_outputs := []int{
+		4,
+		5,
+		0,
+		28,
+	}
+
+	f := func(i input) int {
+		return numSubmatrixSumTarget(i.matrix, i.target)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

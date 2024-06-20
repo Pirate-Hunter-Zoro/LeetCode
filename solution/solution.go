@@ -6,6 +6,7 @@ import (
 	"leetcode/binary_tree"
 	"leetcode/disjoint_set"
 	"leetcode/euclidean"
+	"leetcode/float_rounding"
 	"leetcode/graph"
 	"leetcode/heap"
 	"leetcode/linked_list"
@@ -6167,7 +6168,155 @@ Link:
 https://leetcode.com/problems/max-points-on-a-line/description/
 */
 func maxPoints(points [][]int) int {
-    return 0
+	float_points := [][]float64{}
+	for _, point := range points {
+		float_points = append(float_points, []float64{float64(point[0]), float64(point[1])})
+	}
+	record_hits := 1 // If there's only one point, then it will be hit
+	// Find every possible slope between two lines, and find how many points each of those lines hits
+	for i:=0; i<len(float_points)-1; i++ {
+		p1 := float_points[i]
+		for j:=i+1; j<len(float_points); j++ {
+			p2 := float_points[j]
+			hits := 0
+			if p2[0] == p1[0] {
+				// Vertical line
+				for _, point := range float_points {
+					if p1[0] == point[0] {
+						hits++
+					}
+				}
+			} else {
+				// Non-vertical line
+				m := (p2[1] - p1[1]) / (p2[0] - p1[0])
+				for _, point := range float_points {
+					if float_rounding.RoundFloat(point[1] - p1[1], 5) == float_rounding.RoundFloat(m * (point[0] - p1[0]), 5) {
+						hits++
+					}
+				}
+			}
+			record_hits = max(record_hits, hits)
+		}
+	}
+    return record_hits
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a matrix and a target, return the number of non-empty submatrices that sum to target.
+
+A submatrix x1, y1, x2, y2 is the set of all cells matrix[x][y] with x1 <= x <= x2 and y1 <= y <= y2.
+
+Two submatrices (x1, y1, x2, y2) and (x1', y1', x2', y2') are different if they have some coordinate that is different: for example, if x1 != x1'.
+
+Link:
+https://leetcode.com/problems/number-of-submatrices-that-sum-to-target/description/?envType=daily-question&envId=2024-06-19
+*/
+func numSubmatrixSumTarget(matrix [][]int, target int) int {
+    row_sums := make(map[int]map[int]map[int]int) // Row number, start column, end column
+	for r:=0; r<len(matrix); r++ {
+		row_sums[r] = make(map[int]map[int]int)
+		for c:=0; c<len(matrix[r]); c++ {
+			row_sums[r][c] = make(map[int]int)
+		}
+	}
+	col_sums := make(map[int]map[int]map[int]int) // Column number, start row, end row
+	for c:=0; c<len(matrix[0]); c++ {
+		col_sums[c] = make(map[int]map[int]int)
+		for r:=0; r<len(matrix); r++ {
+			col_sums[c][r] = make(map[int]int)
+		}
+	}
+
+	submatrix_sums := make(map[int]map[int]map[int]map[int]int)
+	for r:=0; r<len(matrix); r++ {
+		submatrix_sums[r] = make(map[int]map[int]map[int]int)
+		for c:=0; c<len(matrix[r]); c++ {
+			submatrix_sums[r][c] = make(map[int]map[int]int)
+			for r_end := r; r_end < len(matrix); r_end++ {
+				submatrix_sums[r][c][r_end] = make(map[int]int)
+			}
+		}
+	}
+
+	count := 0
+	for r_start:=0; r_start<len(matrix); r_start++ {
+		for c_start:=0; c_start<len(matrix[r_start]); c_start++ {
+			for r_end:=r_start; r_end<len(matrix); r_end++ {
+				for c_end:=c_start; c_end<len(matrix[r_end]); c_end++ {
+					if findSubmatrixSum(r_start, c_start, r_end, c_end, row_sums, col_sums, submatrix_sums, matrix) == target {
+						count++
+					}
+				}
+			}
+		}
+	}
+
+	return count
+}	
+
+/*
+Helper method to find the submatrix sum with the given start and end rows and columns
+*/
+func findSubmatrixSum(start_row int, start_col int, end_row int, end_col int, row_sums map[int]map[int]map[int]int, col_sums map[int]map[int]map[int]int, submatrix_sums map[int]map[int]map[int]map[int]int, matrix [][]int) int {
+	_, ok := submatrix_sums[start_row][start_col][end_row][end_col]
+	if !ok {
+		// Need to solve this problem
+		if start_row == end_row {
+			submatrix_sums[start_row][start_col][end_row][end_col] = findRowSum(start_row, start_col, end_col, row_sums, matrix)
+		} else if start_col == end_col {
+			submatrix_sums[start_row][start_col][end_row][end_col] = findColSum(start_col, start_row, end_row, col_sums, matrix)
+		} else {
+			border_sum := findRowSum(start_row, start_col, end_col, row_sums, matrix) + findRowSum(end_row, start_col, end_col, row_sums, matrix)
+			border_sum += findColSum(start_col, start_row, end_row, col_sums, matrix) + findColSum(end_col, start_row, end_row, col_sums, matrix)
+			// Double-counted the corners
+			border_sum -= matrix[start_row][start_col]
+			border_sum -= matrix[start_row][end_col]
+			border_sum -= matrix[end_row][start_col]
+			border_sum -= matrix[end_row][end_col]
+			if end_row - 1 > start_row && end_col - 1 > start_col {
+				// We have a matrix within the border
+				submatrix_sums[start_row][start_col][end_row][end_col] = border_sum + findSubmatrixSum(start_row + 1, start_col + 1, end_row - 1, end_col - 1, row_sums, col_sums, submatrix_sums, matrix)
+			} else {
+				// We just have the border
+				submatrix_sums[start_row][start_col][end_row][end_col] = border_sum
+			}
+		}
+	}
+	return submatrix_sums[start_row][start_col][end_row][end_col]
+}
+
+/*
+Helper method to find the row sum within a matrix
+*/
+func findRowSum(row int, start_col int, end_col int, row_sums map[int]map[int]map[int]int, matrix [][]int) int {
+	if start_col == end_col {
+		return matrix[row][start_col]
+	} else {
+		_, ok := row_sums[row][start_col][end_col]
+		if !ok {
+			// Need to find the sum
+			row_sums[row][start_col][end_col] = matrix[row][start_col] + findRowSum(row, start_col+1, end_col, row_sums, matrix)
+		}
+		return row_sums[row][start_col][end_col]
+	}
+}
+
+/*
+Helper method to find the column sum within a matrix
+*/
+func findColSum(col int, start_row int, end_row int, col_sums map[int]map[int]map[int]int, matrix [][]int) int {
+	if start_row == end_row {
+		return matrix[start_row][col]
+	} else {
+		_, ok := col_sums[col][start_row][end_row]
+		if !ok {
+			// Need to find the sum
+			col_sums[col][start_row][end_row] = matrix[start_row][col] + findColSum(col, start_row+1, end_row, col_sums, matrix)
+		}
+		return col_sums[col][start_row][end_row]
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
