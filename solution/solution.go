@@ -6212,42 +6212,58 @@ Two submatrices (x1, y1, x2, y2) and (x1', y1', x2', y2') are different if they 
 
 Link:
 https://leetcode.com/problems/number-of-submatrices-that-sum-to-target/description/?envType=daily-question&envId=2024-06-19
+
+Inspiration:
+https://leetcode.com/problems/number-of-submatrices-that-sum-to-target/submissions/1294070215/?envType=daily-question&envId=2024-06-19
 */
 func numSubmatrixSumTarget(matrix [][]int, target int) int {
-    row_sums := make(map[int]map[int]map[int]int) // Row number, start column, end column
+    row_sums := make([][]int, len(matrix)) // Row number, start column, end column
 	for r:=0; r<len(matrix); r++ {
-		row_sums[r] = make(map[int]map[int]int)
-		for c:=0; c<len(matrix[r]); c++ {
-			row_sums[r][c] = make(map[int]int)
-		}
+		row_sums[r] = make([]int, len(matrix[r]))
+		row_sums[r][0] = matrix[r][0]
 	}
-	col_sums := make(map[int]map[int]map[int]int) // Column number, start row, end row
-	for c:=0; c<len(matrix[0]); c++ {
-		col_sums[c] = make(map[int]map[int]int)
-		for r:=0; r<len(matrix); r++ {
-			col_sums[c][r] = make(map[int]int)
+	for r:=0; r<len(row_sums); r++ {
+		for c:=1; c<len(row_sums[r]); c++ {
+			row_sums[r][c] = row_sums[r][c-1] + matrix[r][c]
 		}
 	}
 
-	submatrix_sums := make(map[int]map[int]map[int]map[int]int)
-	for r:=0; r<len(matrix); r++ {
-		submatrix_sums[r] = make(map[int]map[int]map[int]int)
-		for c:=0; c<len(matrix[r]); c++ {
-			submatrix_sums[r][c] = make(map[int]map[int]int)
-			for r_end := r; r_end < len(matrix); r_end++ {
-				submatrix_sums[r][c][r_end] = make(map[int]int)
-			}
+	// Now pick every possible pair of columns
+	// For each such pair, start from the top and add up the row sums
+	// Each time you add the sum of a row (between those two columns) to your sum, check if you've run into the DIFFERENCE between target and your current sum already (and how many times you have)
+	// Each time you do, that's another submatrix which sums to target
+	col_sums_seen := make([][]map[int]int, len(matrix[0]))
+	for c := 0; c < len(col_sums_seen); c++ {
+		col_sums_seen[c] = make([]map[int]int, len(matrix[0]))
+		for i := 0; i < len(col_sums_seen); i++ {
+			col_sums_seen[c][i] = make(map[int]int)
+			col_sums_seen[c][i][0] = 1
 		}
 	}
-
 	count := 0
-	for r_start:=0; r_start<len(matrix); r_start++ {
-		for c_start:=0; c_start<len(matrix[r_start]); c_start++ {
-			for r_end:=r_start; r_end<len(matrix); r_end++ {
-				for c_end:=c_start; c_end<len(matrix[r_end]); c_end++ {
-					if findSubmatrixSum(r_start, c_start, r_end, c_end, row_sums, col_sums, submatrix_sums, matrix) == target {
-						count++
-					}
+	for c_left:=0; c_left<len(col_sums_seen); c_left++ {
+		for c_right:=c_left; c_right<len(col_sums_seen); c_right++ {
+			sum := 0
+			for r:=0; r<len(matrix); r++ {
+				// Add this row (in between c_left and c_right) to our sum
+				row_sum := row_sums[r][c_right]
+				if c_left > 0 {
+					row_sum -= row_sums[r][c_left-1]
+				} 
+				sum += row_sum
+				diff := sum - target
+				_, ok := col_sums_seen[c_left][c_right][diff]
+				if ok { 
+					// Then going from whatever row(s) achieved that difference AS ITS SUM to THIS current row - between these two columns - achieves the target sum
+					// However many times said rows occurred
+					count += col_sums_seen[c_left][c_right][diff]
+				}
+				// Record the difference we have just seen
+				_, ok = col_sums_seen[c_left][c_right][sum]
+				if ok {
+					col_sums_seen[c_left][c_right][sum]++
+				} else {
+					col_sums_seen[c_left][c_right][sum] = 1
 				}
 			}
 		}
@@ -6255,69 +6271,6 @@ func numSubmatrixSumTarget(matrix [][]int, target int) int {
 
 	return count
 }	
-
-/*
-Helper method to find the submatrix sum with the given start and end rows and columns
-*/
-func findSubmatrixSum(start_row int, start_col int, end_row int, end_col int, row_sums map[int]map[int]map[int]int, col_sums map[int]map[int]map[int]int, submatrix_sums map[int]map[int]map[int]map[int]int, matrix [][]int) int {
-	_, ok := submatrix_sums[start_row][start_col][end_row][end_col]
-	if !ok {
-		// Need to solve this problem
-		if start_row == end_row {
-			submatrix_sums[start_row][start_col][end_row][end_col] = findRowSum(start_row, start_col, end_col, row_sums, matrix)
-		} else if start_col == end_col {
-			submatrix_sums[start_row][start_col][end_row][end_col] = findColSum(start_col, start_row, end_row, col_sums, matrix)
-		} else {
-			border_sum := findRowSum(start_row, start_col, end_col, row_sums, matrix) + findRowSum(end_row, start_col, end_col, row_sums, matrix)
-			border_sum += findColSum(start_col, start_row, end_row, col_sums, matrix) + findColSum(end_col, start_row, end_row, col_sums, matrix)
-			// Double-counted the corners
-			border_sum -= matrix[start_row][start_col]
-			border_sum -= matrix[start_row][end_col]
-			border_sum -= matrix[end_row][start_col]
-			border_sum -= matrix[end_row][end_col]
-			if end_row - 1 > start_row && end_col - 1 > start_col {
-				// We have a matrix within the border
-				submatrix_sums[start_row][start_col][end_row][end_col] = border_sum + findSubmatrixSum(start_row + 1, start_col + 1, end_row - 1, end_col - 1, row_sums, col_sums, submatrix_sums, matrix)
-			} else {
-				// We just have the border
-				submatrix_sums[start_row][start_col][end_row][end_col] = border_sum
-			}
-		}
-	}
-	return submatrix_sums[start_row][start_col][end_row][end_col]
-}
-
-/*
-Helper method to find the row sum within a matrix
-*/
-func findRowSum(row int, start_col int, end_col int, row_sums map[int]map[int]map[int]int, matrix [][]int) int {
-	if start_col == end_col {
-		return matrix[row][start_col]
-	} else {
-		_, ok := row_sums[row][start_col][end_col]
-		if !ok {
-			// Need to find the sum
-			row_sums[row][start_col][end_col] = matrix[row][start_col] + findRowSum(row, start_col+1, end_col, row_sums, matrix)
-		}
-		return row_sums[row][start_col][end_col]
-	}
-}
-
-/*
-Helper method to find the column sum within a matrix
-*/
-func findColSum(col int, start_row int, end_row int, col_sums map[int]map[int]map[int]int, matrix [][]int) int {
-	if start_row == end_row {
-		return matrix[start_row][col]
-	} else {
-		_, ok := col_sums[col][start_row][end_row]
-		if !ok {
-			// Need to find the sum
-			col_sums[col][start_row][end_row] = matrix[start_row][col] + findColSum(col, start_row+1, end_row, col_sums, matrix)
-		}
-		return col_sums[col][start_row][end_row]
-	}
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

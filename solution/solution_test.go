@@ -2526,6 +2526,7 @@ func TestNumSubmatrixSumTarget(t *testing.T) {
 		{[][]int{{1,-1},{-1,1},}, 0},
 		{[][]int{{904},}, 0},
 		{[][]int{{0,0,0,1,1},{1,1,1,0,1},{1,1,1,1,0},{0,0,0,1,0},{0,0,0,1,1},}, 0},
+		{[][]int{{0,1,0,0,1},{0,0,1,1,1},{1,1,1,0,1},{1,1,0,1,1},{0,1,1,0,0},}, 1},
 	}
 
 	expected_outputs := []int{
@@ -2533,6 +2534,7 @@ func TestNumSubmatrixSumTarget(t *testing.T) {
 		5,
 		0,
 		28,
+		47,
 	}
 
 	f := func(i input) int {
