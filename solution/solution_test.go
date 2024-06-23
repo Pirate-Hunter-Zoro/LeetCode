@@ -3,8 +3,8 @@ package solution
 import (
 	"fmt"
 	"leetcode/binary_tree"
-	"leetcode/list_node"
 	"leetcode/float_rounding"
+	"leetcode/list_node"
 	"reflect"
 	"sort"
 	"testing"
@@ -2443,15 +2443,15 @@ func TestFindSubstringInWraproundString(t *testing.T) {
 
 func TestFindMaximizedCapital(t *testing.T) {
 	type input struct {
-		k 		int
-		w 		int
+		k       int
+		w       int
 		profits []int
 		capital []int
 	}
 	inputs := []input{
-		{2, 0, []int{1,2,3}, []int{0,1,1}},
-		{3, 0, []int{1,2,3}, []int{0,1,2}},
-		{1, 2, []int{1,2,3}, []int{1,1,2}},
+		{2, 0, []int{1, 2, 3}, []int{0, 1, 1}},
+		{3, 0, []int{1, 2, 3}, []int{0, 1, 2}},
+		{1, 2, []int{1, 2, 3}, []int{1, 1, 2}},
 	}
 
 	expected_outputs := []int{
@@ -2470,15 +2470,15 @@ func TestFindMaximizedCapital(t *testing.T) {
 func TestMinPatches(t *testing.T) {
 	type input struct {
 		nums []int
-		n 	 int
+		n    int
 	}
 	inputs := []input{
-		{[]int{1,3}, 6},
-		{[]int{1,5,10}, 20},
-		{[]int{1,2,2}, 5},
-		{[]int{1,2,32}, 2147483647},
+		{[]int{1, 3}, 6},
+		{[]int{1, 5, 10}, 20},
+		{[]int{1, 2, 2}, 5},
+		{[]int{1, 2, 32}, 2147483647},
 	}
-	
+
 	expected_outputs := []int{
 		1,
 		2,
@@ -2498,9 +2498,9 @@ func TestMaxPoints(t *testing.T) {
 		points [][]int
 	}
 	inputs := []input{
-		{[][]int{{1,1},{2,2},{3,3}}},
-		{[][]int{{1,1},{3,2},{5,3},{4,1},{2,3},{1,4}}},
-		{[][]int{{0,1},{0,0}}},
+		{[][]int{{1, 1}, {2, 2}, {3, 3}}},
+		{[][]int{{1, 1}, {3, 2}, {5, 3}, {4, 1}, {2, 3}, {1, 4}}},
+		{[][]int{{0, 1}, {0, 0}}},
 	}
 
 	expected_outputs := []int{
@@ -2522,11 +2522,11 @@ func TestNumSubmatrixSumTarget(t *testing.T) {
 		target int
 	}
 	inputs := []input{
-		{[][]int{{0,1,0},{1,1,1},{0,1,0},}, 0},
-		{[][]int{{1,-1},{-1,1},}, 0},
-		{[][]int{{904},}, 0},
-		{[][]int{{0,0,0,1,1},{1,1,1,0,1},{1,1,1,1,0},{0,0,0,1,0},{0,0,0,1,1},}, 0},
-		{[][]int{{0,1,0,0,1},{0,0,1,1,1},{1,1,1,0,1},{1,1,0,1,1},{0,1,1,0,0},}, 1},
+		{[][]int{{0, 1, 0}, {1, 1, 1}, {0, 1, 0}}, 0},
+		{[][]int{{1, -1}, {-1, 1}}, 0},
+		{[][]int{{904}}, 0},
+		{[][]int{{0, 0, 0, 1, 1}, {1, 1, 1, 0, 1}, {1, 1, 1, 1, 0}, {0, 0, 0, 1, 0}, {0, 0, 0, 1, 1}}, 0},
+		{[][]int{{0, 1, 0, 0, 1}, {0, 0, 1, 1, 1}, {1, 1, 1, 0, 1}, {1, 1, 0, 1, 1}, {0, 1, 1, 0, 0}}, 1},
 	}
 
 	expected_outputs := []int{
@@ -2551,7 +2551,7 @@ func TestBagOfTokensScore(t *testing.T) {
 	}
 	inputs := []input{
 		{[]int{100}, 50},
-		{[]int{200,100}, 150},
+		{[]int{200, 100}, 150},
 		{[]int{100, 200, 300, 400}, 200},
 	}
 
@@ -2576,7 +2576,7 @@ func TestLongestPalindrome(t *testing.T) {
 		{"babad"},
 		{"cbbd"},
 	}
-	
+
 	expected_outputs := []string{
 		"bab",
 		"bb",
@@ -2625,16 +2625,131 @@ func TestGenerateParentheses(t *testing.T) {
 	}
 
 	expected_outputs := [][]string{
-			{"((()))","(()())","(())()","()(())","()()()"},
-			{"()"},
-		}
-	
+		{"((()))", "(()())", "(())()", "()(())", "()()()"},
+		{"()"},
+	}
+
 	f := func(i input) []string {
 		parens := generateParenthesis(i.n)
 		sort.SliceStable(parens, func(i, j int) bool {
 			return parens[i] < parens[j]
 		})
 		return parens
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestLongestValidParentheses(t *testing.T) {
+	type input struct {
+		s string
+	}
+	inputs := []input{
+		{"(()"},
+		{")()())"},
+		{""},
+		{"()(())"},
+		{"(()()"},
+		{"()(()"},
+	}
+
+	expected_outputs := []int{
+		2,
+		4,
+		0,
+		6,
+		4,
+		2,
+	}
+
+	f := func(i input) int {
+		return longestValidParentheses(i.s)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestTrap(t *testing.T) {
+	type input struct {
+		height []int
+	}
+	inputs := []input{
+		{[]int{0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1}},
+		{[]int{4, 2, 0, 3, 2, 5}},
+	}
+
+	expected_outputs := []int{
+		6,
+		9,
+	}
+
+	f := func(i input) int {
+		return trap(i.height)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestCanJump(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{2, 3, 1, 1, 4}},
+		{[]int{3, 2, 1, 0, 4}},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+	}
+
+	f := func(i input) bool {
+		return canJump(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestJump(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{2, 3, 1, 1, 4}},
+		{[]int{2, 3, 0, 1, 4}},
+	}
+
+	expected_outputs := []int{
+		2,
+		2,
+	}
+
+	f := func(i input) int {
+		return jump(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMaxSubArray(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{-2, 1, -3, 4, -1, 2, 1, -5, 4}},
+		{[]int{1}},
+		{[]int{5, 4, -1, 7, 8}},
+	}
+
+	expected_outputs := []int{
+		6,
+		1,
+		23,
+	}
+
+	f := func(i input) int {
+		return maxSubArray(i.nums)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
