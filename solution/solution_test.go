@@ -2543,3 +2543,99 @@ func TestNumSubmatrixSumTarget(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestBagOfTokensScore(t *testing.T) {
+	type input struct {
+		tokens []int
+		power  int
+	}
+	inputs := []input{
+		{[]int{100}, 50},
+		{[]int{200,100}, 150},
+		{[]int{100, 200, 300, 400}, 200},
+	}
+
+	expected_outputs := []int{
+		0,
+		1,
+		2,
+	}
+
+	f := func(i input) int {
+		return bagOfTokensScore(i.tokens, i.power)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestLongestPalindrome(t *testing.T) {
+	type input struct {
+		s string
+	}
+	inputs := []input{
+		{"babad"},
+		{"cbbd"},
+	}
+	
+	expected_outputs := []string{
+		"bab",
+		"bb",
+	}
+
+	f := func(i input) string {
+		return longestPalindrome(i.s)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestIsMatch(t *testing.T) {
+	type input struct {
+		s string
+		p string
+	}
+	inputs := []input{
+		{"aa", "a"},
+		{"aa", "a*"},
+		{"ab", ".*"},
+		{"aab", "c*a*b"},
+	}
+
+	expected_outputs := []bool{
+		false,
+		true,
+		true,
+		true,
+	}
+
+	f := func(i input) bool {
+		return isMatch(i.s, i.p)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestGenerateParentheses(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{3},
+		{1},
+	}
+
+	expected_outputs := [][]string{
+			{"((()))","(()())","(())()","()(())","()()()"},
+			{"()"},
+		}
+	
+	f := func(i input) []string {
+		parens := generateParenthesis(i.n)
+		sort.SliceStable(parens, func(i, j int) bool {
+			return parens[i] < parens[j]
+		})
+		return parens
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

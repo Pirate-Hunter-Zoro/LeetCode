@@ -6274,3 +6274,189 @@ func numSubmatrixSumTarget(matrix [][]int, target int) int {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+You start with an initial power of power, an initial score of 0, and a bag of tokens given as an integer array tokens, where each tokens[i] denotes the value of tokeni.
+
+Your goal is to maximize the total score by strategically playing these tokens. In one move, you can play an unplayed token in one of the two ways (but not both for the same token):
+
+Face-up: If your current power is at least tokens[i], you may play token_i, losing tokens[i] power and gaining 1 score.
+Face-down: If your current score is at least 1, you may play tokeni, gaining tokens[i] power and losing 1 score.
+Return the maximum possible score you can achieve after playing any number of tokens.
+
+Link:
+https://leetcode.com/problems/bag-of-tokens/description/
+*/
+func bagOfTokensScore(tokens []int, power int) int {
+    sort.SliceStable(tokens, func(i, j int) bool {
+		return tokens[i] < tokens[j]
+	})
+
+	score := 0
+	left := 0
+	right := len(tokens)-1
+	for left <= right {
+		if power >= tokens[left] {
+			power -= tokens[left]
+			score++
+			left++
+		} else if score > 0 && right > left {
+			power += tokens[right]
+			score--
+			right--
+		} else {
+			break
+		}
+	}
+
+	return score
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a string s, return the longest 
+palindromic substring in s.
+
+Link:
+https://leetcode.com/problems/longest-palindromic-substring/description/
+*/
+func longestPalindrome(s string) string {
+	record := s[0:1]
+	isPalindrome := make([][]bool, len(s))
+	for i:=0; i<len(isPalindrome); i++ {
+		isPalindrome[i] = make([]bool, len(s))
+		isPalindrome[i][i] = true
+	}
+
+	// Now solve the problem using bottom-up dynamic programming
+	for length := 2; length <= len(s); length++ {
+		for start := 0; start <= len(s) - length; start++ {
+			end := start + length - 1
+			if s[start] == s[end] {
+				isPalindrome[start][end] = (start == end - 1) || isPalindrome[start+1][end-1]
+				if isPalindrome[start][end] && (end - start + 1 > len(record)) {
+					record = s[start:end+1]
+				}
+			}
+		}	
+	}
+
+	return record
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an input string s and a pattern p, implement regular expression matching with support for '.' and '*' where:
+
+'.' Matches any single character.​​​​
+'*' Matches zero or more of the preceding element.
+The matching should cover the entire input string (not partial).
+
+Link:
+https://leetcode.com/problems/regular-expression-matching/description/
+*/
+func isMatch(s string, p string) bool {
+	// first key is s-index, second key is p-index
+	isMatch := make(map[int]map[int]bool)
+	for i:=-1; i<len(s); i++ {
+		isMatch[i] = make(map[int]bool)
+	}
+	return topDownIsMatch(s, p, len(s)-1, len(p)-1, isMatch)
+}
+
+/*
+Top-down recursive helper method to solve the above problem
+*/
+func topDownIsMatch(s string, p string, s_idx int, p_idx int, isMatch map[int]map[int]bool) bool {
+	_, ok := isMatch[s_idx][p_idx]
+	if !ok {
+		// We need to solve this problem
+
+		// Base cases
+		if (s_idx < 0) && (p_idx < 0) {
+			// Both ran out
+			isMatch[s_idx][p_idx] = true
+		} else if (p_idx < 0) {
+			// Only the pattern ran out
+			isMatch[s_idx][p_idx] = false
+		} else if (s_idx < 0) {
+			// Only the string ran out - whatever's left in the pattern had better be optional
+			isMatch[s_idx][p_idx] = p_idx >= 1 && p[p_idx] == '*' && topDownIsMatch(s, p, s_idx, p_idx-2, isMatch)
+		} else {
+			// Non-base cases
+			if p_idx == 0 {
+				// We are on the last index in the pattern to match
+				if s_idx == 0 {
+					isMatch[s_idx][p_idx] = s[s_idx] == p[p_idx] || p[p_idx] == '.'
+				} else  {
+					isMatch[s_idx][p_idx] = false
+				}
+			} else {
+				if p[p_idx] == '.' || s[s_idx] == p[p_idx] {
+					isMatch[s_idx][p_idx] = topDownIsMatch(s, p, s_idx-1, p_idx-1, isMatch)
+				} else if p[p_idx] == '*' && (p[p_idx-1] == s[s_idx] || p[p_idx-1] == '.') {
+					// Try matching and and making it the last match
+					isMatch[s_idx][p_idx] = topDownIsMatch(s, p, s_idx-1, p_idx-2, isMatch)
+					// Try matching and NOT making it the last match
+					isMatch[s_idx][p_idx] = isMatch[s_idx][p_idx] || topDownIsMatch(s, p, s_idx-1, p_idx, isMatch)
+					// Try not matching
+					isMatch[s_idx][p_idx] = isMatch[s_idx][p_idx] || topDownIsMatch(s, p, s_idx, p_idx-2, isMatch)
+				} else if p[p_idx] == '*' {
+					// Forced to skip the preceding character in the pattern (not matching)
+					isMatch[s_idx][p_idx] = topDownIsMatch(s, p, s_idx, p_idx-2, isMatch)
+				} else {
+					isMatch[s_idx][p_idx] = false
+				}
+			}
+		}
+	}
+	return isMatch[s_idx][p_idx]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+
+Link:
+https://leetcode.com/problems/generate-parentheses/description/
+*/
+func generateParenthesis(n int) []string {
+    output := []string{"()"}
+	for i:=2; i<=n; i++ {
+		new_parens := []string{}
+		// Where are all the places we could put the new two parentheses?
+		for _, s := range output {
+			var buffer bytes.Buffer
+			// These two new parentheses could go around any (*) valid set of parentheses (because remember 's' is valid)
+			st := linked_list.NewStack[int]()
+			for idx := 0; idx <= len(s); idx++ {
+				if st.Empty() {
+					// Wrap whatever is left with a '(*)'
+					if idx > 0 {
+						buffer.WriteString(s[:idx])
+					}
+					buffer.WriteString("(")
+					if idx < len(s) {
+						buffer.WriteString(s[idx:])
+					}
+					buffer.WriteString(")")
+					new_parens = append(new_parens, buffer.String())
+					buffer.Reset()
+				}
+				if idx < len(s) && s[idx] == ')' {
+					st.Pop()
+				} else {
+					st.Push(idx)
+				}
+			}
+		}
+		output = new_parens
+	}
+
+	return output
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
