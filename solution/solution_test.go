@@ -2651,6 +2651,7 @@ func TestLongestValidParentheses(t *testing.T) {
 		{"()(())"},
 		{"(()()"},
 		{"()(()"},
+		{"((()))())"},
 	}
 
 	expected_outputs := []int{
@@ -2660,6 +2661,7 @@ func TestLongestValidParentheses(t *testing.T) {
 		6,
 		4,
 		2,
+		8,
 	}
 
 	f := func(i input) int {
@@ -2697,11 +2699,13 @@ func TestCanJump(t *testing.T) {
 	inputs := []input{
 		{[]int{2, 3, 1, 1, 4}},
 		{[]int{3, 2, 1, 0, 4}},
+		{[]int{2,5,0,0}},
 	}
 
 	expected_outputs := []bool{
 		true,
 		false,
+		true,
 	}
 
 	f := func(i input) bool {

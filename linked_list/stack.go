@@ -23,6 +23,10 @@ func (s *Stack[T]) Pop() T {
 	return v
 }
 
+func (s *Stack[T]) Peek() T {
+	return s.values_head.Val
+}
+
 func (s *Stack[T]) Empty() bool {
 	return s.length == 0
 }

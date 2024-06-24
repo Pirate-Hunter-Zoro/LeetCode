@@ -6470,9 +6470,41 @@ Link:
 https://leetcode.com/problems/longest-valid-parentheses/description/
 */
 func longestValidParentheses(s string) int {
-	//st := linked_list.NewStack[int]()
+	longestStartingHere := make(map[int]int)
+	record := 0
+	for i:=0; i<len(s); i++ {
+		record = max(record, findLongestStartingHere(i, s, longestStartingHere))
+	}
+	return record
+}
 
-	return 0
+/*
+Helper function (top-down) to find the longest valid set of parentheses starting at the given index
+*/
+func findLongestStartingHere(i int, s string, longestStartingHere map[int]int) int {
+	if i >= len(s)-1 {
+		return 0
+	} else if s[i] == ')' {
+		return 0
+	} else {
+		_, ok := longestStartingHere[i]
+		if !ok {
+			// Need to solve this problem
+			if s[i+1] == ')' {
+				// ()*
+				longestStartingHere[i] = 2 + findLongestStartingHere(i+2, s, longestStartingHere)
+			} else {
+				// (*)* MAYBE - if we can find that later parentheses
+				nest := findLongestStartingHere(i+1, s, longestStartingHere)
+				if nest > 0 && i + nest + 1 < len(s) && s[i+nest+1] == ')' {
+					longestStartingHere[i] = nest + 2 + findLongestStartingHere(i+nest+2, s, longestStartingHere)
+				} else {
+					longestStartingHere[i] = 0
+				}
+			}
+		}
+		return longestStartingHere[i]
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6484,13 +6516,44 @@ Link:
 https://leetcode.com/problems/trapping-rain-water/description/
 */
 func trap(height []int) int {
-	return 0
+	i := 0
+	for i < len(height) && height[i] == 0 {
+		i++
+	}
+
+	total := 0
+	st := linked_list.NewStack[int]()
+	st.Push(i)
+	for i < len(height) - 1 {
+		i++
+		h := height[i]
+		if h == 0 {
+			continue
+		}
+		next_highest := 0
+		for !st.Empty() {
+			relevant_height := min(height[st.Peek()], h)
+			total += (i - st.Peek() - 1) * (relevant_height - next_highest)
+			if height[st.Peek()] < h {
+				next_highest = height[st.Pop()]
+			} else {
+				if height[st.Peek()] == h {
+					st.Pop()
+				}
+				break
+			}
+		}
+		st.Push(i)
+	}
+
+	return total
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are given an integer array nums. You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.
+You are given an integer array nums. 
+You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.
 
 Return true if you can reach the last index, or false otherwise.
 
@@ -6498,7 +6561,19 @@ Link:
 https://leetcode.com/problems/jump-game/description/
 */
 func canJump(nums []int) bool {
-	return false
+	canReach := make([]bool, len(nums))
+	// For a given index, can we reach the end from that index?
+	canReach[len(canReach)-1] = true
+	for i:=len(canReach)-2; i>=0; i-- {
+		max_jump_dist := nums[i]
+		for jump := 1; jump <= min(max_jump_dist, len(nums) - i - 1); jump++ {
+			canReach[i] = canReach[i + jump]
+			if canReach[i] {
+				break
+			}
+		}
+	}
+	return canReach[0]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
