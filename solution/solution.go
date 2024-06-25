@@ -6636,6 +6636,49 @@ func maxSubArray(nums []int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
+Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+You can return the answer in any order.
+
+Link:
+https://leetcode.com/problems/two-sum/description/
+*/
+func twoSum(nums []int, target int) []int {
+    val_to_indices := make(map[int][]int)
+    for idx, v := range nums {
+        _, ok := val_to_indices[v]
+        if !ok {
+            val_to_indices[v] = []int{idx}
+        } else {
+            val_to_indices[v] = append(val_to_indices[v], idx)
+        }
+    }
+
+    sort.SliceStable(nums, func(i, j int) bool {
+        return nums[i] < nums[j]
+    })
+
+    left := 0
+    right := len(nums)-1
+    for nums[left] + nums[right] != target {
+        if nums[left] + nums[right] < target {
+            left++
+        } else {
+            right--
+        }
+    }
+    if nums[left] == nums[right] {
+        return []int{val_to_indices[nums[left]][0], val_to_indices[nums[left]][1]}
+    } else {
+        return []int{val_to_indices[nums[left]][0], val_to_indices[nums[right]][0]}
+    }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
 There is a robot on an m x n grid. 
 The robot is initially located at the top-left corner (i.e., grid[0][0]). 
 The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). 

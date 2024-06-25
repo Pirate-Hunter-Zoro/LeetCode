@@ -2759,6 +2759,34 @@ func TestMaxSubArray(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
 }
 
+func TestTwoSum(t *testing.T) {
+	type input struct {
+		nums []int
+		target int
+	}
+	inputs := []input{
+		{[]int{2,7,11,15}, 9},
+		{[]int{3,2,4}, 6},
+		{[]int{3,3}, 6},
+	}
+
+	expected_outputs := [][]int{
+		{0,1},
+		{1,2},
+		{0,1},
+	}
+
+	f := func(i input) []int{
+		values := twoSum(i.nums, i.target)
+		sort.SliceStable(values, func(i, j int) bool {
+			return values[i] < values[j]
+		})
+		return values
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
 func TestUniquePaths(t *testing.T) {
 	type input struct {
 		m int
