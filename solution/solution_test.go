@@ -2758,3 +2758,57 @@ func TestMaxSubArray(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestUniquePaths(t *testing.T) {
+	type input struct {
+		m int
+		n int
+	}
+	inputs := []input{
+		{3, 7},
+		{3, 2},
+	}
+
+	expected_outputs := []int{
+		28,
+		3,
+	}
+
+	f := func(i input) int {
+		return uniquePaths(i.m, i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestUniquePathsWithObstacles(t *testing.T) {
+	type input struct {
+		obstacleGrid [][]int
+	}
+	inputs := []input{
+		{
+			[][]int{
+				{0, 0, 0},
+				{0, 1, 0},
+				{0, 0, 0},
+			},
+		},
+		{
+			[][]int{
+				{0, 1},
+				{0, 0},
+			},
+		},
+	}
+
+	expected_outputs := []int{
+		2,
+		1,
+	}
+
+	f := func(i input) int {
+		return uniquePathsWithObstacles(i.obstacleGrid)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

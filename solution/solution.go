@@ -6579,19 +6579,36 @@ func canJump(nums []int) bool {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are given a 0-indexed array of integers nums of length n. You are initially positioned at nums[0].
+You are given a 0-indexed array of integers nums of length n. 
+You are initially positioned at nums[0].
 
-Each element nums[i] represents the maximum length of a forward jump from index i. In other words, if you are at nums[i], you can jump to any nums[i + j] where:
+Each element nums[i] represents the maximum length of a forward jump from index i. 
+In other words, if you are at nums[i], you can jump to any nums[i + j] where:
 
 0 <= j <= nums[i] and
 i + j < n
-Return the minimum number of jumps to reach nums[n - 1]. The test cases are generated such that you can reach nums[n - 1].
+
+Return the minimum number of jumps to reach nums[n - 1]. 
+The test cases are generated such that you can reach nums[n - 1].
 
 Link:
 https://leetcode.com/problems/jump-game-ii/description/
 */
 func jump(nums []int) int {
-	return 0
+	min_jumps := make([]int, len(nums))
+	for i:=0; i<len(min_jumps)-1; i++ {
+		min_jumps[i] = math.MaxInt
+	}
+
+	for i:=len(min_jumps)-2; i>=0; i-- {
+		for jump := 1; jump <= min(nums[i], len(nums)-i-1); jump++ {
+			if min_jumps[i + jump] != math.MaxInt {
+				min_jumps[i] = min(min_jumps[i], 1 + min_jumps[i + jump])
+			}
+		}
+	}
+
+	return min_jumps[0]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6603,7 +6620,59 @@ Link:
 https://leetcode.com/problems/maximum-subarray/
 */
 func maxSubArray(nums []int) int {
-	return 0
+	records := make([]int, len(nums))
+	records[0] = nums[0]
+	best := records[0]
+	// Consider, if you MUST include nums[i], and have nums[0:i+1] to work with, what's the best sum you could achieve?
+	for i:=1; i<len(records); i++ {
+		// DON'T include the immediate left-most best sum achievable, or DO include it - whichever achieves a greater sum.
+		records[i] = max(nums[i], nums[i] + records[i-1])
+		best = max(best, records[i])
+	}
+
+	return best
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There is a robot on an m x n grid. 
+The robot is initially located at the top-left corner (i.e., grid[0][0]). 
+The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). 
+The robot can only move either down or right at any point in time.
+
+Given the two integers m and n, return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+
+The test cases are generated so that the answer will be less than or equal to 2 * 10^9.
+
+Link:
+https://leetcode.com/problems/unique-paths/description/
+*/
+func uniquePaths(m int, n int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an m x n integer array grid. 
+There is a robot initially located at the top-left corner (i.e., grid[0][0]). 
+The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). 
+The robot can only move either down or right at any point in time.
+
+An obstacle and space are marked as 1 or 0 respectively in grid. 
+A path that the robot takes cannot include any square that is an obstacle.
+
+Return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+
+The testcases are generated so that the answer will be less than or equal to 2 * 10^9.
+
+Link:
+https://leetcode.com/problems/unique-paths-ii/description/
+*/
+func uniquePathsWithObstacles(obstacleGrid [][]int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
