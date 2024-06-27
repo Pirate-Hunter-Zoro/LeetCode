@@ -2787,6 +2787,27 @@ func TestTwoSum(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
 }
 
+func TestBalanceBST(t *testing.T) {
+	type input struct {
+		root *binary_tree.TreeNode
+	}
+	inputs := []input{
+		{binary_tree.NewTree([]int{1,binary_tree.NULL,2,binary_tree.NULL,3,binary_tree.NULL,4,binary_tree.NULL,binary_tree.NULL})},
+		{binary_tree.NewTree([]int{2, 1, 3})},
+	}
+
+	expected_outputs := []*binary_tree.TreeNode{
+		binary_tree.NewTree([]int{3,2,4,1}),
+		binary_tree.NewTree([]int{2,1,3}),
+	}
+
+	f := func(i input) *binary_tree.TreeNode {
+		return balanceBST(i.root)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
 func TestUniquePaths(t *testing.T) {
 	type input struct {
 		m int

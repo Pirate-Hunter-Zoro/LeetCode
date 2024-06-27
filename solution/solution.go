@@ -6679,6 +6679,80 @@ func twoSum(nums []int, target int) []int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
+Given the root of a binary search tree, return a balanced binary search tree with the same node values. 
+If there is more than one answer, return any of them.
+
+A binary search tree is balanced if the depth of the two subtrees of every node never differs by more than 1.
+
+Link:
+https://leetcode.com/problems/balance-a-binary-search-tree/description/?envType=daily-question&envId=2024-06-26
+*/
+func balanceBST(root *binary_tree.TreeNode) *binary_tree.TreeNode {
+    st := linked_list.NewStack[*binary_tree.TreeNode]()
+	explored := make(map[*binary_tree.TreeNode]bool)
+	st.Push(root)
+	values := []int{}
+	for !st.Empty() {
+		if st.Peek().Left != nil {
+			_, ok := explored[st.Peek().Left]
+			if !ok {
+				explored[st.Peek().Left] = true
+				st.Push(st.Peek().Left)
+			} else {
+				curr := st.Pop()
+				values = append(values, curr.Val)
+				if curr.Right != nil {
+					st.Push(curr.Right)
+				}
+			}
+		} else {
+			curr := st.Pop()
+			values = append(values, curr.Val)
+			if curr.Right != nil {
+				st.Push(curr.Right)
+			}
+		}
+	}
+
+	nodes := make([]*binary_tree.TreeNode, len(values))
+	idx_stack := linked_list.NewStack[[]int]()
+	idx_stack.Push([]int{0, len(values)})
+	for !idx_stack.Empty() {
+		left := idx_stack.Peek()[0]
+		right := idx_stack.Peek()[1]
+		mid := (left + right) / 2
+		if mid == left { // Base case - size 1
+			idx_stack.Pop()
+			nodes[mid] = &binary_tree.TreeNode{Val: values[mid], Left: nil, Right: nil}
+		} else if mid == left - 1 { // Base case - size 2
+			idx_stack.Pop()
+			nodes[left] = &binary_tree.TreeNode{Val: values[left], Left: nil, Right: nil}
+			nodes[mid] = &binary_tree.TreeNode{Val: values[mid], Left: nodes[left], Right: nil}
+		} else {
+			if nodes[mid] == nil {
+				// Do left
+				nodes[mid] = &binary_tree.TreeNode{Val: values[mid], Left: nil, Right: nil}
+				idx_stack.Push([]int{left, mid})
+			} else if (mid + 1 + right) / 2 < right && nodes[(mid + 1 + right) / 2] == nil {
+				// Do right
+				idx_stack.Push([]int{mid+1, right})
+			} else {
+				// Both left and right are done
+				nodes[mid].Left = nodes[(left + mid) / 2]
+				if (mid + 1 + right) / 2 < right {
+					nodes[mid].Right = nodes[(mid + 1 + right) / 2]
+				}
+				idx_stack.Pop()
+			}
+		}
+	}
+
+	return nodes[len(nodes)/2]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
 There is a robot on an m x n grid. 
 The robot is initially located at the top-left corner (i.e., grid[0][0]). 
 The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). 
