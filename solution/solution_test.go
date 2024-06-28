@@ -2861,3 +2861,77 @@ func TestUniquePathsWithObstacles(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMinPathSum(t *testing.T) {
+	type input struct {
+		grid [][]int
+	}
+	inputs := []input{
+		{
+			[][]int{
+				{1,3,1},
+				{1,5,1},
+				{4,2,1},
+			},
+		},
+		{
+			[][]int{
+				{1,2,3},
+				{4,5,6},
+			},
+		},
+	}
+
+	expected_outputs := []int{
+		7,
+		12,
+	}
+
+	f := func(i input) int {
+		return minPathSum(i.grid)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestClimbStairs(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{2},
+		{3},
+	}
+
+	expected_outputs := []int{
+		2,
+		3,
+	}
+
+	f := func(i input) int {
+		return climbStairs(i.n)
+	}
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMinDistance(t *testing.T) {
+	type input struct {
+		word1 string
+		word2 string
+	}
+	inputs := []input{
+		{"horse", "ros"},
+		{"intention", "execution"},
+	}
+
+	expected_outputs := []int{
+		3,
+		5,
+	}
+
+	f := func(i input) int {
+		return minDistance(i.word1, i.word2)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

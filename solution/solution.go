@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"leetcode/algorithm"
 	"leetcode/binary_tree"
+	"leetcode/combinations"
 	disjointset "leetcode/disjoint_set"
 	"leetcode/euclidean"
 	"leetcode/float_rounding"
@@ -6766,7 +6767,10 @@ Link:
 https://leetcode.com/problems/unique-paths/description/
 */
 func uniquePaths(m int, n int) int {
-    return 0
+    // We will have to move (m-1 + n-1) times
+	// ANY m-1 of those moves will be horizontal 
+	// You also hence immediately choose the reamining n-1 of those moves to be vertical
+	return combinations.Choose(m-1+n-1, m-1)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6788,6 +6792,84 @@ Link:
 https://leetcode.com/problems/unique-paths-ii/description/
 */
 func uniquePathsWithObstacles(obstacleGrid [][]int) int {
+	r := len(obstacleGrid)
+	c := len(obstacleGrid[0])
+	sols := make([][]int, r)
+	for i:=0; i<r; i++ {
+		sols[i] = make([]int, c)
+	}
+	if obstacleGrid[r-1][c-1] == 0 {
+		sols[r-1][c-1] = 1
+		for row := r-1; row >= 0; row-- {
+			for col := c-1; col >= 0; col-- {
+				if row == r-1 && col == c - 1 {
+					continue
+				} else {
+					if obstacleGrid[row][col] == 1 {
+						sols[row][col] = 0
+					} else { // Go down or go right
+						if row < r-1 {
+							// Count ways if we go down
+							sols[row][col] += sols[row+1][col]
+						}
+						if col < c-1 {
+							// Count ways if we go right
+							sols[row][col] += sols[row][col+1]
+						}
+					}
+				}
+			}
+		}
+		return sols[0][0]
+	} else {
+		return 0
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right, which minimizes the sum of all numbers along its path.
+
+Note: You can only move either down or right at any point in time.
+
+Link:
+https://leetcode.com/problems/minimum-path-sum/description/
+*/
+func minPathSum(grid [][]int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are climbing a staircase. 
+It takes n steps to reach the top.
+
+Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+
+Link:
+https://leetcode.com/problems/climbing-stairs/description/
+*/
+func climbStairs(n int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.
+
+You have the following three operations permitted on a word:
+
+- Insert a character
+- Delete a character
+- Replace a character
+
+Link:
+https://leetcode.com/problems/edit-distance/description/
+*/
+func minDistance(word1 string, word2 string) int {
     return 0
 }
 
