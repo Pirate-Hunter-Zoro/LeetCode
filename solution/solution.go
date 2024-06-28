@@ -6973,6 +6973,9 @@ If it doesn't exist, return -1 for this number.
 
 Link:
 https://leetcode.com/problems/next-greater-element-ii/description/
+
+Inspiration:
+https://medium.com/algorithms-digest/previous-smaller-element-e3996fb8be3c
 */
 func nextGreaterElements(nums []int) []int {
     return []int{}
@@ -6985,6 +6988,9 @@ Given an array of integers heights representing the histogram's bar height where
 
 Link:
 https://leetcode.com/problems/largest-rectangle-in-histogram/description/
+
+Inspiration:
+https://medium.com/algorithms-digest/largest-rectangle-in-histogram-234004ecd15a#id_token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjJhZjkwZTg3YmUxNDBjMjAwMzg4OThhNmVmYTExMjgzZGFiNjAzMWQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIyMTYyOTYwMzU4MzQtazFrNnFlMDYwczJ0cDJhMmphbTRsamRjbXMwMHN0dGcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIyMTYyOTYwMzU4MzQtazFrNnFlMDYwczJ0cDJhMmphbTRsamRjbXMwMHN0dGcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDY2NTg0ODA4ODE4Njk5ODMxMTMiLCJlbWFpbCI6Im1pa2V5dGFsbHlmZXJndXNvbkBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmJmIjoxNzE5NjA5OTc1LCJuYW1lIjoiTWlrZXkgRmVyZ3Vzb24iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3NGNk9hLWtGNlk5QnREWGJQbjNiMTZqZmE0Zkl1cHJIWjJBaEJWWW9nX2ZfTE5RMD1zOTYtYyIsImdpdmVuX25hbWUiOiJNaWtleSIsImZhbWlseV9uYW1lIjoiRmVyZ3Vzb24iLCJpYXQiOjE3MTk2MTAyNzUsImV4cCI6MTcxOTYxMzg3NSwianRpIjoiN2NmNGNjNDRhNmNmZjQyN2QxODAzNmE3YjY2YzA2MzlkM2Y2ZWRkNSJ9.lNkIfnS1XT3LzW-OCPU_VBaluRCBvzIJBPucyywxH6rMlrN8Jx48g72_EOOj4Jf_ViyWStPI1uDDCFfp4wVMltMMlwoxHz1P4s3yYqGozjT2izF8ZqSK8wWwUNBw4LN0T9W9UDabv-q_EKM5UKS-sMLgWFfWcNQAcrrAo0xk-uNfNeD1DGQcP3pbMDlayzldXxi9K-Yl0cMqP-RbSwvc75pcUPb1CPzZsXqJnZQZT0KHSdeyEbUbJ8mBCPocGu_9V-EyDbHIrWDh6qMuSFV7DQUWxz5KQPfOLxHVy6AwteZyO8jTkMlc6x9bcP2LPgaNdbSU_YXs96K-Mv12cyf-Tw
 */
 func largestRectangleArea(heights []int) int {
 	return 0
@@ -6997,6 +7003,9 @@ Given a rows x cols binary matrix filled with 0's and 1's, find the largest rect
 
 Link:
 https://leetcode.com/problems/maximal-rectangle/
+
+Inspiration:
+The discussion forums were helpful!
 */
 func maximalRectangle(matrix [][]byte) int {
 	return 0
