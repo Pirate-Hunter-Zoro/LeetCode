@@ -6837,7 +6837,31 @@ Link:
 https://leetcode.com/problems/minimum-path-sum/description/
 */
 func minPathSum(grid [][]int) int {
-    return 0
+	r := len(grid)
+	c := len(grid[0])
+	min_sums := make([][]int, r)
+	for i:=0; i<r; i++ {
+		min_sums[i] = make([]int, c)
+	}
+	min_sums[r-1][c-1] = grid[r-1][c-1]
+	for row := r-1; row >= 0; row-- {
+		for col := c-1; col >= 0; col-- {
+			if row == r-1 && col == c - 1 {
+				continue
+			} else {
+				min_sums[row][col] = grid[row][col]
+				addition := math.MaxInt
+				if col < c - 1 {
+					addition = min(addition, min_sums[row][col+1])
+				}
+				if row < r - 1 {
+					addition = min(addition, min_sums[row+1][col])
+				}
+				min_sums[row][col] += addition
+			}
+		}
+	}
+	return min_sums[0][0]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6852,7 +6876,15 @@ Link:
 https://leetcode.com/problems/climbing-stairs/description/
 */
 func climbStairs(n int) int {
-    return 0
+	prev_prev := 1
+	prev := 1
+	curr := 1
+	for i:=1; i<n; i++ {
+		curr = prev_prev + prev
+		prev_prev = prev
+		prev = curr
+	}
+    return curr
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6870,7 +6902,104 @@ Link:
 https://leetcode.com/problems/edit-distance/description/
 */
 func minDistance(word1 string, word2 string) int {
-    return 0
+	i, j := 0, 0
+	sols := make(map[int]map[int]int)
+	return topDownMinDistance(i, word1, j, word2, sols)
+}
+
+/*
+Top down helper method to find the minimum edit distance based on the two strings
+*/
+func topDownMinDistance(i int, word1 string, j int, word2 string, sols map[int]map[int]int) int {
+	_, ok := sols[i]
+	if !ok {
+		sols[i] = make(map[int]int)
+	}
+	_, ok = sols[i][j]
+	if !ok {
+		// Need to solve this problem
+		if i == len(word1) && j == len(word2) {
+			// Words are completed
+			sols[i][j] = 0
+		} else if i == len(word1) {
+			// Add the rest of the characters in word2 to what you have in word1
+			sols[i][j] = len(word2) - j
+		} else if j == len(word2) {
+			// Delete the characters in word1 that you don't have in word2
+			sols[i][j] = len(word1) - i
+		} else {
+			if word1[i] == word2[j] {
+				// If the characters match, just move on
+				sols[i][j] = topDownMinDistance(i+1, word1, j+1,  word2, sols)
+			} else {
+				// Try inserting the character from word2 into word1
+				sols[i][j] = 1 + topDownMinDistance(i, word1, j+1, word2, sols)
+				// Try deleting the character from word1 that doesn't match in word2
+				sols[i][j] = min(sols[i][j], 1 + topDownMinDistance(i+1, word1, j, word2, sols))
+				// Try replacing the character in word1 that doesn't match with the character in word2
+				sols[i][j] = min(sols[i][j], 1 + topDownMinDistance(i+1, word1, j+1, word2, sols))
+			}
+		}
+	}
+	return sols[i][j]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+The next greater element of some element x in an array is the first greater element that is to the right of x in the same array.
+
+You are given two distinct 0-indexed integer arrays nums1 and nums2, where nums1 is a subset of nums2.
+
+For each 0 <= i < nums1.length, find the index j such that nums1[i] == nums2[j] and determine the next greater element of nums2[j] in nums2. 
+If there is no next greater element, then the answer for this query is -1.
+
+Return an array ans of length nums1.length such that ans[i] is the next greater element as described above.
+
+Link:
+https://leetcode.com/problems/next-greater-element-i/description/
+*/
+func nextGreaterElement(nums1 []int, nums2 []int) []int {
+    return []int{}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a circular integer array nums (i.e., the next element of nums[nums.length - 1] is nums[0]), return the next greater number for every element in nums.
+
+The next greater number of a number x is the first greater number to its traversing-order next in the array, which means you could search circularly to find its next greater number. 
+If it doesn't exist, return -1 for this number.
+
+Link:
+https://leetcode.com/problems/next-greater-element-ii/description/
+*/
+func nextGreaterElements(nums []int) []int {
+    return []int{}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an array of integers heights representing the histogram's bar height where the width of each bar is 1, return the area of the largest rectangle in the histogram.
+
+Link:
+https://leetcode.com/problems/largest-rectangle-in-histogram/description/
+*/
+func largestRectangleArea(heights []int) int {
+	return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a rows x cols binary matrix filled with 0's and 1's, find the largest rectangle containing only 1's and return its area
+
+Link:
+https://leetcode.com/problems/maximal-rectangle/
+*/
+func maximalRectangle(matrix [][]byte) int {
+	return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -2935,3 +2935,105 @@ func TestMinDistance(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestNextGreaterElement(t *testing.T) {
+	type input struct {
+		nums1 []int
+		nums2 []int
+	}
+	inputs := []input{
+		{[]int{4,1,2}, []int{1,3,4,2}},
+		{[]int{2,4}, []int{1,2,3,4}},
+	}
+
+	expected_outputs := [][]int{
+		{-1,3,-1},
+		{3,-1},
+	}
+
+	f := func(i input) []int {
+		return nextGreaterElement(i.nums1, i.nums2)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestNextGreaterElements(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{1,2,1}},
+		{[]int{1,2,3,4,3}},
+	}
+
+	expected_outputs := [][]int{
+		{2,-1,2},
+		{2,3,4,-1,4},
+	}
+
+	f := func(i input) []int {
+		return nextGreaterElements(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestLargestRectangleArea(t *testing.T) {
+	type input struct {
+		heights []int
+	}
+	inputs := []input{
+		{[]int{2,1,5,6,2,3}},
+		{[]int{2,4}},
+	}
+
+	expected_outputs := []int{
+		10,
+		4,
+	}
+
+	f := func(i input) int {
+		return largestRectangleArea(i.heights)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMaximalRectangle(t *testing.T) {
+	type input struct {
+		matrix [][]byte
+	}
+	inputs := []input{
+		{
+			[][]byte{
+				{'1','0','1','0','0'},
+				{'1','0','1','1','1'},
+				{'1','1','1','1','1'},
+				{'1','0','0','1','0'},
+			},
+		},
+		{
+			[][]byte{
+				{'0'},
+			},
+		},
+		{
+			[][]byte{
+				{'1'},
+			},
+		},
+	}
+
+	expected_outputs := []int{
+		6,
+		0,
+		1,
+	}
+
+	f := func(i input) int {
+		return maximalRectangle(i.matrix)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
