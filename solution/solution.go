@@ -6958,9 +6958,39 @@ Return an array ans of length nums1.length such that ans[i] is the next greater 
 
 Link:
 https://leetcode.com/problems/next-greater-element-i/description/
+
+Inspiration:
+https://leetcode.com/problems/next-greater-element-i/solutions/97595/java-10-lines-linear-time-complexity-o-n-with-explanation/
 */
 func nextGreaterElement(nums1 []int, nums2 []int) []int {
-    return []int{}
+	next_greater := make(map[int]int)
+	// We need to maintain a stack of decreasing values
+	decreasing_stack := linked_list.NewStack[int]()
+	for _, v := range nums2 {
+		if decreasing_stack.Empty() || decreasing_stack.Peek() > v {
+			decreasing_stack.Push(v)
+		} else {
+			for !decreasing_stack.Empty() && decreasing_stack.Peek() < v {
+				next_greater[decreasing_stack.Pop()] = v
+			}
+			decreasing_stack.Push(v)
+		}
+	}
+	for !decreasing_stack.Empty() {
+		next_greater[decreasing_stack.Pop()] = -1
+	}
+
+    results := []int{}
+	for _, v := range nums1 {
+		next_greater_value, ok := next_greater[v]
+		if ok {
+			results = append(results, next_greater_value)
+		} else {
+			results = append(results, -1)
+		}
+	}
+
+	return results
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6975,10 +7005,82 @@ Link:
 https://leetcode.com/problems/next-greater-element-ii/description/
 
 Inspiration:
-https://medium.com/algorithms-digest/previous-smaller-element-e3996fb8be3c
+The Editorial
 */
 func nextGreaterElements(nums []int) []int {
-    return []int{}
+	decreasing_stack := linked_list.NewStack[int]()
+	// For a given index, record the next greater element
+	next_greater := make(map[int]int)
+	for repeat := 0; repeat < 2; repeat++ {
+		for i:=len(nums)-1; i>=0; i-- {
+			for !decreasing_stack.Empty() && nums[decreasing_stack.Peek()] <= nums[i] {
+				decreasing_stack.Pop()
+			}
+			if decreasing_stack.Empty() {
+				next_greater[i] = -1
+			} else {
+				next_greater[i] = nums[decreasing_stack.Peek()]
+			}
+			decreasing_stack.Push(i)
+		}
+	}
+	results := make([]int, len(nums))
+	for i:=0; i<len(results); i++ {
+		results[i] = next_greater[i]
+	}
+	return results
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a positive integer n, find the smallest integer which has exactly the same digits existing in the integer n and is greater in value than n. 
+If no such positive integer exists, return -1.
+
+Note that the returned integer should fit in 32-bit integer, if there is a valid answer but it does not fit in 32-bit integer, return -1.
+
+Link:
+https://leetcode.com/problems/next-greater-element-iii/description/
+
+Inspiration:
+The discussion forums...
+*/
+func nextGreaterElementIII(n int) int {
+	// 10 digits for max 32-bit integer
+	// NOTE - 10! is under 4 million - brute force will work
+	digits := make([]int, int(math.Log10(float64(n))) + 1)
+	for i:=0; i<len(digits); i++ {
+		// rounded_num will have i+1 digits - we want the right-most one
+		rounded_num := n / (int(math.Pow(float64(10), float64(len(digits)-1-i))))
+		digits[i] = rounded_num % 10
+	}
+	// Going from right, find the first digit smaller than previous digit.
+	// Find the first digit bigger than said digit. Swap those two values.
+	// Given your new array of digits, reverse the order of all digits preceding the number that swapped places with that aforementioned digit
+	for i:=len(digits)-2; i>=0; i-- {
+		if digits[i] < digits[i+1] {
+			for k := len(digits)-1; k>=i+1; k-- {
+				if digits[i] < digits[k] {
+					digits[i], digits[k] = digits[k], digits[i]
+					break
+				}
+			}
+			num_digits_to_flip := len(digits) - i - 1
+			for j := i+1; j < i + 1 + num_digits_to_flip / 2; j++ {
+				digits[j], digits[len(digits) - (j-i)] = digits[len(digits) - (j-i)], digits[j]
+			}
+			res := 0
+			for k:=0; k<len(digits); k++ {
+				res += digits[k]*int(math.Pow(float64(10), float64(len(digits) - 1 - k)))
+				if res < 0 || res > 2147483647 {
+					return -1
+				}
+			}
+			return res
+		}
+	}
+
+	return -1
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6990,6 +7092,7 @@ Link:
 https://leetcode.com/problems/largest-rectangle-in-histogram/description/
 
 Inspiration:
+https://medium.com/algorithms-digest/previous-smaller-element-e3996fb8be3c
 https://medium.com/algorithms-digest/largest-rectangle-in-histogram-234004ecd15a#id_token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjJhZjkwZTg3YmUxNDBjMjAwMzg4OThhNmVmYTExMjgzZGFiNjAzMWQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIyMTYyOTYwMzU4MzQtazFrNnFlMDYwczJ0cDJhMmphbTRsamRjbXMwMHN0dGcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIyMTYyOTYwMzU4MzQtazFrNnFlMDYwczJ0cDJhMmphbTRsamRjbXMwMHN0dGcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDY2NTg0ODA4ODE4Njk5ODMxMTMiLCJlbWFpbCI6Im1pa2V5dGFsbHlmZXJndXNvbkBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmJmIjoxNzE5NjA5OTc1LCJuYW1lIjoiTWlrZXkgRmVyZ3Vzb24iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3NGNk9hLWtGNlk5QnREWGJQbjNiMTZqZmE0Zkl1cHJIWjJBaEJWWW9nX2ZfTE5RMD1zOTYtYyIsImdpdmVuX25hbWUiOiJNaWtleSIsImZhbWlseV9uYW1lIjoiRmVyZ3Vzb24iLCJpYXQiOjE3MTk2MTAyNzUsImV4cCI6MTcxOTYxMzg3NSwianRpIjoiN2NmNGNjNDRhNmNmZjQyN2QxODAzNmE3YjY2YzA2MzlkM2Y2ZWRkNSJ9.lNkIfnS1XT3LzW-OCPU_VBaluRCBvzIJBPucyywxH6rMlrN8Jx48g72_EOOj4Jf_ViyWStPI1uDDCFfp4wVMltMMlwoxHz1P4s3yYqGozjT2izF8ZqSK8wWwUNBw4LN0T9W9UDabv-q_EKM5UKS-sMLgWFfWcNQAcrrAo0xk-uNfNeD1DGQcP3pbMDlayzldXxi9K-Yl0cMqP-RbSwvc75pcUPb1CPzZsXqJnZQZT0KHSdeyEbUbJ8mBCPocGu_9V-EyDbHIrWDh6qMuSFV7DQUWxz5KQPfOLxHVy6AwteZyO8jTkMlc6x9bcP2LPgaNdbSU_YXs96K-Mv12cyf-Tw
 */
 func largestRectangleArea(heights []int) int {

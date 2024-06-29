@@ -2979,6 +2979,33 @@ func TestNextGreaterElements(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
 }
 
+func TestNextGreaterElementIII(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{12},
+		{21},
+		{230241},
+		{2147483486},
+		{2147483476},
+	}
+
+	expected_outputs := []int{
+		21,
+		-1,
+		230412,
+		-1,
+		2147483647,
+	}
+
+	f := func(i input) int {
+		return nextGreaterElementIII(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
 func TestLargestRectangleArea(t *testing.T) {
 	type input struct {
 		heights []int
