@@ -3064,3 +3064,46 @@ func TestMaximalRectangle(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMaxNumEdgesToRemove(t *testing.T) {
+	type input struct {
+		n     int
+		edges [][]int
+	}
+	inputs := []input{
+		{4, [][]int{
+			{3,1,2},
+			{3,2,3},
+			{1,1,3},
+			{1,2,4},
+			{1,1,2},
+			{2,3,4},
+			},
+		},
+		{4, [][]int{
+			{3,1,2},
+			{3,2,3},
+			{1,1,4},
+			{2,1,4},
+			},
+		},
+		{4, [][]int{
+			{3,2,3},
+			{1,1,2},
+			{2,3,4},
+			},
+		},
+	}
+
+	expected_outputs := []int{
+		2,
+		0,
+		-1,
+	}
+
+	f := func(i input) int {
+		return maxNumEdgesToRemove(i.n, i.edges)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

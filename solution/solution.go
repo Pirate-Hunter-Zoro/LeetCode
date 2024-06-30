@@ -7093,11 +7093,47 @@ Link:
 https://leetcode.com/problems/largest-rectangle-in-histogram/description/
 
 Inspiration:
-https://medium.com/algorithms-digest/previous-smaller-element-e3996fb8be3c
 https://medium.com/algorithms-digest/largest-rectangle-in-histogram-234004ecd15a#id_token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjJhZjkwZTg3YmUxNDBjMjAwMzg4OThhNmVmYTExMjgzZGFiNjAzMWQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiIyMTYyOTYwMzU4MzQtazFrNnFlMDYwczJ0cDJhMmphbTRsamRjbXMwMHN0dGcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiIyMTYyOTYwMzU4MzQtazFrNnFlMDYwczJ0cDJhMmphbTRsamRjbXMwMHN0dGcuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDY2NTg0ODA4ODE4Njk5ODMxMTMiLCJlbWFpbCI6Im1pa2V5dGFsbHlmZXJndXNvbkBnbWFpbC5jb20iLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwibmJmIjoxNzE5NjA5OTc1LCJuYW1lIjoiTWlrZXkgRmVyZ3Vzb24iLCJwaWN0dXJlIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jS3NGNk9hLWtGNlk5QnREWGJQbjNiMTZqZmE0Zkl1cHJIWjJBaEJWWW9nX2ZfTE5RMD1zOTYtYyIsImdpdmVuX25hbWUiOiJNaWtleSIsImZhbWlseV9uYW1lIjoiRmVyZ3Vzb24iLCJpYXQiOjE3MTk2MTAyNzUsImV4cCI6MTcxOTYxMzg3NSwianRpIjoiN2NmNGNjNDRhNmNmZjQyN2QxODAzNmE3YjY2YzA2MzlkM2Y2ZWRkNSJ9.lNkIfnS1XT3LzW-OCPU_VBaluRCBvzIJBPucyywxH6rMlrN8Jx48g72_EOOj4Jf_ViyWStPI1uDDCFfp4wVMltMMlwoxHz1P4s3yYqGozjT2izF8ZqSK8wWwUNBw4LN0T9W9UDabv-q_EKM5UKS-sMLgWFfWcNQAcrrAo0xk-uNfNeD1DGQcP3pbMDlayzldXxi9K-Yl0cMqP-RbSwvc75pcUPb1CPzZsXqJnZQZT0KHSdeyEbUbJ8mBCPocGu_9V-EyDbHIrWDh6qMuSFV7DQUWxz5KQPfOLxHVy6AwteZyO8jTkMlc6x9bcP2LPgaNdbSU_YXs96K-Mv12cyf-Tw
 */
 func largestRectangleArea(heights []int) int {
-	return 0
+	// The first thing we need to do is, for each height in heights, find the first LEFT BOUND height smaller than this height and record its position
+	// Do the same for the first RIGHT BOUND height lower than this height
+	// L is left posn index, R is right posn index, width is L-R-1, and height is the height of our current rectangle
+	// See if that area breaks the record
+
+	// SO FIRST, find those left bound lesser height positions for all elements in heights
+	first_left_less := make([]int, len(heights))
+	non_decreasing_stack := linked_list.NewStack[int]()
+	for i:=len(heights)-1; i>=0; i-- {
+		for !non_decreasing_stack.Empty() && heights[non_decreasing_stack.Peek()] > heights[i] {
+			first_left_less[non_decreasing_stack.Pop()] = i
+		}
+		non_decreasing_stack.Push(i)
+	}
+	for !non_decreasing_stack.Empty() {
+		first_left_less[non_decreasing_stack.Pop()] = -1
+	}
+
+	// Now do the same for the right bound lesser height positions
+	first_right_less := make([]int, len(heights))
+	for i:=0; i<len(heights); i++ {
+		for !non_decreasing_stack.Empty() && heights[non_decreasing_stack.Peek()] > heights[i] {
+			first_right_less[non_decreasing_stack.Pop()] = i
+		}
+		non_decreasing_stack.Push(i)
+	}
+	for !non_decreasing_stack.Empty() {
+		first_right_less[non_decreasing_stack.Pop()] = len(heights)
+	}
+
+	// Now try making every possible height in heights THE height to be our largest possible rectangle
+	record := 0
+	for i:=0; i<len(heights); i++ {
+		width := first_right_less[i] - first_left_less[i] - 1
+		record = max(record, width * heights[i])
+	}
+
+	return record
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7112,7 +7148,41 @@ Inspiration:
 The discussion forums were helpful!
 */
 func maximalRectangle(matrix [][]byte) int {
-	return 0
+	// We will repeat the problem of maximal rectangle area as we progress down the rows
+	rectangles := make([]int, len(matrix[0]))
+	record := 0
+	for row := 0; row < len(matrix); row++ {
+		for i:=0; i<len(matrix[row]); i++ {
+			if matrix[row][i] == '1' {
+				rectangles[i]++
+			} else {
+				rectangles[i] = 0
+			}
+		}
+		record = max(record, largestRectangleArea(rectangles))
+	}
+
+	return record
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Alice and Bob have an undirected graph of n nodes and three types of edges:
+
+Type 1: Can be traversed by Alice only.
+Type 2: Can be traversed by Bob only.
+Type 3: Can be traversed by both Alice and Bob.
+Given an array edges where edges[i] = [type_i, u_i, v_i] represents a bidirectional edge of type typei between nodes u_i and v_i, find the maximum number of edges you can remove so that after removing the edges, the graph can still be fully traversed by both Alice and Bob. 
+The graph is fully traversed by Alice and Bob if starting from any node, they can reach all other nodes.
+
+Return the maximum number of edges you can remove, or return -1 if Alice and Bob cannot fully traverse the graph.
+
+Link:
+https://leetcode.com/problems/remove-max-number-of-edges-to-keep-graph-fully-traversable/description/?envType=daily-question&envId=2024-06-30
+*/
+func maxNumEdgesToRemove(n int, edges [][]int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
