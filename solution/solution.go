@@ -7065,6 +7065,7 @@ func nextGreaterElementIII(n int) int {
 					break
 				}
 			}
+			// Now we need to flip all of the digits that precede the digit position we just swapped - because they were in decreasing order - making them increasing will minimize this next larger number
 			num_digits_to_flip := len(digits) - i - 1
 			for j := i+1; j < i + 1 + num_digits_to_flip / 2; j++ {
 				digits[j], digits[len(digits) - (j-i)] = digits[len(digits) - (j-i)], digits[j]
