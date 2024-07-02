@@ -3109,3 +3109,50 @@ func TestMaxNumEdgesToRemove(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestIsScramble(t *testing.T) {
+	type input struct {
+		s1 string
+		s2 string
+	}
+	inputs := []input{
+		{"great", "rgeat"},
+		{"abcde", "caebd"},
+		{"a", "a"},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+		true,
+	}
+
+	f := func(i input) bool {
+		return isScramble(i.s1, i.s2)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestNumDecodings(t *testing.T) {
+	type input struct {
+		s string
+	}
+	inputs := []input{
+		{"12"},
+		{"226"},
+		{"06"},
+	}
+
+	expected_outputs := []int{
+		2,
+		3,
+		0,
+	}
+
+	f := func(i input) int {
+		return numDecodings(i.s)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

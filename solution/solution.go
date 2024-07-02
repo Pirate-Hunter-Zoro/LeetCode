@@ -1036,13 +1036,15 @@ func canTraverseAllPairs(nums []int) bool {
 		if n == 1 {
 			return false
 		}
-		nodes[idx] = s.MakeNode(n)
+		s.MakeNode(n)
+		nodes[idx] = s.GetNode(n)
 	}
 
 	for idx, n := range nums {
 		prime_factors := euclidean.GetPrimeFactors(n)
 		for _, p := range prime_factors {
-			nodes[idx].Join(s.MakeNode(p))
+			s.MakeNode(p)
+			nodes[idx].Join(s.GetNode(p))
 		}
 	}
 
@@ -6473,7 +6475,7 @@ https://leetcode.com/problems/longest-valid-parentheses/description/
 func longestValidParentheses(s string) int {
 	longestStartingHere := make(map[int]int)
 	record := 0
-	for i:=0; i<len(s); i++ {
+	for i := 0; i < len(s); i++ {
 		record = max(record, findLongestStartingHere(i, s, longestStartingHere))
 	}
 	return record
@@ -6497,7 +6499,7 @@ func findLongestStartingHere(i int, s string, longestStartingHere map[int]int) i
 			} else {
 				// (*)* MAYBE - if we can find that later parentheses
 				nest := findLongestStartingHere(i+1, s, longestStartingHere)
-				if nest > 0 && i + nest + 1 < len(s) && s[i+nest+1] == ')' {
+				if nest > 0 && i+nest+1 < len(s) && s[i+nest+1] == ')' {
 					longestStartingHere[i] = nest + 2 + findLongestStartingHere(i+nest+2, s, longestStartingHere)
 				} else {
 					longestStartingHere[i] = 0
@@ -6525,7 +6527,7 @@ func trap(height []int) int {
 	total := 0
 	st := linked_list.NewStack[int]()
 	st.Push(i)
-	for i < len(height) - 1 {
+	for i < len(height)-1 {
 		i++
 		h := height[i]
 		if h == 0 {
@@ -6553,7 +6555,7 @@ func trap(height []int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are given an integer array nums. 
+You are given an integer array nums.
 You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.
 
 Return true if you can reach the last index, or false otherwise.
@@ -6565,10 +6567,10 @@ func canJump(nums []int) bool {
 	canReach := make([]bool, len(nums))
 	// For a given index, can we reach the end from that index?
 	canReach[len(canReach)-1] = true
-	for i:=len(canReach)-2; i>=0; i-- {
+	for i := len(canReach) - 2; i >= 0; i-- {
 		max_jump_dist := nums[i]
-		for jump := 1; jump <= min(max_jump_dist, len(nums) - i - 1); jump++ {
-			canReach[i] = canReach[i + jump]
+		for jump := 1; jump <= min(max_jump_dist, len(nums)-i-1); jump++ {
+			canReach[i] = canReach[i+jump]
 			if canReach[i] {
 				break
 			}
@@ -6580,16 +6582,16 @@ func canJump(nums []int) bool {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are given a 0-indexed array of integers nums of length n. 
+You are given a 0-indexed array of integers nums of length n.
 You are initially positioned at nums[0].
 
-Each element nums[i] represents the maximum length of a forward jump from index i. 
+Each element nums[i] represents the maximum length of a forward jump from index i.
 In other words, if you are at nums[i], you can jump to any nums[i + j] where:
 
 0 <= j <= nums[i] and
 i + j < n
 
-Return the minimum number of jumps to reach nums[n - 1]. 
+Return the minimum number of jumps to reach nums[n - 1].
 The test cases are generated such that you can reach nums[n - 1].
 
 Link:
@@ -6597,14 +6599,14 @@ https://leetcode.com/problems/jump-game-ii/description/
 */
 func jump(nums []int) int {
 	min_jumps := make([]int, len(nums))
-	for i:=0; i<len(min_jumps)-1; i++ {
+	for i := 0; i < len(min_jumps)-1; i++ {
 		min_jumps[i] = math.MaxInt
 	}
 
-	for i:=len(min_jumps)-2; i>=0; i-- {
+	for i := len(min_jumps) - 2; i >= 0; i-- {
 		for jump := 1; jump <= min(nums[i], len(nums)-i-1); jump++ {
-			if min_jumps[i + jump] != math.MaxInt {
-				min_jumps[i] = min(min_jumps[i], 1 + min_jumps[i + jump])
+			if min_jumps[i+jump] != math.MaxInt {
+				min_jumps[i] = min(min_jumps[i], 1+min_jumps[i+jump])
 			}
 		}
 	}
@@ -6625,9 +6627,9 @@ func maxSubArray(nums []int) int {
 	records[0] = nums[0]
 	best := records[0]
 	// Consider, if you MUST include nums[i], and have nums[0:i+1] to work with, what's the best sum you could achieve?
-	for i:=1; i<len(records); i++ {
+	for i := 1; i < len(records); i++ {
 		// DON'T include the immediate left-most best sum achievable, or DO include it - whichever achieves a greater sum.
-		records[i] = max(nums[i], nums[i] + records[i-1])
+		records[i] = max(nums[i], nums[i]+records[i-1])
 		best = max(best, records[i])
 	}
 
@@ -6647,40 +6649,40 @@ Link:
 https://leetcode.com/problems/two-sum/description/
 */
 func twoSum(nums []int, target int) []int {
-    val_to_indices := make(map[int][]int)
-    for idx, v := range nums {
-        _, ok := val_to_indices[v]
-        if !ok {
-            val_to_indices[v] = []int{idx}
-        } else {
-            val_to_indices[v] = append(val_to_indices[v], idx)
-        }
-    }
+	val_to_indices := make(map[int][]int)
+	for idx, v := range nums {
+		_, ok := val_to_indices[v]
+		if !ok {
+			val_to_indices[v] = []int{idx}
+		} else {
+			val_to_indices[v] = append(val_to_indices[v], idx)
+		}
+	}
 
-    sort.SliceStable(nums, func(i, j int) bool {
-        return nums[i] < nums[j]
-    })
+	sort.SliceStable(nums, func(i, j int) bool {
+		return nums[i] < nums[j]
+	})
 
-    left := 0
-    right := len(nums)-1
-    for nums[left] + nums[right] != target {
-        if nums[left] + nums[right] < target {
-            left++
-        } else {
-            right--
-        }
-    }
-    if nums[left] == nums[right] {
-        return []int{val_to_indices[nums[left]][0], val_to_indices[nums[left]][1]}
-    } else {
-        return []int{val_to_indices[nums[left]][0], val_to_indices[nums[right]][0]}
-    }
+	left := 0
+	right := len(nums) - 1
+	for nums[left]+nums[right] != target {
+		if nums[left]+nums[right] < target {
+			left++
+		} else {
+			right--
+		}
+	}
+	if nums[left] == nums[right] {
+		return []int{val_to_indices[nums[left]][0], val_to_indices[nums[left]][1]}
+	} else {
+		return []int{val_to_indices[nums[left]][0], val_to_indices[nums[right]][0]}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-Given the root of a binary search tree, return a balanced binary search tree with the same node values. 
+Given the root of a binary search tree, return a balanced binary search tree with the same node values.
 If there is more than one answer, return any of them.
 
 A binary search tree is balanced if the depth of the two subtrees of every node never differs by more than 1.
@@ -6689,7 +6691,7 @@ Link:
 https://leetcode.com/problems/balance-a-binary-search-tree/description/?envType=daily-question&envId=2024-06-26
 */
 func balanceBST(root *binary_tree.TreeNode) *binary_tree.TreeNode {
-    st := linked_list.NewStack[*binary_tree.TreeNode]()
+	st := linked_list.NewStack[*binary_tree.TreeNode]()
 	explored := make(map[*binary_tree.TreeNode]bool)
 	st.Push(root)
 	values := []int{}
@@ -6725,7 +6727,7 @@ func balanceBST(root *binary_tree.TreeNode) *binary_tree.TreeNode {
 		if mid == left { // Base case - size 1
 			idx_stack.Pop()
 			nodes[mid] = &binary_tree.TreeNode{Val: values[mid], Left: nil, Right: nil}
-		} else if mid == left - 1 { // Base case - size 2
+		} else if mid == left-1 { // Base case - size 2
 			idx_stack.Pop()
 			nodes[left] = &binary_tree.TreeNode{Val: values[left], Left: nil, Right: nil}
 			nodes[mid] = &binary_tree.TreeNode{Val: values[mid], Left: nodes[left], Right: nil}
@@ -6734,14 +6736,14 @@ func balanceBST(root *binary_tree.TreeNode) *binary_tree.TreeNode {
 				// Do left
 				nodes[mid] = &binary_tree.TreeNode{Val: values[mid], Left: nil, Right: nil}
 				idx_stack.Push([]int{left, mid})
-			} else if (mid + 1 + right) / 2 < right && nodes[(mid + 1 + right) / 2] == nil {
+			} else if (mid+1+right)/2 < right && nodes[(mid+1+right)/2] == nil {
 				// Do right
-				idx_stack.Push([]int{mid+1, right})
+				idx_stack.Push([]int{mid + 1, right})
 			} else {
 				// Both left and right are done
-				nodes[mid].Left = nodes[(left + mid) / 2]
-				if (mid + 1 + right) / 2 < right {
-					nodes[mid].Right = nodes[(mid + 1 + right) / 2]
+				nodes[mid].Left = nodes[(left+mid)/2]
+				if (mid+1+right)/2 < right {
+					nodes[mid].Right = nodes[(mid+1+right)/2]
 				}
 				idx_stack.Pop()
 			}
@@ -6754,9 +6756,9 @@ func balanceBST(root *binary_tree.TreeNode) *binary_tree.TreeNode {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-There is a robot on an m x n grid. 
-The robot is initially located at the top-left corner (i.e., grid[0][0]). 
-The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). 
+There is a robot on an m x n grid.
+The robot is initially located at the top-left corner (i.e., grid[0][0]).
+The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]).
 The robot can only move either down or right at any point in time.
 
 Given the two integers m and n, return the number of possible unique paths that the robot can take to reach the bottom-right corner.
@@ -6767,8 +6769,8 @@ Link:
 https://leetcode.com/problems/unique-paths/description/
 */
 func uniquePaths(m int, n int) int {
-    // We will have to move (m-1 + n-1) times
-	// ANY m-1 of those moves will be horizontal 
+	// We will have to move (m-1 + n-1) times
+	// ANY m-1 of those moves will be horizontal
 	// You also hence immediately choose the reamining n-1 of those moves to be vertical
 	return combinations.Choose(m-1+n-1, m-1)
 }
@@ -6776,12 +6778,12 @@ func uniquePaths(m int, n int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are given an m x n integer array grid. 
-There is a robot initially located at the top-left corner (i.e., grid[0][0]). 
-The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). 
+You are given an m x n integer array grid.
+There is a robot initially located at the top-left corner (i.e., grid[0][0]).
+The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]).
 The robot can only move either down or right at any point in time.
 
-An obstacle and space are marked as 1 or 0 respectively in grid. 
+An obstacle and space are marked as 1 or 0 respectively in grid.
 A path that the robot takes cannot include any square that is an obstacle.
 
 Return the number of possible unique paths that the robot can take to reach the bottom-right corner.
@@ -6795,14 +6797,14 @@ func uniquePathsWithObstacles(obstacleGrid [][]int) int {
 	r := len(obstacleGrid)
 	c := len(obstacleGrid[0])
 	sols := make([][]int, r)
-	for i:=0; i<r; i++ {
+	for i := 0; i < r; i++ {
 		sols[i] = make([]int, c)
 	}
 	if obstacleGrid[r-1][c-1] == 0 {
 		sols[r-1][c-1] = 1
-		for row := r-1; row >= 0; row-- {
-			for col := c-1; col >= 0; col-- {
-				if row == r-1 && col == c - 1 {
+		for row := r - 1; row >= 0; row-- {
+			for col := c - 1; col >= 0; col-- {
+				if row == r-1 && col == c-1 {
 					continue
 				} else {
 					if obstacleGrid[row][col] == 1 {
@@ -6840,21 +6842,21 @@ func minPathSum(grid [][]int) int {
 	r := len(grid)
 	c := len(grid[0])
 	min_sums := make([][]int, r)
-	for i:=0; i<r; i++ {
+	for i := 0; i < r; i++ {
 		min_sums[i] = make([]int, c)
 	}
 	min_sums[r-1][c-1] = grid[r-1][c-1]
-	for row := r-1; row >= 0; row-- {
-		for col := c-1; col >= 0; col-- {
-			if row == r-1 && col == c - 1 {
+	for row := r - 1; row >= 0; row-- {
+		for col := c - 1; col >= 0; col-- {
+			if row == r-1 && col == c-1 {
 				continue
 			} else {
 				min_sums[row][col] = grid[row][col]
 				addition := math.MaxInt
-				if col < c - 1 {
+				if col < c-1 {
 					addition = min(addition, min_sums[row][col+1])
 				}
-				if row < r - 1 {
+				if row < r-1 {
 					addition = min(addition, min_sums[row+1][col])
 				}
 				min_sums[row][col] += addition
@@ -6867,7 +6869,7 @@ func minPathSum(grid [][]int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are climbing a staircase. 
+You are climbing a staircase.
 It takes n steps to reach the top.
 
 Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
@@ -6879,12 +6881,12 @@ func climbStairs(n int) int {
 	prev_prev := 1
 	prev := 1
 	curr := 1
-	for i:=1; i<n; i++ {
+	for i := 1; i < n; i++ {
 		curr = prev_prev + prev
 		prev_prev = prev
 		prev = curr
 	}
-    return curr
+	return curr
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -6930,14 +6932,14 @@ func topDownMinDistance(i int, word1 string, j int, word2 string, sols map[int]m
 		} else {
 			if word1[i] == word2[j] {
 				// If the characters match, just move on
-				sols[i][j] = topDownMinDistance(i+1, word1, j+1,  word2, sols)
+				sols[i][j] = topDownMinDistance(i+1, word1, j+1, word2, sols)
 			} else {
 				// Try inserting the character from word2 into word1
 				sols[i][j] = 1 + topDownMinDistance(i, word1, j+1, word2, sols)
 				// Try deleting the character from word1 that doesn't match in word2
-				sols[i][j] = min(sols[i][j], 1 + topDownMinDistance(i+1, word1, j, word2, sols))
+				sols[i][j] = min(sols[i][j], 1+topDownMinDistance(i+1, word1, j, word2, sols))
 				// Try replacing the character in word1 that doesn't match with the character in word2
-				sols[i][j] = min(sols[i][j], 1 + topDownMinDistance(i+1, word1, j+1, word2, sols))
+				sols[i][j] = min(sols[i][j], 1+topDownMinDistance(i+1, word1, j+1, word2, sols))
 			}
 		}
 	}
@@ -6951,7 +6953,7 @@ The next greater element of some element x in an array is the first greater elem
 
 You are given two distinct 0-indexed integer arrays nums1 and nums2, where nums1 is a subset of nums2.
 
-For each 0 <= i < nums1.length, find the index j such that nums1[i] == nums2[j] and determine the next greater element of nums2[j] in nums2. 
+For each 0 <= i < nums1.length, find the index j such that nums1[i] == nums2[j] and determine the next greater element of nums2[j] in nums2.
 If there is no next greater element, then the answer for this query is -1.
 
 Return an array ans of length nums1.length such that ans[i] is the next greater element as described above.
@@ -6980,7 +6982,7 @@ func nextGreaterElement(nums1 []int, nums2 []int) []int {
 		next_greater[decreasing_stack.Pop()] = -1
 	}
 
-    results := []int{}
+	results := []int{}
 	for _, v := range nums1 {
 		next_greater_value, ok := next_greater[v]
 		if ok {
@@ -6998,7 +7000,7 @@ func nextGreaterElement(nums1 []int, nums2 []int) []int {
 /*
 Given a circular integer array nums (i.e., the next element of nums[nums.length - 1] is nums[0]), return the next greater number for every element in nums.
 
-The next greater number of a number x is the first greater number to its traversing-order next in the array, which means you could search circularly to find its next greater number. 
+The next greater number of a number x is the first greater number to its traversing-order next in the array, which means you could search circularly to find its next greater number.
 If it doesn't exist, return -1 for this number.
 
 Link:
@@ -7012,7 +7014,7 @@ func nextGreaterElements(nums []int) []int {
 	// For a given index, record the next greater element
 	next_greater := make(map[int]int)
 	for repeat := 0; repeat < 2; repeat++ {
-		for i:=len(nums)-1; i>=0; i-- {
+		for i := len(nums) - 1; i >= 0; i-- {
 			for !decreasing_stack.Empty() && nums[decreasing_stack.Peek()] <= nums[i] {
 				decreasing_stack.Pop()
 			}
@@ -7025,7 +7027,7 @@ func nextGreaterElements(nums []int) []int {
 		}
 	}
 	results := make([]int, len(nums))
-	for i:=0; i<len(results); i++ {
+	for i := 0; i < len(results); i++ {
 		results[i] = next_greater[i]
 	}
 	return results
@@ -7034,7 +7036,7 @@ func nextGreaterElements(nums []int) []int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-Given a positive integer n, find the smallest integer which has exactly the same digits existing in the integer n and is greater in value than n. 
+Given a positive integer n, find the smallest integer which has exactly the same digits existing in the integer n and is greater in value than n.
 If no such positive integer exists, return -1.
 
 Note that the returned integer should fit in 32-bit integer, if there is a valid answer but it does not fit in 32-bit integer, return -1.
@@ -7048,8 +7050,8 @@ The discussion forums...
 func nextGreaterElementIII(n int) int {
 	// 10 digits for max 32-bit integer
 	// NOTE - 10! is under 4 million - brute force will work
-	digits := make([]int, int(math.Log10(float64(n))) + 1)
-	for i:=0; i<len(digits); i++ {
+	digits := make([]int, int(math.Log10(float64(n)))+1)
+	for i := 0; i < len(digits); i++ {
 		// rounded_num will have i+1 digits - we want the right-most one
 		rounded_num := n / (int(math.Pow(float64(10), float64(len(digits)-1-i))))
 		digits[i] = rounded_num % 10
@@ -7057,9 +7059,9 @@ func nextGreaterElementIII(n int) int {
 	// Going from right, find the first digit smaller than previous digit.
 	// Find the first digit bigger than said digit. Swap those two values.
 	// Given your new array of digits, reverse the order of all digits preceding the number that swapped places with that aforementioned digit
-	for i:=len(digits)-2; i>=0; i-- {
+	for i := len(digits) - 2; i >= 0; i-- {
 		if digits[i] < digits[i+1] {
-			for k := len(digits)-1; k>=i+1; k-- {
+			for k := len(digits) - 1; k >= i+1; k-- {
 				if digits[i] < digits[k] {
 					digits[i], digits[k] = digits[k], digits[i]
 					break
@@ -7067,12 +7069,12 @@ func nextGreaterElementIII(n int) int {
 			}
 			// Now we need to flip all of the digits that precede the digit position we just swapped - because they were in decreasing order - making them increasing will minimize this next larger number
 			num_digits_to_flip := len(digits) - i - 1
-			for j := i+1; j < i + 1 + num_digits_to_flip / 2; j++ {
-				digits[j], digits[len(digits) - (j-i)] = digits[len(digits) - (j-i)], digits[j]
+			for j := i + 1; j < i+1+num_digits_to_flip/2; j++ {
+				digits[j], digits[len(digits)-(j-i)] = digits[len(digits)-(j-i)], digits[j]
 			}
 			res := 0
-			for k:=0; k<len(digits); k++ {
-				res += digits[k]*int(math.Pow(float64(10), float64(len(digits) - 1 - k)))
+			for k := 0; k < len(digits); k++ {
+				res += digits[k] * int(math.Pow(float64(10), float64(len(digits)-1-k)))
 				if res < 0 || res > 2147483647 {
 					return -1
 				}
@@ -7104,7 +7106,7 @@ func largestRectangleArea(heights []int) int {
 	// SO FIRST, find those left bound lesser height positions for all elements in heights
 	first_left_less := make([]int, len(heights))
 	non_decreasing_stack := linked_list.NewStack[int]()
-	for i:=len(heights)-1; i>=0; i-- {
+	for i := len(heights) - 1; i >= 0; i-- {
 		for !non_decreasing_stack.Empty() && heights[non_decreasing_stack.Peek()] > heights[i] {
 			first_left_less[non_decreasing_stack.Pop()] = i
 		}
@@ -7116,7 +7118,7 @@ func largestRectangleArea(heights []int) int {
 
 	// Now do the same for the right bound lesser height positions
 	first_right_less := make([]int, len(heights))
-	for i:=0; i<len(heights); i++ {
+	for i := 0; i < len(heights); i++ {
 		for !non_decreasing_stack.Empty() && heights[non_decreasing_stack.Peek()] > heights[i] {
 			first_right_less[non_decreasing_stack.Pop()] = i
 		}
@@ -7128,9 +7130,9 @@ func largestRectangleArea(heights []int) int {
 
 	// Now try making every possible height in heights THE height to be our largest possible rectangle
 	record := 0
-	for i:=0; i<len(heights); i++ {
+	for i := 0; i < len(heights); i++ {
 		width := first_right_less[i] - first_left_less[i] - 1
-		record = max(record, width * heights[i])
+		record = max(record, width*heights[i])
 	}
 
 	return record
@@ -7152,7 +7154,7 @@ func maximalRectangle(matrix [][]byte) int {
 	rectangles := make([]int, len(matrix[0]))
 	record := 0
 	for row := 0; row < len(matrix); row++ {
-		for i:=0; i<len(matrix[row]); i++ {
+		for i := 0; i < len(matrix[row]); i++ {
 			if matrix[row][i] == '1' {
 				rectangles[i]++
 			} else {
@@ -7173,128 +7175,136 @@ Alice and Bob have an undirected graph of n nodes and three types of edges:
 Type 1: Can be traversed by Alice only.
 Type 2: Can be traversed by Bob only.
 Type 3: Can be traversed by both Alice and Bob.
-Given an array edges where edges[i] = [type_i, u_i, v_i] represents a bidirectional edge of type typei between nodes u_i and v_i, find the maximum number of edges you can remove so that after removing the edges, the graph can still be fully traversed by both Alice and Bob. 
+Given an array edges where edges[i] = [type_i, u_i, v_i] represents a bidirectional edge of type typei between nodes u_i and v_i, find the maximum number of edges you can remove so that after removing the edges, the graph can still be fully traversed by both Alice and Bob.
 The graph is fully traversed by Alice and Bob if starting from any node, they can reach all other nodes.
 
 Return the maximum number of edges you can remove, or return -1 if Alice and Bob cannot fully traverse the graph.
 
 Link:
 https://leetcode.com/problems/remove-max-number-of-edges-to-keep-graph-fully-traversable/description/?envType=daily-question&envId=2024-06-30
+
+Inspiration:
+The LeetCode hints...
 */
 func maxNumEdgesToRemove(n int, edges [][]int) int {
-	// Let's start removing
-	removed := 0
+	// Sort the edges so that we analyze the SHARED edges first
+	sort.SliceStable(edges, func(i, j int) bool {
+		return edges[i][0] > edges[j][0]
+	})
 
-	// Keep track of edge types
-	edge_type := make(map[int]map[int]int)
-	// Create an adjacency list
-	edge_map_alice := make(map[int]map[int]bool)
-	edge_map_bob := make(map[int]map[int]bool)
-	edge_map_both := make(map[int]map[int]bool)
+	alice_node_factory := disjointset.NewSetOfSets[int]()
+	bob_node_factory := disjointset.NewSetOfSets[int]()
+	for i:=1; i<=n; i++ {
+		alice_node_factory.MakeNode(i)
+		bob_node_factory.MakeNode(i)
+	}
+
+	// Now join our nodes based on the edges and remove as we go
+	removed := 0
 	for _, edge := range edges {
-		t := edge[0]
 		n1 := edge[1]
 		n2 := edge[2]
+		if edge[0] == 3 {
+			// Shared edge
+			node1_alice := alice_node_factory.GetNode(n1)
+			node1_bob := bob_node_factory.GetNode(n1)
+			node2_alice := alice_node_factory.GetNode(n2)
+			node2_bob := bob_node_factory.GetNode(n2)
+			// See if both Alice and Bob already have these two nodes connected
+			bob_needs := node1_bob.RootValue() != node2_bob.RootValue()
+			alice_needs := node1_alice.RootValue() != node2_alice.RootValue()
+			if bob_needs || alice_needs {
+				node1_bob.Join(node2_bob)
+				node1_alice.Join(node2_alice)
+			} else {
+				removed++
+			}
+		} else if edge[0] == 2 {
+			// Bob edge
+			node_1 := bob_node_factory.GetNode(n1)
+			node_2 := bob_node_factory.GetNode(n2)
 
-		// Record the edge type
-		_, ok := edge_type[n1]
-		if !ok {
-			edge_type[n1] = make(map[int]int)
-		}
-		edge_type[n1][n2] = t
-		_, ok = edge_type[n2]
-		if !ok {
-			edge_type[n2] = make(map[int]int)
-		}
-		edge_type[n2][n1] = t
-
-		// Record the edge - IF AN EDGE IS EVER SHARED AND THAT SAME EDGE IS ALSO SHOWING UP TAYLORED TO ONE PERSON, REMOVE THE TAYLORED VERSION
-		if t == 1 {
-			_, ok = edge_map_both[n1]
-			if ok {
-				_, ok = edge_map_both[n1][n2]
-				if ok {
-					edge_type[n1][n2] = 3
-					edge_type[n2][n1] = 3
-					removed++
-					continue
-				}
+			// Does Bob need this edge?
+			if node_1.RootValue() == node_2.RootValue() {
+				// Nope
+				removed++
+			} else {
+				node_1.Join(node_2)
 			}
-
-			_, ok = edge_map_alice[n1]
-			if !ok {
-				edge_map_alice[n1] = make(map[int]bool)
-			}
-			edge_map_alice[n1][n2] = true
-			_, ok = edge_map_alice[n2]
-			if !ok {
-				edge_map_alice[n2] = make(map[int]bool)
-			}
-			edge_map_alice[n2][n1] = true
-		} else if t == 2 {
-			_, ok = edge_map_both[n1]
-			if ok {
-				_, ok = edge_map_both[n1][n2]
-				if ok {
-					edge_type[n1][n2] = 3
-					edge_type[n2][n1] = 3
-					removed++
-					continue
-				}
-			}
-
-			_, ok = edge_map_bob[n1]
-			if !ok {
-				edge_map_bob[n1] = make(map[int]bool)
-			}
-			edge_map_bob[n1][n2] = true
-			_, ok = edge_map_bob[n2]
-			if !ok {
-				edge_map_bob[n2] = make(map[int]bool)
-			}
-			edge_map_bob[n2][n1] = true
 		} else {
-			_, ok = edge_map_alice[n1]
-			if ok {
-				_, ok = edge_map_alice[n1][n2]
-				if ok {
-					delete(edge_map_alice[n1], n2)
-					delete(edge_map_alice[n1], n2)
-					removed++
-				}
-			}
+			// Alice edge
+			node_1 := alice_node_factory.GetNode(n1)
+			node_2 := alice_node_factory.GetNode(n2)
 
-			_, ok = edge_map_bob[n1]
-			if ok {
-				_, ok = edge_map_bob[n1][n2]
-				if ok {
-					delete(edge_map_bob[n1], n2)
-					delete(edge_map_bob[n1], n2)
-					removed++
-				}
+			// Does Alice need this edge?
+			if node_1.RootValue() == node_2.RootValue() {
+				// Nope
+				removed++
+			} else {
+				node_1.Join(node_2)
 			}
-
-			_, ok = edge_map_both[n1]
-			if !ok {
-				edge_map_both[n1] = make(map[int]bool)
-			}
-			edge_map_both[n1][n2] = true
-			_, ok = edge_map_both[n2]
-			if !ok {
-				edge_map_both[n2] = make(map[int]bool)
-			}
-			edge_map_both[n2][n1] = true
 		}
 	}
 
-	// First, edge case
-	if len(edge_map_alice) + len(edge_map_both) < n-1 || len(edge_map_bob) + len(edge_map_both) < n-1 {
-		return -1
+	// Check and see if all nodes are connected.
+	// If not then neither Alice nor Bob could fully traverse in the first place.
+	bob_root := bob_node_factory.GetNode(1).RootValue()
+	alice_root := alice_node_factory.GetNode(1).RootValue()
+	for i:=2; i<=n; i++ {
+		if bob_node_factory.GetNode(i).RootValue() != bob_root {
+			return -1
+		} else if alice_node_factory.GetNode(i).RootValue() != alice_root {
+			return -1
+		}
 	}
-
-	// TODO...
 
 	return removed
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+We can scramble a string s to get a string t using the following algorithm:
+
+If the length of the string is 1, stop.
+If the length of the string is > 1, do the following:
+- Split the string into two non-empty substrings at a random index, i.e., if the string is s, divide it to x and y where s = x + y.
+- Randomly decide to swap the two substrings or to keep them in the same order. i.e., after this step, s may become s = x + y or s = y + x.
+- Apply step 1 recursively on each of the two substrings x and y.
+
+Given two strings s1 and s2 of the same length, return true if s2 is a scrambled string of s1, otherwise, return false.
+
+Link:
+https://leetcode.com/problems/scramble-string/description/
+*/
+func isScramble(s1 string, s2 string) bool {
+    return false
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+A message containing letters from A-Z can be encoded into numbers using the following mapping:
+- 'A' -> "1"
+- 'B' -> "2"
+- ...
+- 'Z' -> "26"
+
+To decode an encoded message, all the digits must be grouped then mapped back into letters using the reverse of the mapping above (there may be multiple ways). 
+For example, "11106" can be mapped into:
+- "AAJF" with the grouping (1 1 10 6)
+- "KJF" with the grouping (11 10 6)
+- Note that the grouping (1 11 06) is invalid because "06" cannot be mapped into 'F' since "6" is different from "06".
+
+Given a string s containing only digits, return the number of ways to decode it.
+
+The test cases are generated so that the answer fits in a 32-bit integer.
+
+Link:
+https://leetcode.com/problems/decode-ways/description/
+*/
+func numDecodings(s string) int {
+	return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

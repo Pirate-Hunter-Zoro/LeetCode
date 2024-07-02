@@ -74,11 +74,19 @@ func (s *SetOfSets[T]) Clear() {
 	s.nodes = make(map[T]*Node[T])
 }
 
-// Make the node if it does not already exist, and return it.
-func (s *SetOfSets[T]) MakeNode(v T) *Node[T] {
+// Return this node if it exists.
+func (s *SetOfSets[T]) GetNode(v T) *Node[T] {
+	_, ok := s.nodes[v]
+	if !ok {
+		return nil
+	}
+	return s.nodes[v]
+}
+
+// Make this node if it does not already exist
+func (s *SetOfSets[T]) MakeNode(v T) {
 	_, ok := s.nodes[v]
 	if !ok {
 		s.nodes[v] = NewNode[T](v)
 	}
-	return s.nodes[v]
 }
