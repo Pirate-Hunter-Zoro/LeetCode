@@ -7182,7 +7182,119 @@ Link:
 https://leetcode.com/problems/remove-max-number-of-edges-to-keep-graph-fully-traversable/description/?envType=daily-question&envId=2024-06-30
 */
 func maxNumEdgesToRemove(n int, edges [][]int) int {
-    return 0
+	// Let's start removing
+	removed := 0
+
+	// Keep track of edge types
+	edge_type := make(map[int]map[int]int)
+	// Create an adjacency list
+	edge_map_alice := make(map[int]map[int]bool)
+	edge_map_bob := make(map[int]map[int]bool)
+	edge_map_both := make(map[int]map[int]bool)
+	for _, edge := range edges {
+		t := edge[0]
+		n1 := edge[1]
+		n2 := edge[2]
+
+		// Record the edge type
+		_, ok := edge_type[n1]
+		if !ok {
+			edge_type[n1] = make(map[int]int)
+		}
+		edge_type[n1][n2] = t
+		_, ok = edge_type[n2]
+		if !ok {
+			edge_type[n2] = make(map[int]int)
+		}
+		edge_type[n2][n1] = t
+
+		// Record the edge - IF AN EDGE IS EVER SHARED AND THAT SAME EDGE IS ALSO SHOWING UP TAYLORED TO ONE PERSON, REMOVE THE TAYLORED VERSION
+		if t == 1 {
+			_, ok = edge_map_both[n1]
+			if ok {
+				_, ok = edge_map_both[n1][n2]
+				if ok {
+					edge_type[n1][n2] = 3
+					edge_type[n2][n1] = 3
+					removed++
+					continue
+				}
+			}
+
+			_, ok = edge_map_alice[n1]
+			if !ok {
+				edge_map_alice[n1] = make(map[int]bool)
+			}
+			edge_map_alice[n1][n2] = true
+			_, ok = edge_map_alice[n2]
+			if !ok {
+				edge_map_alice[n2] = make(map[int]bool)
+			}
+			edge_map_alice[n2][n1] = true
+		} else if t == 2 {
+			_, ok = edge_map_both[n1]
+			if ok {
+				_, ok = edge_map_both[n1][n2]
+				if ok {
+					edge_type[n1][n2] = 3
+					edge_type[n2][n1] = 3
+					removed++
+					continue
+				}
+			}
+
+			_, ok = edge_map_bob[n1]
+			if !ok {
+				edge_map_bob[n1] = make(map[int]bool)
+			}
+			edge_map_bob[n1][n2] = true
+			_, ok = edge_map_bob[n2]
+			if !ok {
+				edge_map_bob[n2] = make(map[int]bool)
+			}
+			edge_map_bob[n2][n1] = true
+		} else {
+			_, ok = edge_map_alice[n1]
+			if ok {
+				_, ok = edge_map_alice[n1][n2]
+				if ok {
+					delete(edge_map_alice[n1], n2)
+					delete(edge_map_alice[n1], n2)
+					removed++
+				}
+			}
+
+			_, ok = edge_map_bob[n1]
+			if ok {
+				_, ok = edge_map_bob[n1][n2]
+				if ok {
+					delete(edge_map_bob[n1], n2)
+					delete(edge_map_bob[n1], n2)
+					removed++
+				}
+			}
+
+			_, ok = edge_map_both[n1]
+			if !ok {
+				edge_map_both[n1] = make(map[int]bool)
+			}
+			edge_map_both[n1][n2] = true
+			_, ok = edge_map_both[n2]
+			if !ok {
+				edge_map_both[n2] = make(map[int]bool)
+			}
+			edge_map_both[n2][n1] = true
+		}
+	}
+
+	// First, edge case
+	if len(edge_map_alice) + len(edge_map_both) < n-1 || len(edge_map_bob) + len(edge_map_both) < n-1 {
+		return -1
+	}
+
+	// TODO...
+
+	return removed
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
