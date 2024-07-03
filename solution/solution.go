@@ -7278,7 +7278,47 @@ Link:
 https://leetcode.com/problems/scramble-string/description/
 */
 func isScramble(s1 string, s2 string) bool {
-    return false
+	is_scramble := make(map[string]bool)
+	return topDownIsScramble(s1, s2, is_scramble)
+}
+
+/*
+Top-down recursive helper method to solve the isScramble problem
+*/
+func topDownIsScramble(s1 string, s2 string, is_scramble map[string]bool) bool {
+	var buffer bytes.Buffer
+	buffer.WriteString(s1)
+	buffer.WriteString(s2)
+	combined := buffer.String()
+	_, ok := is_scramble[combined]
+	if !ok {
+		if s1 == s2 {
+			is_scramble[combined] = true
+		} else if len(s1) == 1 {
+			is_scramble[combined] = false
+		} else {
+			for split := 1; split < len(s1); split++ {
+				left_s1 := s1[:split]
+				right_s1 := s1[split:]
+				// Try swapping the two strings in s1
+				left_s2_swap := s2[len(s2)-split:]
+				right_s2_swap := s2[:len(s2)-split]
+				if topDownIsScramble(left_s1, left_s2_swap, is_scramble) && topDownIsScramble(right_s1, right_s2_swap, is_scramble) {
+					is_scramble[combined] = true
+					break
+				} else {
+					// Not swapping the two strings in s1 is our only hope
+					left_s2_no_swap := s2[:split]
+					right_s2_no_swap := s2[split:]
+					is_scramble[combined] = topDownIsScramble(left_s1, left_s2_no_swap, is_scramble) && topDownIsScramble(right_s1, right_s2_no_swap, is_scramble)
+					if is_scramble[combined] {
+						break
+					}
+				}
+			}
+		}
+	}
+	return is_scramble[combined]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7304,7 +7344,75 @@ Link:
 https://leetcode.com/problems/decode-ways/description/
 */
 func numDecodings(s string) int {
-	return 0
+	num_to_char := make(map[string]rune)
+	for i:=1; i<=26; i++ {
+		num_to_char[strconv.Itoa(i)] = rune('A' + i - 1)
+	}
+	num_decodings := make(map[string]int)
+	return topDownNumDecodings(s, num_decodings, num_to_char)
+}
+
+/*
+Top down helper method to solve the numDecodings problem
+*/
+func topDownNumDecodings(s string, num_decodings map[string]int, num_to_char map[string]rune) int {
+	_, ok := num_decodings[s]
+	if !ok {
+		// Need to solve this problem
+		if len(s) == 1 {
+			_, ok := num_to_char[s]
+			if !ok {
+				num_decodings[s] = 0
+			} else {
+				num_decodings[s] = 1
+			}
+		} else if len(s) == 2 {
+			_, ok := num_to_char[s]
+			if !ok {
+				left_count := topDownNumDecodings(s[:1], num_decodings, num_to_char)
+				right_count := topDownNumDecodings(s[1:], num_decodings, num_to_char)
+				if left_count == 1 && right_count == 1 {
+					num_decodings[s] = 1
+				}
+			} else {
+				num_decodings[s] = 1
+				left_count := topDownNumDecodings(s[:1], num_decodings, num_to_char)
+				right_count := topDownNumDecodings(s[1:], num_decodings, num_to_char)
+				if left_count == 1 && right_count == 1 {
+					num_decodings[s] += 1
+				}
+			}
+		} else {
+			num_decodings[s] = 0
+			first := s[:1]
+			_, ok := num_to_char[first]
+			if ok {
+				num_decodings[s] += topDownNumDecodings(s[1:], num_decodings, num_to_char)
+			}
+			first_two := s[:2]
+			_, ok = num_to_char[first_two]
+			if ok {
+				num_decodings[s] += topDownNumDecodings(s[2:], num_decodings, num_to_char)
+			}
+		}
+	}
+	return num_decodings[s]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an integer array nums.
+
+In one move, you can choose one element of nums and change it to any value.
+
+Return the minimum difference between the largest and smallest value of nums after performing at most three moves.
+
+Link:
+https://leetcode.com/problems/minimum-difference-between-largest-and-smallest-value-in-three-moves/description/?envType=daily-question&envId=2024-07-03
+*/
+func minDifference(nums []int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

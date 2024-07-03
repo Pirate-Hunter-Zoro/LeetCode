@@ -3156,3 +3156,26 @@ func TestNumDecodings(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMinDifference(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{5,3,2,4}},
+		{[]int{1,5,0,10,14}},
+		{[]int{3,100,20}},
+	}
+
+	expected_outputs := []int{
+		0,
+		1,
+		0,
+	}
+
+	f := func(i input) int {
+		return minDifference(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
