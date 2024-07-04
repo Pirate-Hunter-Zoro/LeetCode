@@ -7410,9 +7410,166 @@ Return the minimum difference between the largest and smallest value of nums aft
 
 Link:
 https://leetcode.com/problems/minimum-difference-between-largest-and-smallest-value-in-three-moves/description/?envType=daily-question&envId=2024-07-03
+
+Inspiration:
+The Editorial
 */
 func minDifference(nums []int) int {
-    return 0
+	if len(nums) <= 4 {
+		return 0
+	}
+	sort.SliceStable(nums, func(i, j int) bool {
+		return nums[i] < nums[j]
+	})
+	n := len(nums)
+	// Try deleting lowest 3
+	// Try deleting lowest 2 and highest
+	// Try deleting lowest and highest 2
+	// Try deleting highest 3
+	return min(nums[n-4] - nums[0],
+		min(nums[n-3] - nums[1],
+			min(
+				nums[n-2] - nums[2],
+				nums[n-1] - nums[3],
+			),
+		),
+	)
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given the head of a linked list, which contains a series of integers separated by 0's. The beginning and end of the linked list will have Node.val == 0.
+
+For every two consecutive 0's, merge all the nodes lying in between them into a single node whose value is the sum of all the merged nodes. The modified list should not contain any 0's.
+
+Return the head of the modified linked list.
+
+Link:
+https://leetcode.com/problems/merge-nodes-in-between-zeros/description/?envType=daily-question&envId=2024-07-04
+*/
+func mergeNodes(head *list_node.ListNode) *list_node.ListNode {
+    new_head := &list_node.ListNode{Val: 0, Next: nil}
+	current_addition := new_head
+	running_sum := 0
+	current := head.Next
+	for current != nil {
+		if current.Val == 0 {
+			current_addition.Val = running_sum
+			if current.Next != nil {
+				new_addition := &list_node.ListNode{Val: 0, Next: nil}
+				current_addition.Next = new_addition
+				current_addition = new_addition
+			}
+			running_sum = 0
+		} else {
+			running_sum += current.Val
+		}
+		current = current.Next
+	}
+
+	return new_head
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer n, return all the structurally unique BST's (binary search trees), which has exactly n nodes of unique values from 1 to n. 
+Return the answer in any order.
+
+Link:
+https://leetcode.com/problems/unique-binary-search-trees-ii/description/
+*/
+func generateTrees(n int) []*binary_tree.TreeNode {
+	sols := make([][][]*binary_tree.TreeNode, n)
+	for i:=0; i<n; i++ {
+		sols[i] = make([][]*binary_tree.TreeNode, n)
+		sols[i][i] = []*binary_tree.TreeNode{{Val: i+1, Left: nil, Right: nil}}
+	}
+
+	for num_values := 2; num_values <= n; num_values++ {
+		for start := 0; start <= n - num_values; start++ {
+			end := start + num_values - 1
+			trees := []*binary_tree.TreeNode{}
+			for root := start; root <= end; root++ {
+				if root == start {
+					for _, tree := range sols[root+1][end] {
+						trees = append(trees, &binary_tree.TreeNode{Val: root+1, Left: nil, Right: tree})
+					}
+				} else if root == end {
+					for _, tree := range sols[start][root-1] {
+						trees = append(trees, &binary_tree.TreeNode{Val: root+1, Left: tree, Right: nil})
+					}
+				} else {
+					for _, left_tree := range sols[start][root-1] {
+						for _, right_tree := range sols[root+1][end] {
+							trees = append(trees, &binary_tree.TreeNode{Val: root+1, Left: left_tree, Right: right_tree})
+						}
+					}
+				}
+			}
+			sols[start][end] = make([]*binary_tree.TreeNode, len(trees))
+			copy(sols[start][end], trees)
+		}
+	}
+
+	return sols[0][n-1]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer n, return the number of structurally unique BST's (binary search trees) which has exactly n nodes of unique values from 1 to n.
+
+Link:
+https://leetcode.com/problems/unique-binary-search-trees/description/
+*/
+func numTrees(n int) int {
+	sols := make([]int, n+1)
+	sols[0] = 1 // One way to have no nodes in a tree
+    sols[1] = 1 // One way to have one node in a tree
+	for i:=2; i<=n; i++ {
+		for num_in_left := 0; num_in_left < i; num_in_left++ {
+			num_in_right := i - 1 - num_in_left
+			sols[i] += sols[num_in_left] * sols[num_in_right]
+		}
+	}
+
+    return sols[n]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given strings s1, s2, and s3, find whether s3 is formed by an interleaving of s1 and s2.
+
+An interleaving of two strings s and t is a configuration where s and t are divided into n and m substrings respectively, such that:
+
+s = s1 + s2 + ... + sn
+t = t1 + t2 + ... + tm
+|n - m| <= 1
+The interleaving is s1 + t1 + s2 + t2 + s3 + t3 + ... or t1 + s1 + t2 + s2 + t3 + s3 + ...
+Note: a + b is the concatenation of strings a and b.
+
+Link:
+https://leetcode.com/problems/interleaving-string/description/
+*/
+func isInterleave(s1 string, s2 string, s3 string) bool {
+    return false
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given two strings s and t, return the number of distinct subsequences of s which equals t.
+
+The test cases are generated so that the answer fits on a 32-bit signed integer.
+
+Link:
+https://leetcode.com/problems/distinct-subsequences/description/
+*/
+func numDistinct(s string, t string) int {
+	return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

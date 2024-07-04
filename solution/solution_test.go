@@ -3179,3 +3179,121 @@ func TestMinDifference(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMergeNodes(t *testing.T) {
+	type input struct {
+		head *list_node.ListNode
+	}
+	inputs := []input{
+		{list_node.NewList([]int{0,3,1,0,4,5,2,0})},
+		{list_node.NewList([]int{0,1,0,3,0,2,2,0})},
+	}
+
+	expected_outputs := []*list_node.ListNode{
+		list_node.NewList([]int{4,11}),
+		list_node.NewList([]int{1,3,4}),
+	}
+
+	f := func(i input) *list_node.ListNode {
+		return mergeNodes(i.head)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestGenerateTrees(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{3},
+		{1},
+	}
+
+	expected_outputs := [][]*binary_tree.TreeNode{
+		{
+			binary_tree.NewTree([]int{1,binary_tree.NULL,2,binary_tree.NULL,3}),
+			binary_tree.NewTree([]int{1,binary_tree.NULL,3,2}),
+			binary_tree.NewTree([]int{2,1,3}),
+			binary_tree.NewTree([]int{3,1,binary_tree.NULL,binary_tree.NULL,2}),
+			binary_tree.NewTree([]int{3,2,binary_tree.NULL,1,binary_tree.NULL}),
+		},
+		{
+			binary_tree.NewTree([]int{1}),
+		},
+	}
+
+	f := func(i input) []*binary_tree.TreeNode {
+		return generateTrees(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestNumTrees(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{3},
+		{1},
+	}
+
+	expected_outputs := []int{
+		5,
+		1,
+	}
+
+	f := func(i input) int {
+		return numTrees(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestIsInterleave(t *testing.T) {
+	type input struct {
+		s1 string
+		s2 string
+		s3 string
+	}
+	inputs := []input{
+		{"aabcc", "dbbca", "aadbbcbcac"},
+		{"aabcc", "dbbca", "aadbbbaccc"},
+		{"", "", ""},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+		true,
+	}
+
+	f := func(i input) bool {
+		return isInterleave(i.s1, i.s2, i.s3)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestNumDistinct(t *testing.T) {
+	type input struct {
+		s string
+		t string
+	}
+	inputs := []input{
+		{"rabbbit", "rabbit"},
+		{"babgbag", "bag"},
+	}
+
+	expected_outputs := []int{
+		3,
+		5,
+	}
+
+	f := func(i input) int {
+		return numDistinct(i.s, i.t)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
