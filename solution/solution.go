@@ -7555,7 +7555,51 @@ Link:
 https://leetcode.com/problems/interleaving-string/description/
 */
 func isInterleave(s1 string, s2 string, s3 string) bool {
-    return false
+	if len(s3) < len(s1) + len(s2) {
+		return false
+	}
+    sols := make(map[int]map[int]bool)
+	for i:=0; i<=len(s1); i++ {
+		sols[i] = make(map[int]bool)
+	}
+	// If we manage to use all the characters, then we made it
+	return topDownIsInterleave(s1, s2, s3, 0, 0, sols)
+}
+
+/*
+Top-down helper method for the above problem
+*/
+func topDownIsInterleave(s1 string, s2 string, s3 string, s1_used int, s2_used int, sols map[int]map[int]bool) bool {
+	_, ok := sols[s1_used][s2_used]
+	if !ok {
+		// Need to solve this problem
+		if s1_used == len(s1) && s2_used == len(s2) { 
+			// We managed to use up all the characters in both s1 and s2 matching along s3
+			sols[s1_used][s2_used] = len(s1) + len(s2) == len(s3) // Make sure that matches ALL of s3
+		} else if s1_used == len(s1) {
+			// We can only use characters from s2 now
+			sols[s1_used][s2_used] = s2[s2_used:] == s3[s1_used + s2_used:]
+		} else if s2_used == len(s2) {
+			// We can only use characters from s1 now
+			sols[s1_used][s2_used] = s1[s1_used:] == s3[s1_used + s2_used:]
+		} else {
+			if (s1[s1_used] != s3[s1_used + s2_used]) && (s2[s2_used] != s3[s1_used + s2_used]) {
+				// No first characters match - we're at a dead end
+				sols[s1_used][s2_used] = false
+			} else {
+				sols[s1_used][s2_used] = false
+				if s1[s1_used] == s3[s1_used + s2_used] {
+					// Try matching the first character in s1 since we can
+					sols[s1_used][s2_used] = sols[s1_used][s2_used] || topDownIsInterleave(s1, s2, s3, s1_used+1, s2_used, sols)
+				}
+				if s2[s2_used] == s3[s1_used + s2_used] {
+					// Try matching the first character in s2 since we can
+					sols[s1_used][s2_used] = sols[s1_used][s2_used] || topDownIsInterleave(s1, s2, s3, s1_used, s2_used+1, sols)
+				} 
+			}
+		}
+	}
+	return sols[s1_used][s2_used]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
