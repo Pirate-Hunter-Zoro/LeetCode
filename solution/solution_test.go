@@ -2699,7 +2699,7 @@ func TestCanJump(t *testing.T) {
 	inputs := []input{
 		{[]int{2, 3, 1, 1, 4}},
 		{[]int{3, 2, 1, 0, 4}},
-		{[]int{2,5,0,0}},
+		{[]int{2, 5, 0, 0}},
 	}
 
 	expected_outputs := []bool{
@@ -2761,22 +2761,22 @@ func TestMaxSubArray(t *testing.T) {
 
 func TestTwoSum(t *testing.T) {
 	type input struct {
-		nums []int
+		nums   []int
 		target int
 	}
 	inputs := []input{
-		{[]int{2,7,11,15}, 9},
-		{[]int{3,2,4}, 6},
-		{[]int{3,3}, 6},
+		{[]int{2, 7, 11, 15}, 9},
+		{[]int{3, 2, 4}, 6},
+		{[]int{3, 3}, 6},
 	}
 
 	expected_outputs := [][]int{
-		{0,1},
-		{1,2},
-		{0,1},
+		{0, 1},
+		{1, 2},
+		{0, 1},
 	}
 
-	f := func(i input) []int{
+	f := func(i input) []int {
 		values := twoSum(i.nums, i.target)
 		sort.SliceStable(values, func(i, j int) bool {
 			return values[i] < values[j]
@@ -2792,13 +2792,13 @@ func TestBalanceBST(t *testing.T) {
 		root *binary_tree.TreeNode
 	}
 	inputs := []input{
-		{binary_tree.NewTree([]int{1,binary_tree.NULL,2,binary_tree.NULL,3,binary_tree.NULL,4,binary_tree.NULL,binary_tree.NULL})},
+		{binary_tree.NewTree([]int{1, binary_tree.NULL, 2, binary_tree.NULL, 3, binary_tree.NULL, 4, binary_tree.NULL, binary_tree.NULL})},
 		{binary_tree.NewTree([]int{2, 1, 3})},
 	}
 
 	expected_outputs := []*binary_tree.TreeNode{
-		binary_tree.NewTree([]int{3,2,4,1}),
-		binary_tree.NewTree([]int{2,1,3}),
+		binary_tree.NewTree([]int{3, 2, 4, 1}),
+		binary_tree.NewTree([]int{2, 1, 3}),
 	}
 
 	f := func(i input) *binary_tree.TreeNode {
@@ -2869,15 +2869,15 @@ func TestMinPathSum(t *testing.T) {
 	inputs := []input{
 		{
 			[][]int{
-				{1,3,1},
-				{1,5,1},
-				{4,2,1},
+				{1, 3, 1},
+				{1, 5, 1},
+				{4, 2, 1},
 			},
 		},
 		{
 			[][]int{
-				{1,2,3},
-				{4,5,6},
+				{1, 2, 3},
+				{4, 5, 6},
 			},
 		},
 	}
@@ -2942,13 +2942,13 @@ func TestNextGreaterElement(t *testing.T) {
 		nums2 []int
 	}
 	inputs := []input{
-		{[]int{4,1,2}, []int{1,3,4,2}},
-		{[]int{2,4}, []int{1,2,3,4}},
+		{[]int{4, 1, 2}, []int{1, 3, 4, 2}},
+		{[]int{2, 4}, []int{1, 2, 3, 4}},
 	}
 
 	expected_outputs := [][]int{
-		{-1,3,-1},
-		{3,-1},
+		{-1, 3, -1},
+		{3, -1},
 	}
 
 	f := func(i input) []int {
@@ -2963,13 +2963,13 @@ func TestNextGreaterElements(t *testing.T) {
 		nums []int
 	}
 	inputs := []input{
-		{[]int{1,2,1}},
-		{[]int{1,2,3,4,3}},
+		{[]int{1, 2, 1}},
+		{[]int{1, 2, 3, 4, 3}},
 	}
 
 	expected_outputs := [][]int{
-		{2,-1,2},
-		{2,3,4,-1,4},
+		{2, -1, 2},
+		{2, 3, 4, -1, 4},
 	}
 
 	f := func(i input) []int {
@@ -3011,8 +3011,8 @@ func TestLargestRectangleArea(t *testing.T) {
 		heights []int
 	}
 	inputs := []input{
-		{[]int{2,1,5,6,2,3}},
-		{[]int{2,4}},
+		{[]int{2, 1, 5, 6, 2, 3}},
+		{[]int{2, 4}},
 	}
 
 	expected_outputs := []int{
@@ -3034,10 +3034,10 @@ func TestMaximalRectangle(t *testing.T) {
 	inputs := []input{
 		{
 			[][]byte{
-				{'1','0','1','0','0'},
-				{'1','0','1','1','1'},
-				{'1','1','1','1','1'},
-				{'1','0','0','1','0'},
+				{'1', '0', '1', '0', '0'},
+				{'1', '0', '1', '1', '1'},
+				{'1', '1', '1', '1', '1'},
+				{'1', '0', '0', '1', '0'},
 			},
 		},
 		{
@@ -3072,28 +3072,28 @@ func TestMaxNumEdgesToRemove(t *testing.T) {
 	}
 	inputs := []input{
 		{4, [][]int{
-			{3,1,2},
-			{3,2,3},
-			{1,1,3},
-			{1,2,4},
-			{1,1,2},
-			{2,3,4},
-			},
+			{3, 1, 2},
+			{3, 2, 3},
+			{1, 1, 3},
+			{1, 2, 4},
+			{1, 1, 2},
+			{2, 3, 4},
+		},
 		},
 		{4, [][]int{
-			{3,1,2},
-			{3,2,3},
-			{1,1,4},
-			{2,1,4},
-			},
+			{3, 1, 2},
+			{3, 2, 3},
+			{1, 1, 4},
+			{2, 1, 4},
+		},
 		},
 		{4, [][]int{
-			{3,2,3},
-			{1,1,2},
-			{2,3,4},
-			},
+			{3, 2, 3},
+			{1, 1, 2},
+			{2, 3, 4},
 		},
-		{12, [][]int{{3,1,2},{2,2,3},{3,1,4},{2,3,5},{1,2,6},{2,4,7},{3,3,8},{3,2,9},{2,1,10},{2,1,11},{1,11,12},{1,10,11},{2,5,9},{2,7,10},{2,4,12},{3,9,10},{1,6,9},{2,10,12},{1,2,5},{3,5,6},{1,7,11},{1,8,9},{1,1,11},{3,4,5},{1,5,9},{2,4,9},{1,8,11},{3,6,8},{1,8,10},{2,2,4},{2,3,8},{3,2,6},{3,10,11},{2,3,11},{3,5,9},{3,3,5},{2,6,11},{3,2,7},{1,5,11},{1,1,5},{2,9,10},{1,6,7},{3,2,3},{2,8,9},{3,2,8}},},
+		},
+		{12, [][]int{{3, 1, 2}, {2, 2, 3}, {3, 1, 4}, {2, 3, 5}, {1, 2, 6}, {2, 4, 7}, {3, 3, 8}, {3, 2, 9}, {2, 1, 10}, {2, 1, 11}, {1, 11, 12}, {1, 10, 11}, {2, 5, 9}, {2, 7, 10}, {2, 4, 12}, {3, 9, 10}, {1, 6, 9}, {2, 10, 12}, {1, 2, 5}, {3, 5, 6}, {1, 7, 11}, {1, 8, 9}, {1, 1, 11}, {3, 4, 5}, {1, 5, 9}, {2, 4, 9}, {1, 8, 11}, {3, 6, 8}, {1, 8, 10}, {2, 2, 4}, {2, 3, 8}, {3, 2, 6}, {3, 10, 11}, {2, 3, 11}, {3, 5, 9}, {3, 3, 5}, {2, 6, 11}, {3, 2, 7}, {1, 5, 11}, {1, 1, 5}, {2, 9, 10}, {1, 6, 7}, {3, 2, 3}, {2, 8, 9}, {3, 2, 8}}},
 	}
 
 	expected_outputs := []int{
@@ -3162,9 +3162,9 @@ func TestMinDifference(t *testing.T) {
 		nums []int
 	}
 	inputs := []input{
-		{[]int{5,3,2,4}},
-		{[]int{1,5,0,10,14}},
-		{[]int{3,100,20}},
+		{[]int{5, 3, 2, 4}},
+		{[]int{1, 5, 0, 10, 14}},
+		{[]int{3, 100, 20}},
 	}
 
 	expected_outputs := []int{
@@ -3185,13 +3185,13 @@ func TestMergeNodes(t *testing.T) {
 		head *list_node.ListNode
 	}
 	inputs := []input{
-		{list_node.NewList([]int{0,3,1,0,4,5,2,0})},
-		{list_node.NewList([]int{0,1,0,3,0,2,2,0})},
+		{list_node.NewList([]int{0, 3, 1, 0, 4, 5, 2, 0})},
+		{list_node.NewList([]int{0, 1, 0, 3, 0, 2, 2, 0})},
 	}
 
 	expected_outputs := []*list_node.ListNode{
-		list_node.NewList([]int{4,11}),
-		list_node.NewList([]int{1,3,4}),
+		list_node.NewList([]int{4, 11}),
+		list_node.NewList([]int{1, 3, 4}),
 	}
 
 	f := func(i input) *list_node.ListNode {
@@ -3212,11 +3212,11 @@ func TestGenerateTrees(t *testing.T) {
 
 	expected_outputs := [][]*binary_tree.TreeNode{
 		{
-			binary_tree.NewTree([]int{1,binary_tree.NULL,2,binary_tree.NULL,3}),
-			binary_tree.NewTree([]int{1,binary_tree.NULL,3,2}),
-			binary_tree.NewTree([]int{2,1,3}),
-			binary_tree.NewTree([]int{3,1,binary_tree.NULL,binary_tree.NULL,2}),
-			binary_tree.NewTree([]int{3,2,binary_tree.NULL,1,binary_tree.NULL}),
+			binary_tree.NewTree([]int{1, binary_tree.NULL, 2, binary_tree.NULL, 3}),
+			binary_tree.NewTree([]int{1, binary_tree.NULL, 3, 2}),
+			binary_tree.NewTree([]int{2, 1, 3}),
+			binary_tree.NewTree([]int{3, 1, binary_tree.NULL, binary_tree.NULL, 2}),
+			binary_tree.NewTree([]int{3, 2, binary_tree.NULL, 1, binary_tree.NULL}),
 		},
 		{
 			binary_tree.NewTree([]int{1}),
@@ -3293,6 +3293,83 @@ func TestNumDistinct(t *testing.T) {
 
 	f := func(i input) int {
 		return numDistinct(i.s, i.t)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestGenerate(t *testing.T) {
+	type input struct {
+		numRows int
+	}
+	inputs := []input{
+		{5},
+		{1},
+	}
+
+	expected_outputs := [][][]int{
+		{
+			{1},{1,1},{1,2,1},{1,3,3,1},{1,4,6,4,1},
+		},
+		{
+			{1},
+		},
+	}
+
+	f := func(i input) [][]int {
+		return generate(i.numRows)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestGetRow(t *testing.T) {
+	type input struct {
+		rowIndex int
+	}
+	inputs := []input{
+		{3},
+		{0},
+		{1},
+	}
+
+	expected_outputs := [][]int{
+		{1,3,3,1},
+		{1},
+		{1,1},
+	}
+
+	f := func(i input) []int {
+		return getRow(i.rowIndex)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMinimumTotal(t *testing.T) {
+	type input struct {
+		triangle [][]int
+	}
+	inputs := []input{
+		{
+			[][]int{
+				{2},{3,4},{6,5,7},{4,1,8,3},
+			},
+		},
+		{
+			[][]int{
+				{-10},
+			},
+		},
+	}
+
+	expected_outputs := []int{
+		11,
+		-10,
+	}
+
+	f := func(i input) int {
+		return minimumTotal(i.triangle)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

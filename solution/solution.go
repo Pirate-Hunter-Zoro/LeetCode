@@ -7611,9 +7611,83 @@ The test cases are generated so that the answer fits on a 32-bit signed integer.
 
 Link:
 https://leetcode.com/problems/distinct-subsequences/description/
+
+Inspiration:
+https://leetcode.com/problems/distinct-subsequences/solutions/5402100/dp-tabulation-memoization-c-must-watch/
 */
 func numDistinct(s string, t string) int {
-	return 0
+	// For a given index in s and index in t, how many subsequences in s that that use up to the first s_count characters in s equal t up to its first t_count characters?
+	counts := make(map[int]map[int]int)
+	for i:=0; i<=len(s); i++ {
+		counts[i] = make(map[int]int)
+	}
+	return topDownNumDistinct(s, len(s), t, len(t), counts)
+}
+
+/*
+Top down helper method to find how many subsequences in s that END at the s-index equal t up to t-index
+*/
+func topDownNumDistinct(s string, s_count int, t string, t_count int, counts map[int]map[int]int) int {
+	_, ok := counts[s_count][t_count]
+	if !ok {
+		// Need to solve this problem
+		if t_count == 0 {
+			counts[s_count][t_count] = 1 // There is one way to match the empty sequence of characters - with the empty sequence
+		} else if s_count == 0 {
+			counts[s_count][t_count] = 0 // Ran out of characters in s to match the required characters in t
+		} else {
+			counts[s_count][t_count] = 0
+			if s[s_count-1] == t[t_count-1] {
+				// Try matching these two characters
+				counts[s_count][t_count] += topDownNumDistinct(s, s_count-1, t, t_count-1, counts)
+			}
+			// Try not matching these two characters
+			counts[s_count][t_count] += topDownNumDistinct(s, s_count-1, t, t_count, counts)
+		}
+	}
+	return counts[s_count][t_count]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer numRows, return the first numRows of Pascal's triangle.
+
+In Pascal's triangle, each number is the sum of the two numbers directly above it as shown:
+
+Link:
+https://leetcode.com/problems/pascals-triangle/description/
+*/
+func generate(numRows int) [][]int {
+    return [][]int{}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer rowIndex, return the rowIndexth (0-indexed) row of the Pascal's triangle.
+
+In Pascal's triangle, each number is the sum of the two numbers directly above it as shown:
+
+Link:
+https://leetcode.com/problems/pascals-triangle-ii/
+*/
+func getRow(rowIndex int) []int {
+	return []int{}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a triangle array, return the minimum path sum from top to bottom.
+
+For each step, you may move to an adjacent number of the row below. More formally, if you are on index i on the current row, you may move to either index i or index i + 1 on the next row.
+
+Link:
+https://leetcode.com/problems/triangle/description/
+*/
+func minimumTotal(triangle [][]int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
