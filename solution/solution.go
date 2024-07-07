@@ -17,6 +17,7 @@ import (
 	"regexp"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7747,7 +7748,96 @@ Link:
 https://leetcode.com/problems/reward-top-k-students/description/
 */
 func topStudents(positive_feedback []string, negative_feedback []string, report []string, student_id []int, k int) []int {
-    return []int{}
+	positives := make(map[string]bool)
+	negatives := make(map[string]bool)
+	for _, v := range positive_feedback {
+		positives[v] = true
+	}
+	for _, v := range negative_feedback {
+		negatives[v] = true
+	}
+
+	scores := make(map[int]int)
+	for idx, id := range student_id {
+		student_report := report[idx]
+		scores[id] = 0
+		words := strings.Split(student_report, " ")
+		for _, w := range words {
+			_, ok := positives[w]
+			if ok {
+				scores[id] += 3
+			} else {
+				_, ok = negatives[w]
+				if ok {
+					scores[id]--
+				}
+			}
+		}
+	}
+
+	sort.SliceStable(student_id, func(i, j int) bool {
+		id_i := student_id[i]
+		id_j := student_id[j]
+		if scores[id_i] != scores[id_j] {
+			return scores[id_i] > scores[id_j]
+		} else {
+			return id_i < id_j
+		}
+	})
+    return student_id[:k]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an array prices where prices[i] is the price of a given stock on the ith day.
+
+You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+
+Return the maximum profit you can achieve from this transaction. 
+If you cannot achieve any profit, return 0.
+
+Link:
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock/description/
+*/
+func maxProfit(prices []int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an integer array prices where prices[i] is the price of a given stock on the ith day.
+
+On each day, you may decide to buy and/or sell the stock. 
+You can only hold at most one share of the stock at any time. 
+However, you can buy it then immediately sell it on the same day.
+
+Find and return the maximum profit you can achieve.
+
+Link:
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/description/
+*/
+func maxProfit2(prices []int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an array prices where prices[i] is the price of a given stock on the ith day.
+
+Find the maximum profit you can achieve. 
+You may complete at most two transactions.
+
+Note: You may not engage in multiple transactions simultaneously 
+(i.e., you must sell the stock before you buy again).
+
+Link:
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/description/
+*/
+func maxProfit3(prices []int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

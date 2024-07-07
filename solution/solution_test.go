@@ -3411,3 +3411,70 @@ func TestTopStudents(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMaxProfit(t *testing.T) {
+	type input struct {
+		prices []int
+	}
+	inputs := []input{
+		{[]int{7,1,5,3,6,4}},
+		{[]int{7,6,4,3,1}},
+	}
+
+	expected_outputs := []int{
+		5,
+		0,
+	}
+
+	f := func(i input) int {
+		return maxProfit(i.prices)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMaxProfit2(t *testing.T) {
+	type input struct {
+		prices []int
+	}
+	inputs := []input{
+		{[]int{7,1,5,3,6,4}},
+		{[]int{1,2,3,4,5}},
+		{[]int{7,6,4,3,1}},
+	}
+
+	expected_outputs := []int{
+		7,
+		4,
+		0,
+	}
+
+	f := func(i input) int {
+		return maxProfit2(i.prices)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMaxProfit3(t *testing.T) {
+	type input struct {
+		prices []int
+	}
+	inputs := []input{
+		{[]int{3,3,5,0,0,3,1,4}},
+		{[]int{1,2,3,4,5}},
+		{[]int{7,6,4,3,1}},
+	}
+
+	expected_outputs := []int{
+		6,
+		4,
+		0,
+	}
+
+	f := func(i input) int {
+		return maxProfit3(i.prices)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
