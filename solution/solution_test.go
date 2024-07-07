@@ -3374,3 +3374,40 @@ func TestMinimumTotal(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestTopStudents(t *testing.T) {
+	type input struct {
+		positive_feedback []string
+		negative_feedback []string
+		report []string
+		student_id []int
+		k int
+	}
+	inputs := []input{
+		{
+			[]string{"smart","brilliant","studious"}, 
+			[]string{"not"},
+			[]string{"this student is studious", "the student is smart"},
+			[]int{1,2},
+			2,
+		},
+		{
+			[]string{"smart","brilliant","studious"}, 
+			[]string{"not"},
+			[]string{"this student is not studious", "the student is smart"},
+			[]int{1,2},
+			2,
+		},
+	}
+
+	expected_outputs := [][]int{
+		{1,2},
+		{2,1},
+	}
+
+	f := func(i input) []int{
+		return topStudents(i.positive_feedback, i.negative_feedback, i.report, i.student_id, i.k)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}

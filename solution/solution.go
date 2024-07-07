@@ -7659,7 +7659,20 @@ Link:
 https://leetcode.com/problems/pascals-triangle/description/
 */
 func generate(numRows int) [][]int {
-    return [][]int{}
+	rows := [][]int{{1}}
+	if numRows >= 2 {
+		rows = append(rows, []int{1,1})
+		for i:=3; i<=numRows; i++ {
+			prev_row := rows[len(rows)-1]
+			next_row := []int{1}
+			for j:=0; j<len(prev_row)-1; j++ {
+				next_row = append(next_row, prev_row[j] + prev_row[j+1])
+			}
+			next_row = append(next_row, 1)
+			rows = append(rows, next_row)
+		}
+	}
+    return rows
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7673,7 +7686,16 @@ Link:
 https://leetcode.com/problems/pascals-triangle-ii/
 */
 func getRow(rowIndex int) []int {
-	return []int{}
+	current_row := []int{1}
+	for i:=1; i<=rowIndex; i++ {
+		next_row := []int{1}
+		for j:=0; j<len(current_row)-1; j++ {
+			next_row = append(next_row, current_row[j] + current_row[j+1])
+		}
+		next_row = append(next_row, 1)
+		current_row = next_row
+	}
+	return current_row
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7687,7 +7709,45 @@ Link:
 https://leetcode.com/problems/triangle/description/
 */
 func minimumTotal(triangle [][]int) int {
-    return 0
+	min_sums := []int{triangle[0][0]}
+
+	for i:=1; i<len(triangle); i++ {
+		new_min_sums := make([]int, len(triangle[i]))
+		new_min_sums[0] = min_sums[0] + triangle[i][0]
+		for j:=1; j<len(min_sums); j++ {
+			new_min_sums[j] = min(min_sums[j-1], min_sums[j]) + triangle[i][j]
+		}
+		new_min_sums[len(new_min_sums)-1] = min_sums[len(min_sums)-1] + triangle[i][len(new_min_sums)-1]
+		min_sums = new_min_sums
+	}
+
+	min_sum := math.MaxInt
+	for _, v := range min_sums {
+		min_sum = min(min_sum, v)
+	}
+    return min_sum
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given two string arrays positive_feedback and negative_feedback, containing the words denoting positive and negative feedback, respectively. 
+Note that no word is both positive and negative.
+
+Initially every student has 0 points. 
+Each positive word in a feedback report increases the points of a student by 3, whereas each negative word decreases the points by 1.
+
+You are given n feedback reports, represented by a 0-indexed string array report and a 0-indexed integer array student_id, where student_id[i] represents the ID of the student who has received the feedback report report[i]. 
+The ID of each student is unique.
+
+Given an integer k, return the top k students after ranking them in non-increasing order by their points. 
+In case more than one student has the same points, the one with the lower ID ranks higher.
+
+Link:
+https://leetcode.com/problems/reward-top-k-students/description/
+*/
+func topStudents(positive_feedback []string, negative_feedback []string, report []string, student_id []int, k int) []int {
+    return []int{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
