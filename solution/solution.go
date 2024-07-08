@@ -7801,7 +7801,18 @@ Link:
 https://leetcode.com/problems/best-time-to-buy-and-sell-stock/description/
 */
 func maxProfit(prices []int) int {
-    return 0
+	record := 0
+	// The price of whatever we decide to buy
+	buy_price := prices[0]
+	for idx:=1; idx<len(prices); idx++ {
+		price := prices[idx]
+		if price > buy_price {
+			record = max(record, price - buy_price)
+		} else {
+			buy_price = price
+		}
+	}
+    return record
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7819,7 +7830,32 @@ Link:
 https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/description/
 */
 func maxProfit2(prices []int) int {
-    return 0
+	// First we need to find this out for all elements
+	first_greater_idx := make([]int, len(prices))
+	non_increasing_stack := linked_list.NewStack[int]()
+	non_increasing_stack.Push(0)
+	for i:=1; i<len(prices); i++ {
+		for !non_increasing_stack.Empty() && prices[non_increasing_stack.Peek()] < prices[i] {
+			first_greater_idx[non_increasing_stack.Pop()] = i
+		}
+		non_increasing_stack.Push(i)
+	}
+	for !non_increasing_stack.Empty() {
+		first_greater_idx[non_increasing_stack.Pop()] = -1
+	}
+
+	// Now we are ready to solve this problem bottom-up style
+	sols := make([]int, len(prices))
+	for i:=len(prices)-2; i>=0; i-- {
+		if first_greater_idx[i] == -1 {
+			// Just DO NOT buy stock on this day
+			sols[i] = sols[i+1]
+		} else {
+			// There is a way to profit if we buy today - try buying and try not buying
+			sols[i] = max(sols[i+1], prices[first_greater_idx[i]] - prices[i] + sols[first_greater_idx[i]])
+		}
+	}
+    return sols[0]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7835,8 +7871,75 @@ Note: You may not engage in multiple transactions simultaneously
 
 Link:
 https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iii/description/
+
+Inspiration:
+https://cpexplanations.blogspot.com/2021/04/123-best-time-to-buy-and-sell-stock-iii.html
 */
 func maxProfit3(prices []int) int {
+	sols := make([]map[int]int, 4)
+	sols[0] = make(map[int]int) // BSBS
+	sols[0][len(prices)-1] = 0 // On the last element - don't buy
+	sols[1] = make(map[int]int) // SBS
+	sols[1][len(prices)-1] = prices[len(prices)-1] // On the last element - sell
+	sols[2] = make(map[int]int) // BS
+	sols[2][len(prices)-1] = 0 // On the last element - don't buy
+	sols[3] = make(map[int]int) // S
+	sols[3][len(prices)-1] = prices[len(prices)-1] // On the last element - sell
+    return topDownMaxProfit3(0, 0, prices, sols)
+}
+
+/*
+Top-down helper method to solve the above problem
+*/
+func topDownMaxProfit3(idx int, operations int, prices []int, sols []map[int]int) int {
+	_, ok := sols[operations][idx]
+	if !ok {
+		// Need to solve this problem
+		if operations == 3 {
+			// S - try selling and try not selling
+			sols[operations][idx] = max(topDownMaxProfit3(idx+1, operations, prices, sols), prices[idx])
+		} else if operations == 1 {
+			// SBS - again try sell or not selling
+			sols[operations][idx] = max(topDownMaxProfit3(idx+1, operations, prices, sols), prices[idx] + topDownMaxProfit3(idx+1, operations+1, prices, sols))
+		} else {
+			// B* - try buying and try not buying
+			sols[operations][idx] = max(topDownMaxProfit3(idx+1, operations, prices, sols), topDownMaxProfit3(idx+1, operations + 1, prices, sols) - prices[idx])
+		}
+	}
+	return sols[operations][idx]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an integer array prices where prices[i] is the price of a given stock on the ith day, and an integer k.
+
+Find the maximum profit you can achieve. 
+You may complete at most k transactions: i.e. you may buy at most k times and sell at most k times.
+
+Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+
+Link:
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/description/
+*/
+func maxProfit4(k int, prices []int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an array prices where prices[i] is the price of a given stock on the ith day.
+
+Find the maximum profit you can achieve. 
+You may complete as many transactions as you like (i.e., buy one and sell one share of the stock multiple times) with the following restrictions:
+- After you sell your stock, you cannot buy stock on the next day (i.e., cooldown one day).
+- Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+
+Link:
+https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/description/
+*/
+func maxProfit5(prices []int) int {
     return 0
 }
 

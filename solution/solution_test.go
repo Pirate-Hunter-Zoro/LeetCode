@@ -3478,3 +3478,46 @@ func TestMaxProfit3(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestMaxProfit4(t *testing.T) {
+	type input struct {
+		k int
+		prices []int
+	}
+	inputs := []input{
+		{2, []int{2,4,1}},
+		{2, []int{3,2,6,5,0,3}},
+	}
+
+	expected_outputs := []int{
+		2,
+		7,
+	}
+
+	f := func(i input) int {
+		return maxProfit4(i.k, i.prices)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMaxProfit5(t *testing.T) {
+	type input struct {
+		prices []int
+	}
+	inputs := []input{
+		{[]int{1,2,3,0,2}},
+		{[]int{1}},
+	}
+
+	expected_outputs := []int{
+		3,
+		0,
+	}
+
+	f := func(i input) int {
+		return maxProfit5(i.prices)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
