@@ -7923,7 +7923,37 @@ Link:
 https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/description/
 */
 func maxProfit4(k int, prices []int) int {
-    return 0
+    sols := make([]map[int]int, 2*k)
+	for i:=0; i<2*k; i++ {
+		sols[i] = make(map[int]int)
+		if i % 2 == 1 { // Start with a sell
+			sols[i][len(prices)-1] = prices[len(prices)-1]
+		} else { // Start with a buy
+			sols[i][len(prices)-1] = 0
+		}
+	}
+    return topDownMaxProfit4(0, 0, prices, sols)
+}
+
+/*
+Top-down helper method to solve the above problem
+*/
+func topDownMaxProfit4(idx int, operations int, prices []int, sols []map[int]int) int {
+	_, ok := sols[operations][idx]
+	if !ok {
+		// Need to solve this problem
+		if operations == len(sols)-1 {
+			// Only one option left - to sell - try selling and try not selling
+			sols[operations][idx] = max(topDownMaxProfit4(idx+1, operations, prices, sols), prices[idx])
+		} else if operations % 2 == 1 {
+			// S* - again try sell or not selling
+			sols[operations][idx] = max(topDownMaxProfit4(idx+1, operations, prices, sols), prices[idx] + topDownMaxProfit4(idx+1, operations+1, prices, sols))
+		} else {
+			// B* - try buying and try not buying
+			sols[operations][idx] = max(topDownMaxProfit4(idx+1, operations, prices, sols), topDownMaxProfit4(idx+1, operations + 1, prices, sols) - prices[idx])
+		}
+	}
+	return sols[operations][idx]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -7940,7 +7970,124 @@ Link:
 https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/description/
 */
 func maxProfit5(prices []int) int {
+	// Ready to buy
+	best_given_can_buy := make([]int, len(prices))
+	best_given_can_buy[len(prices)-1] = 0
+
+	// Ready to sell
+	best_given_can_sell := make([]int, len(prices))
+	best_given_can_sell[len(prices)-1] = prices[len(prices)-1]
+	if len(prices) >= 2 { // Also a base case, since if you sell on the second to last day, you're still done
+		best_given_can_sell[len(prices)-2] = max(prices[len(prices)-2], prices[len(prices)-1])
+	}
+ 
+	for i:=len(prices)-2; i>=0; i-- {
+		// Suppose we're ready to buy
+		// Try buying
+		best_given_can_buy[i] = best_given_can_sell[i+1] - prices[i]
+		// Try not buying
+		best_given_can_buy[i] = max(best_given_can_buy[i], best_given_can_buy[i+1])
+
+		if i < len(prices)-2 {
+			// Suppose we're ready to sell
+			// Try selling - remember the cooldown
+			best_given_can_sell[i] = prices[i] + best_given_can_buy[i+2]
+			// Try not selling
+			best_given_can_sell[i] = max(best_given_can_sell[i], best_given_can_sell[i+1])
+		}
+	}
+
+    return best_given_can_buy[0]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There is a restaurant with a single chef. 
+You are given an array customers, where customers[i] = [arrival_i, time_i]:
+
+arrival_i is the arrival time of the ith customer. 
+The arrival times are sorted in non-decreasing order.
+time_i is the time needed to prepare the order of the ith customer.
+When a customer arrives, he gives the chef his order, and the chef starts preparing it once he is idle. 
+The customer waits till the chef finishes preparing his order. 
+The chef does not prepare food for more than one customer at a time. 
+The chef prepares food for customers in the order they were given in the input.
+
+Return the average waiting time of all customers. 
+Solutions within 10^-5 from the actual answer are considered accepted.
+*/
+func averageWaitingTime(customers [][]int) float64 {
+    n := float64(len(customers))
+	total_wait_time := float64(0)
+	float_customers := make([][]float64, len(customers))
+	for idx, v := range customers {
+		float_customers[idx] = make([]float64, 2)
+		float_customers[idx][0] = float64(v[0])
+		float_customers[idx][1] = float64(v[1])
+	}
+
+	for idx:=0; idx<len(float_customers)-1; idx++ {
+		first_arrival := float_customers[idx][0]
+		meal_time := float_customers[idx][1]
+		total_wait_time += meal_time
+		second_arrival := float_customers[idx+1][0]
+		wait_time := meal_time - (second_arrival - first_arrival)
+		if wait_time < 0 {
+			wait_time = float64(0)
+		}
+		// Treat the next person as if they arrived at a later time so that the FOLLOWING customer's wait time will be accurate
+		float_customers[idx+1][0] += wait_time
+		total_wait_time += wait_time
+	}
+	total_wait_time += float_customers[len(float_customers)-1][1]
+
+	return total_wait_time / n
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+A path in a binary tree is a sequence of nodes where each pair of adjacent nodes in the sequence has an edge connecting them. 
+A node can only appear in the sequence at most once. 
+Note that the path does not need to pass through the root.
+
+The path sum of a path is the sum of the node's values in the path.
+
+Given the root of a binary tree, return the maximum path sum of any non-empty path.
+
+Link:
+https://leetcode.com/problems/binary-tree-maximum-path-sum/description/
+*/
+func maxPathSum(root *binary_tree.TreeNode) int {
     return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a string s, partition s such that every substring of the partition is a palindrome. 
+Return all possible palindrome partitioning of s.
+
+Link:
+https://leetcode.com/problems/palindrome-partitioning/description/
+*/
+func partition(s string) [][]string {
+    return [][]string{}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a string s, partition s such that every substring of the partition is a palindrome.
+
+Return the minimum cuts needed for a palindrome partitioning of s.
+
+Link:
+https://leetcode.com/problems/palindrome-partitioning-ii/description/
+*/
+func minCut(s string) int {
+	return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

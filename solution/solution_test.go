@@ -3521,3 +3521,103 @@ func TestMaxProfit5(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestAverageWaitingTime(t *testing.T) {
+	type input struct {
+		customers [][]int
+	}
+	inputs := []input{
+		{[][]int{
+			{1,2},
+			{2,5},
+			{4,3},
+		}},
+		{[][]int{
+			{5,2},
+			{5,4},
+			{10,3},
+			{20,1},
+		}},
+	}
+	
+	expected_outputs := []float64{
+		5.0,
+		3.25,
+	}
+
+	f := func(i input) float64 {
+		return averageWaitingTime(i.customers)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMaxPathSum(t *testing.T) {
+	type input struct {
+		root *binary_tree.TreeNode
+	}
+	inputs := []input{
+		{binary_tree.NewTree([]int{1,2,3})},
+		{binary_tree.NewTree([]int{-10,9,20,binary_tree.NULL, binary_tree.NULL,15,7})},
+	}
+
+	expected_outputs := []int{
+		6,
+		42,
+	}
+
+	f := func(i input) int {
+		return maxPathSum(i.root)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestPartition(t *testing.T) {
+	type input struct {
+		s string
+	}
+	inputs := []input{
+		{"aab"},
+		{"a"},
+	}
+
+	expected_outputs := [][][]string{
+		{
+			{"a", "a", "b"},
+			{"aa", "b"},
+		},
+		{
+			{"a"},
+		},
+	}
+
+	f := func(i input) [][]string{
+		return partition(i.s)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMinCut(t *testing.T) {
+	type input struct {
+		s string
+	}
+	inputs := []input{
+		{"aab"},
+		{"a"},
+		{"ab"},
+	}
+
+	expected_outputs := []int{
+		1,
+		0,
+		1,
+	}
+
+	f := func(i input) int {
+		return minCut(i.s)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
