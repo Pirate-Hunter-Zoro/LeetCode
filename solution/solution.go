@@ -8060,7 +8060,35 @@ Link:
 https://leetcode.com/problems/binary-tree-maximum-path-sum/description/
 */
 func maxPathSum(root *binary_tree.TreeNode) int {
-    return 0
+	max_path_left_only := make(map[*binary_tree.TreeNode]int)
+	max_path_right_only := make(map[*binary_tree.TreeNode]int)
+	record := []int{root.Val}
+	topDownFindRecordPath(root, max_path_left_only, max_path_right_only, record)
+    return record[0]
+}
+
+func topDownFindRecordPath(root *binary_tree.TreeNode, max_path_left_only map[*binary_tree.TreeNode]int, max_path_right_only map[*binary_tree.TreeNode]int, record []int) {
+	if root.Left == nil {
+		max_path_left_only[root] = root.Val
+		record[0] = max(record[0], root.Val)
+	}
+	if root.Right == nil {
+		max_path_right_only[root] = root.Val
+		record[0] = max(record[0], root.Val)
+	}
+	if root.Left != nil {
+		topDownFindRecordPath(root.Left, max_path_left_only, max_path_right_only, record)
+		max_path_left_only[root] = max(root.Val, root.Val + max(max_path_left_only[root.Left], max_path_right_only[root.Left]))
+		record[0] = max(record[0], max_path_left_only[root])
+	}
+	if root.Right != nil {
+		topDownFindRecordPath(root.Right, max_path_left_only, max_path_right_only, record)
+		max_path_right_only[root] = max(root.Val, root.Val + max(max_path_left_only[root.Right], max_path_right_only[root.Right]))
+		record[0] = max(record[0], max_path_right_only[root])
+	}
+	if root.Left != nil && root.Right != nil {
+		record[0] = max(record[0], max_path_left_only[root] + max_path_right_only[root] - root.Val)
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8073,7 +8101,54 @@ Link:
 https://leetcode.com/problems/palindrome-partitioning/description/
 */
 func partition(s string) [][]string {
-    return [][]string{}
+	// sols[i][j] answers - "Is s[i:j+1] a palindrome?"
+	sols := make(map[int]map[int]bool)
+	for i:=0; i<len(s); i++ {
+		sols[i] = make(map[int]bool)
+	}
+
+	// partitions[i] contains all of the palindrome partitionings of s[0:i+1]
+	partitions := make([][][]string, len(s))
+	partitions[0] = [][]string{{s[0:1]}}
+	for i:=1; i<len(partitions); i++ {
+		these_palindrome_partitions := [][]string{}
+		for j:=i; j>=0; j-- {
+			if isPalindrome(j, i, s, sols) {
+				if j == 0 {
+					these_palindrome_partitions = append(these_palindrome_partitions, []string{s[j:i+1]})
+				} else {
+					prev_partitions := partitions[j-1]
+					for _, palindrome_list := range prev_partitions {
+						new_palindrome_list := []string{}
+						new_palindrome_list = append(new_palindrome_list, palindrome_list...)
+						new_palindrome_list = append(new_palindrome_list, s[j:i+1])
+						these_palindrome_partitions = append(these_palindrome_partitions, new_palindrome_list)
+					}
+				}
+			}
+		}
+		partitions[i] = these_palindrome_partitions
+	}
+
+    return partitions[len(s)-1]
+}
+
+/*
+Top down helper method to determine if s[start:end+1] is a palindrome
+*/
+func isPalindrome(start int, end int, s string, sols map[int]map[int]bool) bool {
+	_, ok := sols[start][end]
+	if !ok {
+		// Have NOT solved the problem yet
+		if start >= end {
+			return true
+		} else if s[start] != s[end] {
+			return false
+		} else {
+			sols[start][end] = isPalindrome(start+1, end-1, s, sols)
+		}
+	}
+	return sols[start][end]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8085,9 +8160,64 @@ Return the minimum cuts needed for a palindrome partitioning of s.
 
 Link:
 https://leetcode.com/problems/palindrome-partitioning-ii/description/
+
+Inspiration:
+https://leetcode.com/problems/palindrome-partitioning-ii/solutions/42213/easiest-java-dp-solution-97-36/
 */
 func minCut(s string) int {
-	return 0
+	// is_palindrome[i][j] answers - "Is s[i:j+1] a palindrome?"
+	is_palindrome := make(map[int]map[int]bool)
+	for i:=0; i<len(s); i++ {
+		is_palindrome[i] = make(map[int]bool)
+	}
+
+	// sols[i] answers - "What is the minimum number of cuts to partition s[0:i+1] into palindromes?"
+	sols := make([]int, len(s))
+	for i:=1; i<len(sols); i++ {
+		record := math.MaxInt
+		for j:=0; j<=i; j++ {
+			if isPalindrome(j, i, s, is_palindrome) {
+				if j > 0 {
+					record = min(record, 1 + sols[j-1])
+				} else {
+					record = 0
+					break
+				}
+			}
+		}
+		sols[i] = record
+	}
+
+	return sols[len(sols)-1]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a string s and a dictionary of strings wordDict, return true if s can be segmented into a space-separated sequence of one or more dictionary words.
+
+Note that the same word in the dictionary may be reused multiple times in the segmentation.
+
+Link:
+https://leetcode.com/problems/word-break/description/
+*/
+func wordBreak(s string, wordDict []string) bool {
+    return false
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a string s and a dictionary of strings wordDict, add spaces in s to construct a sentence where each word is a valid dictionary word. 
+Return all such possible sentences in any order.
+
+Note that the same word in the dictionary may be reused multiple times in the segmentation.
+
+Link:
+https://leetcode.com/problems/word-break-ii/description/
+*/
+func wordBreak2(s string, wordDict []string) []string {
+	return []string{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

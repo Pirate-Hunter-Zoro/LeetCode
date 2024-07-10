@@ -3580,6 +3580,8 @@ func TestPartition(t *testing.T) {
 	inputs := []input{
 		{"aab"},
 		{"a"},
+		{"cdcef"},
+		{"cccef"},
 	}
 
 	expected_outputs := [][][]string{
@@ -3589,6 +3591,16 @@ func TestPartition(t *testing.T) {
 		},
 		{
 			{"a"},
+		},
+		{
+			{"c", "d", "c", "e", "f"},
+			{"cdc", "e", "f"},
+		},
+		{
+			{"c", "c", "c", "e", "f"},
+			{"cc", "c", "e", "f"},
+			{"c", "cc", "e", "f"},
+			{"ccc", "e", "f"},
 		},
 	}
 
@@ -3607,16 +3619,66 @@ func TestMinCut(t *testing.T) {
 		{"aab"},
 		{"a"},
 		{"ab"},
+		{"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
 	}
 
 	expected_outputs := []int{
 		1,
 		0,
 		1,
+		0,
 	}
 
 	f := func(i input) int {
 		return minCut(i.s)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestWordBreak(t *testing.T) {
+	type input struct {
+		s string
+		wordDict []string
+	}
+	inputs := []input{
+		{"leetcode", []string{"leet","code"}},
+		{"applepenapple", []string{"apple","pen"}},
+		{"catsandog", []string{"cats", "dog", "sand","and","cat"}},
+	}
+
+	expected_outputs := []bool{
+		true,
+		true,
+		false,
+	}
+
+	f := func(i input) bool {
+		return wordBreak(i.s, i.wordDict)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestWordBreak2(t *testing.T) {
+	type input struct {
+		s string
+		wordDict []string
+	}
+	inputs := []input{
+		{"catsanddog", []string{"cat","cats","and","sand","dog"}},
+		{"pineapplepenapple", []string{"apple","pen","applepen","pine","pineapple"}},
+		{"catsandog", []string{"cats", "dog", "sand","and","cat"}},
+	}
+
+	expected_outputs := [][]string{
+		{"cats and dog","cat sand dog"},
+		{"pine apple pen apple","pineapple pen apple","pine applepen apple"},
+		{},
+	}
+
+	f := func(i input) []string {
+		return wordBreak2(i.s, i.wordDict)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
