@@ -8292,45 +8292,45 @@ Link:
 https://leetcode.com/problems/reverse-substrings-between-each-pair-of-parentheses/description/?envType=daily-question&envId=2024-07-11
 */
 func reverseParentheses(s string) string {
-    var buffer bytes.Buffer
-	idx_stack := linked_list.NewStack[int]()
+    idx_stack := linked_list.NewStack[int]()
+	chars := make([]byte, len(s))
+	for i:=0; i<len(s); i++ {
+		chars[i] = s[i]
+	}
 	idx := 0
 	for idx < len(s) {
 		for idx < len(s) && s[idx] != '(' {
-			buffer.WriteByte(s[idx])
 			idx++
 		}
 		if idx < len(s) {
 			idx_stack.Push(idx)
 			idx++
 		}
-		flip := true
 		for !idx_stack.Empty() {
-			var left_addition bytes.Buffer
-			var right_addition bytes.Buffer
 			for s[idx] != '(' && s[idx] != ')' {
-				if flip {
-					end := right_addition.String()
-					right_addition.Reset()
-					right_addition.WriteByte(s[idx])
-					right_addition.WriteString(end)
-				} else {
-					left_addition.WriteByte(s[idx])
-				}
 				idx++
 			}
 			if s[idx] == '(' {
 				idx_stack.Push(idx)
 			} else {
-				left_addition.WriteString(right_addition.String())
-				buffer.WriteString(left_addition.String())
-				idx_stack.Pop()
+				left := idx_stack.Pop()+1
+				right := idx-1
+				for left < right {
+					chars[left], chars[right] = chars[right], chars[left]
+					left++
+					right--
+				}
 			}
-			flip = !flip
 			idx++
 		}
 	}
 
+	var buffer bytes.Buffer
+	for _, v := range chars {
+		if v != '(' && v != ')' {
+			buffer.WriteByte(v)
+		}
+	}
 	return buffer.String()
 }
 
@@ -8352,7 +8352,7 @@ Link:
 https://leetcode.com/problems/maximum-score-from-removing-substrings/description/?envType=daily-question&envId=2024-07-12
 */
 func maximumGain(s string, x int, y int) int {
-    return 0
+	return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
