@@ -1,4 +1,4 @@
-package euclidean
+package prime_numbers
 
 func GCD(n int, k int) int {
 	if n == k {

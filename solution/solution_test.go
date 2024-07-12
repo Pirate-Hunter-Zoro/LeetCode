@@ -3672,13 +3672,63 @@ func TestWordBreak2(t *testing.T) {
 	}
 
 	expected_outputs := [][]string{
-		{"cats and dog","cat sand dog"},
-		{"pine apple pen apple","pineapple pen apple","pine applepen apple"},
+		{"cat sand dog","cats and dog"},
+		{"pine apple pen apple","pine applepen apple","pineapple pen apple"},
 		{},
 	}
 
 	f := func(i input) []string {
 		return wordBreak2(i.s, i.wordDict)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestReverseParentheses(t *testing.T) {
+	type input struct {
+		s string
+	}
+	inputs := []input{
+		{"(abcd)"},
+		{"(u(love)i)"},
+		{"(ed(et(oc))el)"},
+		{"a(bcdefghijkl(mno)p)q"},
+		{"ta()usw((((a))))"},
+	}
+
+	expected_outputs := []string{
+		"dcba",
+		"iloveu",
+		"leetcode",
+		"apmnolkjihgfedcbq",
+		"tauswa",
+	}
+
+	f := func(i input) string {
+		return reverseParentheses(i.s)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+}
+
+func TestMaximumGain(t *testing.T) {
+	type input struct {
+		s string
+		x int
+		y int
+	}
+	inputs := []input{
+		{"cdbcbbaaabab", 4, 5},
+		{"aabbaaxybbaabb", 5, 4},
+	}
+
+	expected_outputs := []int{
+		19,
+		20,
+	}
+
+	f := func(i input) int {
+		return maximumGain(i.s, i.x, i.y)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

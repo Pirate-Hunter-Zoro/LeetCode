@@ -5,8 +5,8 @@ import (
 	"leetcode/algorithm"
 	"leetcode/binary_tree"
 	"leetcode/combinations"
-	disjointset "leetcode/disjoint_set"
-	"leetcode/euclidean"
+	"leetcode/disjoint_set"
+	"leetcode/prime_numbers"
 	"leetcode/float_rounding"
 	"leetcode/graph"
 	"leetcode/heap"
@@ -1042,7 +1042,7 @@ func canTraverseAllPairs(nums []int) bool {
 	}
 
 	for idx, n := range nums {
-		prime_factors := euclidean.GetPrimeFactors(n)
+		prime_factors := prime_numbers.GetPrimeFactors(n)
 		for _, p := range prime_factors {
 			s.MakeNode(p)
 			nodes[idx].Join(s.GetNode(p))
@@ -8202,7 +8202,31 @@ Link:
 https://leetcode.com/problems/word-break/description/
 */
 func wordBreak(s string, wordDict []string) bool {
-    return false
+	wordMap := make(map[string]bool)
+	for _, word := range wordDict {
+		wordMap[word] = true
+	}
+	// From s[idx:], is the substring comprised of words from wordDict?
+	comprised := make([]int, len(s))
+	return topDownWordBreak(s, 0, comprised, wordMap)
+}
+
+/*
+Top-down helper method for the function above
+*/
+func topDownWordBreak(s string, start int, comprised []int, wordMap map[string]bool) bool {
+	if comprised[start] == 0 {
+		// Need to solve this problem
+		comprised[start] = 1
+		for i:=start; i<len(s); i++ {
+			_, ok := wordMap[s[start:i+1]]
+			if ok && (i == len(s)-1 || topDownWordBreak(s, i+1, comprised, wordMap)) {
+				comprised[start] = 2
+				break
+			}
+		}
+	}
+	return comprised[start] == 2
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8217,7 +8241,118 @@ Link:
 https://leetcode.com/problems/word-break-ii/description/
 */
 func wordBreak2(s string, wordDict []string) []string {
-	return []string{}
+	wordMap := make(map[string]bool)
+	for _, word := range wordDict {
+		wordMap[word] = true
+	}
+	// From s[idx:], is the substring comprised of words from wordDict?
+	sentences := make(map[int][]string)
+	return topDownWordBreak2(s, 0, sentences, wordMap)
+}
+
+/*
+Top-down helper method for the function above
+*/
+func topDownWordBreak2(s string, start int, sentences map[int][]string, wordMap map[string]bool) []string {
+	_, ok := sentences[start]
+	if !ok {
+		// Need to solve this problem
+		new_sentences := []string{}
+		for i:=start; i<len(s); i++ {
+			_, ok := wordMap[s[start:i+1]]
+			if ok {
+				if i == len(s)-1 {
+					new_sentences = append(new_sentences, s[start:i+1])
+				} else if len(topDownWordBreak2(s, i+1, sentences, wordMap)) > 0 {
+					for _, following_sentence := range topDownWordBreak2(s, i+1, sentences, wordMap) {
+						var buffer bytes.Buffer
+						buffer.WriteString(s[start:i+1])
+						buffer.WriteString(" ")
+						buffer.WriteString(following_sentence)
+						new_sentences = append(new_sentences, buffer.String())
+					}
+				}
+			}
+		}
+		sentences[start] = new_sentences
+	}
+	return sentences[start]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given a string s that consists of lower case English letters and brackets.
+
+Reverse the strings in each pair of matching parentheses, starting from the innermost one.
+
+Your result should not contain any brackets.
+
+Link:
+https://leetcode.com/problems/reverse-substrings-between-each-pair-of-parentheses/description/?envType=daily-question&envId=2024-07-11
+*/
+func reverseParentheses(s string) string {
+    var buffer bytes.Buffer
+	idx_stack := linked_list.NewStack[int]()
+	idx := 0
+	for idx < len(s) {
+		for idx < len(s) && s[idx] != '(' {
+			buffer.WriteByte(s[idx])
+			idx++
+		}
+		if idx < len(s) {
+			idx_stack.Push(idx)
+			idx++
+		}
+		flip := true
+		for !idx_stack.Empty() {
+			var left_addition bytes.Buffer
+			var right_addition bytes.Buffer
+			for s[idx] != '(' && s[idx] != ')' {
+				if flip {
+					end := right_addition.String()
+					right_addition.Reset()
+					right_addition.WriteByte(s[idx])
+					right_addition.WriteString(end)
+				} else {
+					left_addition.WriteByte(s[idx])
+				}
+				idx++
+			}
+			if s[idx] == '(' {
+				idx_stack.Push(idx)
+			} else {
+				left_addition.WriteString(right_addition.String())
+				buffer.WriteString(left_addition.String())
+				idx_stack.Pop()
+			}
+			flip = !flip
+			idx++
+		}
+	}
+
+	return buffer.String()
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given a string s and two integers x and y. 
+You can perform two types of operations any number of times.
+
+Remove substring "ab" and gain x points.
+For example, when removing "ab" from "cabxbae" it becomes "cxbae".
+
+Remove substring "ba" and gain y points.
+For example, when removing "ba" from "cabxbae" it becomes "cabxe".
+
+Return the maximum points you can gain after applying the above operations on s.
+
+Link:
+https://leetcode.com/problems/maximum-score-from-removing-substrings/description/?envType=daily-question&envId=2024-07-12
+*/
+func maximumGain(s string, x int, y int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
