@@ -3733,3 +3733,28 @@ func TestMaximumGain(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
 }
+
+func TestSurvivedRobotsHealths(t *testing.T) {
+	type input struct {
+		positions []int
+		healths []int
+		directions string
+	}
+	inputs := []input{
+		{[]int{5,4,3,2,1}, []int{2,17,9,15,10}, "RRRRR"},
+		{[]int{3,5,2,6}, []int{10,10,15,12}, "RLRL"},
+		{[]int{1,2,5,6}, []int{10,10,11,11}, "RLRL"},
+	}
+
+	expected_outputs := [][]int{
+		{2,17,9,15,10},
+		{14},
+		{},
+	}
+
+	f := func(i input) []int{
+		return survivedRobotsHealths(i.positions, i.healths, i.directions)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

@@ -8350,9 +8350,115 @@ Return the maximum points you can gain after applying the above operations on s.
 
 Link:
 https://leetcode.com/problems/maximum-score-from-removing-substrings/description/?envType=daily-question&envId=2024-07-12
+
+Inspiration:
+LeetCode's hint...
 */
 func maximumGain(s string, x int, y int) int {
-	return 0
+	score := 0
+	take_ab := x >= y
+	char_stack := linked_list.NewStack[byte]()
+	left_over_chars := []byte{}
+	for i:=0; i<len(s); i++ {
+		if s[i] == 'a'{
+			if !char_stack.Empty() && char_stack.Peek() == 'b' && !take_ab {
+				// take 'ba'
+				char_stack.Pop()
+				score += y
+			} else {
+				char_stack.Push(s[i])
+			}
+		} else if s[i] == 'b' {
+			if !char_stack.Empty() && char_stack.Peek() == 'a' && take_ab {
+				// take 'ab'
+				char_stack.Pop()
+				score += x
+			} else {
+				char_stack.Push(s[i])
+			}
+		} else {
+			char_stack.Push(s[i])
+		}
+	}
+	// Empty the stack one last time in case it's necessary
+	for !char_stack.Empty() {
+		left_over_chars = append(left_over_chars, char_stack.Pop())
+	}
+	for i:=0; i<len(left_over_chars)/2; i++ {
+		left := i
+		right := len(left_over_chars)-i-1
+		left_over_chars[left], left_over_chars[right] = left_over_chars[right], left_over_chars[left]
+	}
+
+	// Now go through another pass for the opposite pair
+	for i:=0; i<len(left_over_chars); i++ {
+		if left_over_chars[i] == 'a'{
+			if !char_stack.Empty() && char_stack.Peek() == 'b'{
+				// take 'ba'
+				char_stack.Pop()
+				score += y
+			} else {
+				char_stack.Push(left_over_chars[i])
+			}
+		} else if left_over_chars[i] == 'b' {
+			if !char_stack.Empty() && char_stack.Peek() == 'a' {
+				// take 'ab'
+				char_stack.Pop()
+				score += x
+			} else {
+				char_stack.Push(left_over_chars[i])
+			}
+		} else {
+			char_stack.Push(left_over_chars[i])
+		}
+	}
+
+	return score
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There are n 1-indexed robots, each having a position on a line, health, and movement direction.
+
+You are given 0-indexed integer arrays positions, healths, and a string directions (directions[i] is either 'L' for left or 'R' for right). 
+All integers in positions are unique.
+
+All robots start moving on the line simultaneously at the same speed in their given directions. 
+If two robots ever share the same position while moving, they will collide.
+
+If two robots collide, the robot with lower health is removed from the line, and the health of the other robot decreases by one. 
+The surviving robot continues in the same direction it was going. 
+If both robots have the same health, they are both removed from the line.
+
+Your task is to determine the health of the robots that survive the collisions, in the same order that the robots were given, i.e. final heath of robot 1 (if survived), final health of robot 2 (if survived), and so on. 
+If there are no survivors, return an empty array.
+
+Return an array containing the health of the remaining robots (in the order they were given in the input), after no further collisions can occur.
+
+Note: The positions may be unsorted.
+
+Link:
+https://leetcode.com/problems/robot-collisions/description/?envType=daily-question&envId=2024-07-13
+*/
+func survivedRobotsHealths(positions []int, healths []int, directions string) []int {
+    robots := make([][]int, len(positions))
+	for i:=0; i<len(positions); i++ {
+		direction := 0
+		if directions[i] == 'R' {
+			direction++
+		}
+		// ID, positions, healths, direction
+		robots[i] = []int{i+1, positions[i], healths[i], direction}
+	}
+	// Sort by position
+	sort.SliceStable(robots, func(i, j int) bool {
+		return robots[i][1] < robots[j][1]
+	})
+
+	// TODO: figure out how to do this algorithm
+
+	return []int{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
