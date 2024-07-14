@@ -3758,3 +3758,45 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestMaxProduct(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{2,3,-2,4}},
+		{[]int{-2,0,-1}},
+	}
+
+	expected_outputs := []int{
+		6,
+		0,
+	}
+
+	f := func(i input) int {
+		return maxProduct(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestCalculateMinimumHP(t *testing.T) {
+	type input struct {
+		dungeon [][]int
+	}
+	inputs := []input{
+		{[][]int{{-2,-3,3},{-5,-10,1},{10,30,-5}}},
+		{[][]int{{0}}},
+	}
+
+	expected_outputs := []int{
+		7,
+		1,
+	}
+
+	f := func(i input) int {
+		return calculateMinimumHP(i.dungeon)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

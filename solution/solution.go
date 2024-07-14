@@ -8440,6 +8440,9 @@ Note: The positions may be unsorted.
 
 Link:
 https://leetcode.com/problems/robot-collisions/description/?envType=daily-question&envId=2024-07-13
+
+Inspiration:
+The hint on LeetCode
 */
 func survivedRobotsHealths(positions []int, healths []int, directions string) []int {
     robots := make([][]int, len(positions))
@@ -8456,9 +8459,81 @@ func survivedRobotsHealths(positions []int, healths []int, directions string) []
 		return robots[i][1] < robots[j][1]
 	})
 
-	// TODO: figure out how to do this algorithm
+	// Use a stack to analyze the relevant collisions
+	robot_stack := linked_list.NewStack[[]int]()
+	for i:=0; i<len(robots); i++ {
+		for !robot_stack.Empty() && robots[i][3] == 0 && robot_stack.Peek()[3] == 1 && robots[i][2] > 0 {
+			if robots[i][2] > robot_stack.Peek()[2] {
+				// Last robot destroyed
+				robot_stack.Pop()
+				robots[i][2]--
+			} else if robots[i][2] < robot_stack.Peek()[2]{
+				// This robot destroyed
+				robots[i][2] = 0
+				robot_stack.Peek()[2]--
+				break
+			} else {
+				// Both robots destroyed
+				robots[i][2] = 0
+				robot_stack.Pop()
+				break
+			}
+		}
+		if robots[i][2] > 0 {
+			robot_stack.Push(robots[i])
+		}
+	}
 
-	return []int{}
+	robot_id_posn := [][]int{}
+	for !robot_stack.Empty() {
+		robot_id_posn = append(robot_id_posn, []int{robot_stack.Peek()[0], robot_stack.Pop()[2]})
+	}
+	sort.SliceStable(robot_id_posn, func(i, j int) bool {
+		return robot_id_posn[i][0] < robot_id_posn[j][0]
+	})
+
+	remaining_healths := make([]int, len(robot_id_posn))
+	for idx, robot := range robot_id_posn {
+		remaining_healths[idx] = robot[1]
+	}
+	return remaining_healths
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer array nums, find a subarray that has the largest product, and return the product.
+
+The test cases are generated so that the answer will fit in a 32-bit integer.
+
+Link:
+https://leetcode.com/problems/maximum-product-subarray/description/
+*/
+func maxProduct(nums []int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+The demons had captured the princess and imprisoned her in the bottom-right corner of a dungeon. 
+The dungeon consists of m x n rooms laid out in a 2D grid. 
+Our valiant knight was initially positioned in the top-left room and must fight his way through dungeon to rescue the princess.
+
+The knight has an initial health point represented by a positive integer. 
+If at any point his health point drops to 0 or below, he dies immediately.
+
+Some of the rooms are guarded by demons (represented by negative integers), so the knight loses health upon entering these rooms; other rooms are either empty (represented as 0) or contain magic orbs that increase the knight's health (represented by positive integers).
+To reach the princess as quickly as possible, the knight decides to move only rightward or downward in each step.
+Return the knight's minimum initial health so that he can rescue the princess.
+
+Note that any room can contain threats or power-ups, even the first room the knight enters and the bottom-right room where the princess is imprisoned.
+
+Link:
+https://leetcode.com/problems/dungeon-game/description/
+*/
+func calculateMinimumHP(dungeon [][]int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
