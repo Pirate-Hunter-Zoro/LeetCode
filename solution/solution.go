@@ -8510,7 +8510,106 @@ Link:
 https://leetcode.com/problems/maximum-product-subarray/description/
 */
 func maxProduct(nums []int) int {
-    return 0
+	if len(nums) == 1 {
+		return nums[0]
+	}
+
+	zeros := []int{}
+	for idx, v := range nums {
+		if v == 0 {
+			zeros = append(zeros, idx)
+		}
+	}
+	record := 0
+	if len(zeros) > 0 {
+		if zeros[0] > 0 {
+			record = max(record, findNonZeroMaxProduct(0, zeros[0]-1, nums))
+		}
+		if zeros[len(zeros)-1] < len(nums)-1 {
+			record = max(record, findNonZeroMaxProduct(zeros[len(zeros)-1] + 1, len(nums)-1, nums))
+		}
+		for i:=0; i<len(zeros)-1; i++ {
+			if zeros[i+1] - zeros[i] > 1 {
+				record = max(record, findNonZeroMaxProduct(zeros[i]+1, zeros[i+1]-1, nums))
+			}
+		}
+	} else {
+		record = max(record, findNonZeroMaxProduct(0, len(nums)-1, nums))
+	}
+
+    return record
+}
+
+/*
+Helper method to find the maximum product within a slice of an array that has NO zeros in it
+*/
+func findNonZeroMaxProduct(start int, end int, nums []int) int {
+	if start == end {
+		return nums[start]
+	}
+
+	// For left-most negative, have left product of it (if left-most negative is start, then that product is 1)
+	left_most_product := int64(1) // what we divide by if we remove the left-most negative's left subarray
+	true_left_most_product := int64(-1)
+	left_most_negative := int64(1)
+	negative_found := false
+	for i:=start; i<=end; i++ {
+		if nums[i] < 0 {
+			negative_found = true
+			left_most_negative *= int64(nums[i])
+			break
+		} else {
+			true_left_most_product = int64(math.Abs(float64(true_left_most_product)))
+			true_left_most_product *= int64(nums[i])
+			left_most_product *= int64(nums[i])
+		}
+	}
+	if !negative_found {
+		return int(left_most_product)
+	}
+
+	// For right-most negative, have right product of it (if right-most negative is end, then that product is 1)
+	right_most_product := int64(1) // what we divide by if we remove the right-most negative's subarray
+	true_right_most_product := int64(-1) 
+	right_most_negative := int64(1)
+	for i:=end; i>=start; i-- {
+		if nums[i] < 0 {
+			right_most_negative *= int64(nums[i])
+			break
+		} else {
+			true_right_most_product = int64(math.Abs(float64(true_right_most_product)))
+			true_right_most_product *= int64(nums[i])
+			right_most_product *= int64(nums[i])
+		}
+	}
+
+	// Find total product and all negative values
+	product := int64(1)
+	for i:=start; i<=end; i++ {
+		v := int64(nums[i])
+		old_product := product
+		product *= int64(v)
+		if int64(math.Abs(float64(product) / float64(v))) != int64(math.Abs(float64(old_product)))  {
+			// Blew the integer value - according to problem constraints the total product will not be the answer
+			product = int64(-1)
+			break
+		}
+	}
+	
+	// Return the max of the whole product, taking out the left most negative subarray, taking out the right most negative subarray, leaving ONLY the left-most negative subarray, and leaving ONLY the right-most negative subarray
+	return int(max(
+		product,
+		max(
+			true_left_most_product, 
+			max(
+				true_right_most_product,
+				max(
+					product / left_most_product / left_most_negative,
+					product / right_most_product / right_most_negative,
+				),
+			),
+		),
+	))
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8534,6 +8633,30 @@ https://leetcode.com/problems/dungeon-game/description/
 */
 func calculateMinimumHP(dungeon [][]int) int {
     return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given the root of a binary tree with n nodes. 
+Each node is uniquely assigned a value from 1 to n. 
+You are also given an integer startValue representing the value of the start node s, and a different integer destValue representing the value of the destination node t.
+
+Find the shortest path starting from node s and ending at node t. 
+Generate step-by-step directions of such path as a string consisting of only the uppercase letters 'L', 'R', and 'U'. 
+
+Each letter indicates a specific direction:
+'L' means to go from a node to its left child node.
+'R' means to go from a node to its right child node.
+'U' means to go from a node to its parent node.
+
+Return the step-by-step directions of the shortest path from node s to node t.
+
+Link:
+https://leetcode.com/problems/step-by-step-directions-from-a-binary-tree-node-to-another/description/?envType=daily-question&envId=2024-07-16
+*/
+func getDirections(root *binary_tree.TreeNode, startValue int, destValue int) string {
+    return ""
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

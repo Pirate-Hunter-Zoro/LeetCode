@@ -3766,11 +3766,13 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	inputs := []input{
 		{[]int{2,3,-2,4}},
 		{[]int{-2,0,-1}},
+		{[]int{0,10,10,10,10,10,10,10,10,10,-10,10,10,10,10,10,10,10,10,10,0}},
 	}
 
 	expected_outputs := []int{
 		6,
 		0,
+		1000000000,
 	}
 
 	f := func(i input) int {
@@ -3796,6 +3798,29 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	f := func(i input) int {
 		return calculateMinimumHP(i.dungeon)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestGetDirections(t *testing.T) {
+	type input struct {
+		root *binary_tree.TreeNode
+		startValue int
+		destValue int
+	}
+	inputs := []input{
+		{binary_tree.NewTree([]int{5,1,2,3,binary_tree.NULL,6,4}), 3, 6},
+		{binary_tree.NewTree([]int{2,1}), 2, 1},
+	}
+
+	expected_outputs := []string{
+		"UURL",
+		"L",
+	}
+
+	f := func(i input) string {
+		return getDirections(i.root, i.startValue, i.destValue)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
