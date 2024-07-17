@@ -3789,10 +3789,14 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	inputs := []input{
 		{[][]int{{-2,-3,3},{-5,-10,1},{10,30,-5}}},
 		{[][]int{{0}}},
+		{[][]int{{-3,5}}},
+		{[][]int{{0,-5},{0,0}}},
 	}
 
 	expected_outputs := []int{
 		7,
+		1,
+		4,
 		1,
 	}
 
@@ -3821,6 +3825,28 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	f := func(i input) string {
 		return getDirections(i.root, i.startValue, i.destValue)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestDelNodes(t *testing.T) {
+	type input struct {
+		root *binary_tree.TreeNode
+		to_delete []int
+	}
+	inputs := []input{
+		{binary_tree.NewTree([]int{1,2,3,4,5,6,7}), []int{3,5}},
+		{binary_tree.NewTree([]int{1,2,4,binary_tree.NULL,3}), []int{3}},
+	}
+
+	expected_outputs := [][]*binary_tree.TreeNode{
+		{binary_tree.NewTree([]int{1,2,binary_tree.NULL,4}), binary_tree.NewTree([]int{6}), binary_tree.NewTree([]int{7})},
+		{binary_tree.NewTree([]int{1,2,4})},
+	}
+
+	f := func(i input) []*binary_tree.TreeNode {
+		return delNodes(i.root, i.to_delete)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

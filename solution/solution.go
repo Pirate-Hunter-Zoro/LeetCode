@@ -8632,7 +8632,31 @@ Link:
 https://leetcode.com/problems/dungeon-game/description/
 */
 func calculateMinimumHP(dungeon [][]int) int {
-    return 0
+	min_health := make([][]int, len(dungeon))
+	for i:=0; i<len(dungeon); i++ {
+		min_health[i] = make([]int, len(dungeon[i]))
+	}
+	for r:=len(dungeon)-1; r>=0; r-- {
+		for c:=len(dungeon[r])-1; c>=0; c-- {
+			min_health[r][c] = max(1, -dungeon[r][c] + 1)
+			if r < len(dungeon) - 1 && c < len(dungeon[r])-1 {
+				// Look both down and right
+				min_health[r][c] = max(1,
+									min(
+										min_health[r+1][c]-dungeon[r][c],
+										min_health[r][c+1]-dungeon[r][c],
+									),
+								)
+			} else if r < len(dungeon) - 1 {
+				// Look down
+				min_health[r][c] = max(1, min_health[r+1][c]-dungeon[r][c])
+			} else if c < len(dungeon[r]) - 1 {
+				// Look right
+				min_health[r][c] = max(1, min_health[r][c+1]-dungeon[r][c])
+			}
+		}
+	}
+    return min_health[0][0]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8657,6 +8681,22 @@ https://leetcode.com/problems/step-by-step-directions-from-a-binary-tree-node-to
 */
 func getDirections(root *binary_tree.TreeNode, startValue int, destValue int) string {
     return ""
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given the root of a binary tree, each node in the tree has a distinct value.
+
+After deleting all nodes with a value in to_delete, we are left with a forest (a disjoint union of trees).
+
+Return the roots of the trees in the remaining forest. You may return the result in any order.
+
+Link:
+https://leetcode.com/problems/delete-nodes-and-return-forest/description/?envType=daily-question&envId=2024-07-17
+*/
+func delNodes(root *binary_tree.TreeNode, to_delete []int) []*binary_tree.TreeNode {
+    return []*binary_tree.TreeNode{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
