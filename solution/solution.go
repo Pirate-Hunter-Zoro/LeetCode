@@ -8781,7 +8781,70 @@ Link:
 https://leetcode.com/problems/delete-nodes-and-return-forest/description/?envType=daily-question&envId=2024-07-17
 */
 func delNodes(root *binary_tree.TreeNode, to_delete []int) []*binary_tree.TreeNode {
-    return []*binary_tree.TreeNode{}
+	delete_set := make(map[int]bool)
+	for _, v := range to_delete {
+		delete_set[v] = true
+	}
+
+	// Check if the root needs to be deleted; if not then add it to our list of root nodes
+	roots := &[]*binary_tree.TreeNode{}
+	_, ok := delete_set[root.Val]
+	if !ok {
+		*roots = append(*roots, root)
+	}
+
+	// Now we are ready for the recursion
+	recDelNodes(root, roots, delete_set)
+
+    return *roots
+}
+
+/*
+Recursive helper method to delete tree nodes
+*/
+func recDelNodes(root *binary_tree.TreeNode, roots *[]*binary_tree.TreeNode, delete_set map[int]bool) {
+	_, ok := delete_set[root.Val]
+	// We need to get rid of this node
+	if ok {
+		if root.Left != nil {
+			_, ok = delete_set[root.Left.Val]
+			if !ok {
+				// This left child - since we are not going to delete it - is a new root
+				*roots = append(*roots, root.Left)
+			}
+			recDelNodes(root.Left, roots, delete_set)
+		}
+		if root.Right != nil {
+			_, ok = delete_set[root.Right.Val]
+			if !ok {
+				// This right child - since we are not going to delete it - is a new root
+				*roots = append(*roots, root.Right)
+			}
+			recDelNodes(root.Right, roots, delete_set)
+		}
+	} else {
+		// Do not get rid of this node
+		if root.Left != nil {
+			_, ok = delete_set[root.Left.Val]
+			if ok {
+				// We need to get rid of this left child
+				recDelNodes(root.Left, roots, delete_set)
+				root.Left = nil
+			} else {
+				recDelNodes(root.Left, roots, delete_set)
+			}
+		}
+		if root.Right != nil {
+			_, ok = delete_set[root.Right.Val]
+			if ok {
+				// We need to get rid of this left child
+				recDelNodes(root.Right, roots, delete_set)
+				root.Right = nil
+			} else {
+				recDelNodes(root.Right, roots, delete_set)
+			}
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
