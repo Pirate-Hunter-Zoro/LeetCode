@@ -8680,7 +8680,92 @@ Link:
 https://leetcode.com/problems/step-by-step-directions-from-a-binary-tree-node-to-another/description/?envType=daily-question&envId=2024-07-16
 */
 func getDirections(root *binary_tree.TreeNode, startValue int, destValue int) string {
-    return ""
+	parents := make(map[*binary_tree.TreeNode]*binary_tree.TreeNode)
+	nodes := make(map[int]*binary_tree.TreeNode)
+	recordParents(root, parents, nodes)
+	correct_direction := make(map[*binary_tree.TreeNode]bool)
+	findTarget(nil, startValue, destValue, nodes, parents, correct_direction)
+	char_queue := linked_list.NewQueue[byte]()
+	fillPath(nil, startValue, destValue, nodes, parents, correct_direction, char_queue)
+    var buffer bytes.Buffer
+	for !char_queue.Empty() {
+		buffer.WriteByte(char_queue.Dequeue())
+	}
+	return buffer.String()
+}
+
+/*
+Helper method to traverse the tree and record all the parents
+*/
+func recordParents(root *binary_tree.TreeNode, parents map[*binary_tree.TreeNode]*binary_tree.TreeNode, nodes map[int]*binary_tree.TreeNode) {
+	nodes[root.Val] = root
+	if root.Left != nil {
+		parents[root.Left] = root
+		recordParents(root.Left, parents, nodes)
+	} 
+	if root.Right != nil {
+		parents[root.Right] = root
+		recordParents(root.Right, parents, nodes)
+	}
+}
+
+/*
+Helper method to start at a source and mark all the nodes needed to reach the destination as true
+*/
+func findTarget(came_from *binary_tree.TreeNode, startValue int, destValue int, nodes map[int]*binary_tree.TreeNode, parents map[*binary_tree.TreeNode]*binary_tree.TreeNode, correct_direction map[*binary_tree.TreeNode]bool) {
+	correct_direction[nodes[startValue]] = false // By default
+	if startValue == destValue {
+		correct_direction[nodes[startValue]] = true
+	} else {
+		// Check for parent
+		parent, ok := parents[nodes[startValue]]
+		if ok && parent != came_from {
+			findTarget(nodes[startValue], parent.Val, destValue, nodes, parents, correct_direction)
+			if correct_direction[parent] {
+				correct_direction[nodes[startValue]] = true
+			}
+		} 
+		// Check for left child
+		if nodes[startValue].Left != nil{
+			left := nodes[startValue].Left
+			if left != came_from {
+				findTarget(nodes[startValue], left.Val, destValue, nodes, parents, correct_direction)
+				if correct_direction[left] {
+					correct_direction[nodes[startValue]] = true
+				}
+			}
+		} 
+		// Check for right child
+		if nodes[startValue].Right != nil {
+			right := nodes[startValue].Right
+			if right != came_from {
+				findTarget(nodes[startValue], right.Val, destValue, nodes, parents, correct_direction)
+				if correct_direction[right] { 
+					correct_direction[nodes[startValue]] = true
+				}
+			}
+		}
+	}
+}
+
+/*
+Once all nodes are marked as important or not, traverse from the startValue to the endValue recording each movement in the buffer
+*/
+func fillPath(came_from *binary_tree.TreeNode, startValue int, destValue int, nodes map[int]*binary_tree.TreeNode, parents map[*binary_tree.TreeNode]*binary_tree.TreeNode, correct_direction map[*binary_tree.TreeNode]bool, char_queue *linked_list.Queue[byte]) {
+	if startValue != destValue {
+		// Check parent
+		parent, ok := parents[nodes[startValue]]
+		if ok && correct_direction[parent] && parent != came_from {
+			char_queue.Enqueue('U')
+			fillPath(nodes[startValue], parent.Val, destValue, nodes, parents, correct_direction, char_queue)
+		} else if nodes[startValue].Left != nil && correct_direction[nodes[startValue].Left] && nodes[startValue].Left != came_from {
+			char_queue.Enqueue('L')
+			fillPath(nodes[startValue], nodes[startValue].Left.Val, destValue, nodes, parents, correct_direction, char_queue)
+		} else if nodes[startValue].Right != nil && correct_direction[nodes[startValue].Right] && nodes[startValue].Right != came_from {
+			char_queue.Enqueue('R')
+			fillPath(nodes[startValue], nodes[startValue].Right.Val, destValue, nodes, parents, correct_direction, char_queue)
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8697,6 +8782,21 @@ https://leetcode.com/problems/delete-nodes-and-return-forest/description/?envTyp
 */
 func delNodes(root *binary_tree.TreeNode, to_delete []int) []*binary_tree.TreeNode {
     return []*binary_tree.TreeNode{}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given the root of a binary tree and an integer distance. 
+A pair of two different LEAF nodes of a binary tree is said to be good if the length of the shortest path between them is less than or equal to distance.
+
+Return the number of good leaf node pairs in the tree.
+
+Link:
+https://leetcode.com/problems/number-of-good-leaf-nodes-pairs/description/?envType=daily-question&envId=2024-07-18
+*/
+func countPairs(root *binary_tree.TreeNode, distance int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

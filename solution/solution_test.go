@@ -3851,3 +3851,27 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestCountPairs(t *testing.T) {
+	type input struct {
+		root *binary_tree.TreeNode
+		distance int
+	}
+	inputs := []input{
+		{binary_tree.NewTree([]int{1,2,3,binary_tree.NULL,4}), 3},
+		{binary_tree.NewTree([]int{1,2,3,4,5,6,7}), 3},
+		{binary_tree.NewTree([]int{7,1,4,6,binary_tree.NULL,5,3,binary_tree.NULL,binary_tree.NULL,binary_tree.NULL,binary_tree.NULL,binary_tree.NULL,2}), 3},
+	}
+
+	expected_outputs := []int{
+		1,
+		2,
+		1,
+	}
+
+	f := func(i input) int {
+		return countPairs(i.root, i.distance)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
