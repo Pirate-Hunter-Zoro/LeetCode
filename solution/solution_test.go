@@ -3861,16 +3861,105 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 		{binary_tree.NewTree([]int{1,2,3,binary_tree.NULL,4}), 3},
 		{binary_tree.NewTree([]int{1,2,3,4,5,6,7}), 3},
 		{binary_tree.NewTree([]int{7,1,4,6,binary_tree.NULL,5,3,binary_tree.NULL,binary_tree.NULL,binary_tree.NULL,binary_tree.NULL,binary_tree.NULL,2}), 3},
+		{binary_tree.NewTree([]int{1,1,1}), 2},
 	}
 
 	expected_outputs := []int{
 		1,
 		2,
 		1,
+		1,
 	}
 
 	f := func(i input) int {
 		return countPairs(i.root, i.distance)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestRob(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{1,2,3,1}},
+		{[]int{2,7,9,3,1}},
+	}
+
+	expected_outputs := []int{
+		4,
+		12,
+	}
+
+	f := func(i input) int {
+		return rob(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestRob2(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{2,3,2}},
+		{[]int{1,2,3,1}},
+		{[]int{1,2,3}},
+	}
+
+	expected_outputs := []int{
+		3,
+		4,
+		3,
+	}
+
+	f := func(i input) int {
+		return rob2(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestRob3(t *testing.T) {
+	type input struct {
+		root *binary_tree.TreeNode
+	}
+	inputs := []input{
+		{binary_tree.NewTree([]int{3,2,3,binary_tree.NULL,3,binary_tree.NULL,1})},
+		{binary_tree.NewTree([]int{3,4,5,1,3,binary_tree.NULL,1})},
+	}
+
+	expected_outputs := []int{
+		7,
+		9,
+	}
+
+	f := func(i input) int {
+		return rob3(i.root)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestMinCapability(t *testing.T) {
+	type input struct {
+		nums []int
+		k int
+	}
+	inputs := []input{
+		{[]int{2,3,5,9}, 2},
+		{[]int{2,7,9,3,1}, 2},
+	}
+
+	expected_outputs := []int{
+		5,
+		2,
+	}
+
+	f := func(i input) int {
+		return minCapability(i.nums, i.k)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

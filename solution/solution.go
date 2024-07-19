@@ -8859,6 +8859,153 @@ Link:
 https://leetcode.com/problems/number-of-good-leaf-nodes-pairs/description/?envType=daily-question&envId=2024-07-18
 */
 func countPairs(root *binary_tree.TreeNode, distance int) int {
+	parents := make(map[*binary_tree.TreeNode]*binary_tree.TreeNode)
+	nodes := make(map[*binary_tree.TreeNode]bool)
+	findParents(root, parents, nodes)
+
+	pairs := 0
+	for node := range nodes {
+		if node.Left == nil && node.Right == nil {
+			// This is a leaf node
+			visited := make(map[*binary_tree.TreeNode]bool)
+			node_queue := linked_list.NewQueue[*binary_tree.TreeNode]()
+			node_queue.Enqueue(node)
+			d := 0
+			for d < distance && !node_queue.Empty() {
+				d++;
+				empty_this_many := node_queue.Length()
+				for i:=0; i<empty_this_many; i++ {
+					// Perform the next breadth expansion
+					next_node := node_queue.Dequeue()
+					visited[next_node] = true
+					if next_node.Left != nil {
+						// See if we have visited this left child
+						_, ok := visited[next_node.Left]
+						if !ok {
+							if next_node.Left.Left == nil && next_node.Left.Right == nil {
+								// We just found a leaf pair
+								pairs++
+							}
+							// Either way, still contribute to the BFS
+							node_queue.Enqueue(next_node.Left)
+						}
+					}
+					if next_node.Right != nil {
+						// Similarly, see if we have visited this right child
+						_, ok := visited[next_node.Right]
+						if !ok {
+							if next_node.Right.Left == nil && next_node.Right.Right == nil {
+								// Another leaf pair
+								pairs++
+							}
+							// Contribute to BFS
+							node_queue.Enqueue(next_node.Right)
+						}
+					}
+					// See if this node has a parent that we can add to our BFS
+					parent, ok := parents[next_node]
+					if ok {
+						_, ok = visited[parent]
+						if !ok {
+							node_queue.Enqueue(parent)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Be sure not to double count each pair
+    return pairs / 2
+}
+
+/*
+Helper method to traverse the tree and record all the parents
+*/
+func findParents(root *binary_tree.TreeNode, parents map[*binary_tree.TreeNode]*binary_tree.TreeNode, nodes map[*binary_tree.TreeNode]bool) {
+	nodes[root] = true
+	if root.Left != nil {
+		parents[root.Left] = root
+		findParents(root.Left, parents, nodes)
+	} 
+	if root.Right != nil {
+		parents[root.Right] = root
+		findParents(root.Right, parents, nodes)
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are a professional robber planning to rob houses along a street. 
+Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
+
+Given an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.
+
+Link:
+https://leetcode.com/problems/house-robber/description/
+*/
+func rob(nums []int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are a professional robber planning to rob houses along a street. 
+Each house has a certain amount of money stashed. 
+All houses at this place are arranged in a circle. 
+That means the first house is the neighbor of the last one. 
+Meanwhile, adjacent houses have a security system connected, and it will automatically contact the police if two adjacent houses were broken into on the same night.
+
+Given an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.
+
+Link:
+https://leetcode.com/problems/house-robber-ii/description/
+*/
+func rob2(nums []int) int {
+	return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+The thief has found himself a new place for his thievery again. 
+There is only one entrance to this area, called root.
+
+Besides the root, each house has one and only one parent house. 
+After a tour, the smart thief realized that all houses in this place form a binary tree. 
+It will automatically contact the police if two directly-linked houses were broken into on the same night.
+
+Given the root of the binary tree, return the maximum amount of money the thief can rob without alerting the police.
+
+Link:
+https://leetcode.com/problems/house-robber-iii/description/
+*/
+func rob3(root *binary_tree.TreeNode) int {
+	return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There are several consecutive houses along a street, each of which has some money inside. 
+There is also a robber, who wants to steal money from the homes, but he refuses to steal from adjacent homes.
+
+The capability of the robber is the maximum amount of money he steals from one house of all the houses he robbed.
+
+You are given an integer array nums representing how much money is stashed in each house. 
+More formally, the ith house from the left has nums[i] dollars.
+
+You are also given an integer k, representing the minimum number of houses the robber will steal from. 
+It is always possible to steal at least k houses.
+
+Return the minimum capability of the robber out of all the possible ways to steal at least k houses.
+
+Link:
+https://leetcode.com/problems/house-robber-iv/description/
+*/
+func minCapability(nums []int, k int) int {
     return 0
 }
 
