@@ -3964,3 +3964,32 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestRestoreMatrix(t *testing.T) {
+	type input struct {
+		rowSum []int
+		colSum []int
+	}
+	inputs := []input{
+		{[]int{3,8},[]int{4,7}},
+		{[]int{5,7,10},[]int{8,6,8}},
+	}
+
+	expected_outputs := [][][]int{
+		{
+			{3,0},
+			{1,7},
+		},
+		{
+			{0,5,0},
+			{6,1,0},
+			{2,0,8},
+		},
+	}
+
+	f := func(i input) [][]int{
+		return restoreMatrix(i.rowSum, i.colSum)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

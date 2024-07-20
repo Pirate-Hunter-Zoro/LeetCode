@@ -8946,7 +8946,27 @@ Link:
 https://leetcode.com/problems/house-robber/description/
 */
 func rob(nums []int) int {
-    return 0
+    rob_prev_prev := nums[len(nums)-1]
+	no_rob_prev_prev := 0
+	if len(nums) == 1 {
+		return rob_prev_prev
+	}
+	rob_prev := nums[len(nums)-2]
+	no_rob_prev := nums[len(nums)-1]
+	if len(nums) == 2 {
+		return max(rob_prev, no_rob_prev)
+	}
+	rob_curr := 0
+	no_rob_curr := 0
+	for i:=len(nums)-3; i>=0; i-- {
+		rob_curr = nums[i] + max(no_rob_prev_prev, rob_prev_prev)
+		no_rob_curr = max(no_rob_prev, rob_prev)
+		rob_prev_prev = rob_prev
+		no_rob_prev_prev = no_rob_prev
+		rob_prev = rob_curr
+		no_rob_prev = no_rob_curr
+	}
+	return max(rob_curr, no_rob_curr)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8964,7 +8984,48 @@ Link:
 https://leetcode.com/problems/house-robber-ii/description/
 */
 func rob2(nums []int) int {
-	return 0
+	// Try allowing us to rob the first house
+	rob_prev_prev := nums[0]
+	no_rob_prev_prev := 0
+	if len(nums) == 1 {
+		return rob_prev_prev
+	}
+	rob_prev := nums[1]
+	no_rob_prev := nums[0]
+	if len(nums) == 2 {
+		return max(rob_prev, no_rob_prev)
+	}
+	rob_curr := max(rob_prev_prev, rob_prev)
+	no_rob_curr := max(rob_prev_prev, rob_prev)
+	for i:=2; i<len(nums)-1; i++ {
+		rob_curr = nums[i] + max(rob_prev_prev, no_rob_prev_prev)
+		no_rob_curr = max(rob_prev, no_rob_prev)
+		no_rob_prev_prev = no_rob_prev
+		rob_prev_prev = rob_prev
+		no_rob_prev = no_rob_curr
+		rob_prev = rob_curr
+	}
+	allow_rob_first := max(rob_curr, no_rob_curr)
+
+	// Try allow us to rob the last house
+	rob_prev_prev = nums[len(nums)-1]
+	no_rob_prev_prev = 0
+	rob_prev = nums[len(nums)-2]
+	no_rob_prev = nums[len(nums)-1]
+	rob_curr = max(rob_prev_prev, rob_prev)
+	no_rob_curr = max(rob_prev_prev, rob_prev)
+	for i:=len(nums)-3; i>=1; i-- {
+		rob_curr = nums[i] + max(rob_prev_prev, no_rob_prev_prev)
+		no_rob_curr = max(rob_prev, no_rob_prev)
+		no_rob_prev_prev = no_rob_prev
+		rob_prev_prev = rob_prev
+		no_rob_prev = no_rob_curr
+		rob_prev = rob_curr
+	}
+	allow_rob_last := max(rob_curr, no_rob_curr)
+
+	// Try robbing neither
+	return max(allow_rob_first, allow_rob_last)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -8983,7 +9044,36 @@ Link:
 https://leetcode.com/problems/house-robber-iii/description/
 */
 func rob3(root *binary_tree.TreeNode) int {
-	return 0
+	rob := make(map[*binary_tree.TreeNode]int)
+	no_rob := make(map[*binary_tree.TreeNode]int)
+	return topDownRob3(root, rob, no_rob)
+}
+
+/*
+Top-down helper method for the above problem
+*/
+func topDownRob3(root *binary_tree.TreeNode, rob map[*binary_tree.TreeNode]int, no_rob map[*binary_tree.TreeNode]int) int {
+	_, ok := rob[root]
+	if !ok {
+		// Need to solve this problem
+		if root.Left == nil && root.Right == nil {
+			rob[root] = root.Val
+			no_rob[root] = 0
+		} else if root.Left == nil {
+			// Only worry about the right child
+			no_rob[root] = topDownRob3(root.Right, rob, no_rob)
+			rob[root] = root.Val + no_rob[root.Right]
+		} else if root.Right == nil {
+			// Only worry about the left child
+			no_rob[root] = topDownRob3(root.Left, rob, no_rob)
+			rob[root] = root.Val + no_rob[root.Left]
+		} else {
+			// Both children are present
+			no_rob[root] = topDownRob3(root.Left, rob, no_rob) + topDownRob3(root.Right, rob, no_rob)
+			rob[root] = root.Val + no_rob[root.Left] + no_rob[root.Right]
+		}
+	}
+	return max(rob[root], no_rob[root])
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9006,7 +9096,66 @@ Link:
 https://leetcode.com/problems/house-robber-iv/description/
 */
 func minCapability(nums []int, k int) int {
-    return 0
+	if len(nums) == 1 {
+		return nums[0]
+	} else if len(nums) == 2 {
+		return min(nums[0], nums[1])
+	}
+
+	sols := make([]map[int]int, len(nums))
+	for i:=0; i<len(sols); i++ {
+		sols[i] = make(map[int]int)
+	}
+	sols[len(nums)-1][1] = nums[len(nums)-1]
+	sols[len(nums)-2][1] = min(nums[len(nums)-1], nums[len(nums)-2])
+	
+	mins := make([]int, len(nums))
+	mins[len(mins)-1] = nums[len(nums)-1]
+	for i:=len(mins)-2; i>=0; i-- {
+		mins[i] = min(mins[i+1], nums[i])
+	}
+
+    return topDownMinCapability(0, k, nums, sols, mins)
+}
+
+/*
+Top-down helper method to solve the above problem
+*/
+func topDownMinCapability(idx int, num_pick int, nums []int, sols []map[int]int, mins []int) int {
+	_, ok := sols[idx][num_pick]
+	if !ok {
+		// Need to solve this problem
+		// TODO - subproblem logic
+		if num_pick > (len(nums)-idx+1)/2 {
+			// Ensure we do not pick this - it won't be possible
+			sols[idx][num_pick] = 2 * 1000000000
+		} else if num_pick == 1 {
+			// Only one value to pick - we'll take the lowest value of course
+			sols[idx][num_pick] = mins[idx]
+		} else {
+			// Try picking this number, or try not picking this number
+			sols[idx][num_pick] = min(topDownMinCapability(idx+1, num_pick, nums, sols, mins), max(nums[idx], topDownMinCapability(idx+2, num_pick-1, nums, sols, mins)))
+		}
+	}
+	return sols[idx][num_pick]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given two arrays rowSum and colSum of non-negative integers where rowSum[i] is the sum of the elements in the ith row and colSum[j] is the sum of the elements of the jth column of a 2D matrix. 
+In other words, you do not know the elements of the matrix, but you do know the sums of each row and column.
+
+Find any matrix of non-negative integers of size rowSum.length x colSum.length that satisfies the rowSum and colSum requirements.
+
+Return a 2D array representing any matrix that fulfills the requirements. 
+It's guaranteed that at least one matrix that fulfills the requirements exists.
+
+Link:
+https://leetcode.com/problems/find-valid-matrix-given-row-and-column-sums/description/?envType=daily-question&envId=2024-07-20
+*/
+func restoreMatrix(rowSum []int, colSum []int) [][]int {
+    return [][]int{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
