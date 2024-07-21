@@ -9171,3 +9171,28 @@ func restoreMatrix(rowSum []int, colSum []int) [][]int {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/*
+You are given a positive integer k. You are also given:
+- a 2D integer array rowConditions of size n where rowConditions[i] = [abovei, belowi], and
+- a 2D integer array colConditions of size m where colConditions[i] = [lefti, righti].
+- The two arrays contain integers from 1 to k.
+
+You have to build a k x k matrix that contains each of the numbers from 1 to k exactly once. 
+The remaining cells should have the value 0.
+
+The matrix should also satisfy the following conditions:
+- The number above_i should appear in a row that is strictly above the row at which the number below_i appears for all i from 0 to n - 1.
+- The number left_i should appear in a column that is strictly left of the column at which the number right_i appears for all i from 0 to m - 1.
+
+Return any matrix that satisfies the conditions. 
+If no answer exists, return an empty matrix.
+
+Link:
+https://leetcode.com/problems/build-a-matrix-with-conditions/description/?envType=daily-question&envId=2024-07-21
+*/
+func buildMatrix(k int, rowConditions [][]int, colConditions [][]int) [][]int {
+    return [][]int{}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
