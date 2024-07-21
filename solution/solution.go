@@ -9094,50 +9094,61 @@ Return the minimum capability of the robber out of all the possible ways to stea
 
 Link:
 https://leetcode.com/problems/house-robber-iv/description/
+
+Inspiration:
+The LeetCode hints were helpful!
 */
 func minCapability(nums []int, k int) int {
-	if len(nums) == 1 {
-		return nums[0]
-	} else if len(nums) == 2 {
-		return min(nums[0], nums[1])
+	min_value := math.MaxInt
+	max_value := math.MinInt
+	for _, v := range nums {
+		min_value = min(min_value, v)
+		max_value = max(max_value, v)
 	}
 
-	sols := make([]map[int]int, len(nums))
-	for i:=0; i<len(sols); i++ {
-		sols[i] = make(map[int]int)
-	}
-	sols[len(nums)-1][1] = nums[len(nums)-1]
-	sols[len(nums)-2][1] = min(nums[len(nums)-1], nums[len(nums)-2])
-	
-	mins := make([]int, len(nums))
-	mins[len(mins)-1] = nums[len(nums)-1]
-	for i:=len(mins)-2; i>=0; i-- {
-		mins[i] = min(mins[i+1], nums[i])
+	left := min_value
+	right := max_value
+	for left < right {
+		mid := (left + right) / 2 
+		if canAchieveCapability(mid, nums, k) {
+			// Try decreasing the achievable capability
+			right = mid
+		} else {
+			// One must increase the achievable capability
+			left = mid+1
+		}
 	}
 
-    return topDownMinCapability(0, k, nums, sols, mins)
+    return left
 }
 
 /*
-Top-down helper method to solve the above problem
+Helper method to solve the above problem
 */
-func topDownMinCapability(idx int, num_pick int, nums []int, sols []map[int]int, mins []int) int {
-	_, ok := sols[idx][num_pick]
-	if !ok {
-		// Need to solve this problem
-		// TODO - subproblem logic
-		if num_pick > (len(nums)-idx+1)/2 {
-			// Ensure we do not pick this - it won't be possible
-			sols[idx][num_pick] = 2 * 1000000000
-		} else if num_pick == 1 {
-			// Only one value to pick - we'll take the lowest value of course
-			sols[idx][num_pick] = mins[idx]
-		} else {
-			// Try picking this number, or try not picking this number
-			sols[idx][num_pick] = min(topDownMinCapability(idx+1, num_pick, nums, sols, mins), max(nums[idx], topDownMinCapability(idx+2, num_pick-1, nums, sols, mins)))
+func canAchieveCapability(capability int, nums []int, length int) bool {
+	indices := []int{}
+	for i:=0; i<len(nums); i++ {
+		if nums[i] <= capability {
+			indices = append(indices, i)
 		}
 	}
-	return sols[idx][num_pick]
+	if len(indices) < length {
+		return false
+	} else {
+		// We must remove consecutive indices
+		i:=0
+		removed := 0
+		for i<len(indices)-1 {
+			if indices[i] == indices[i+1] - 1 {
+				// We are only answering the question if the given capability CAN be achieved, so remove the second value
+				removed++
+				i += 2
+			} else {
+				i++
+			}
+		}
+		return len(indices) - removed >= length
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
