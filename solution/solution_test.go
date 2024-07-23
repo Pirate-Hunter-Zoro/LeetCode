@@ -3965,66 +3965,43 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
  }
 
- func TestRestoreMatrix(t *testing.T) {
+ func TestMaximalSquare(t *testing.T) {
 	type input struct {
-		rowSum []int
-		colSum []int
+		matrix [][]byte
 	}
 	inputs := []input{
-		{[]int{3,8},[]int{4,7}},
-		{[]int{5,7,10},[]int{8,6,8}},
+		{[][]byte{{'1','0','1','0','0'},{'1','0','1','1','1'},{'1','1','1','1','1'},{'1','0','0','1','0'}}},
+		{[][]byte{{'0','1'},{'1','0'}}},
 	}
 
-	expected_outputs := [][][]int{
-		{
-			{3,8},
-			{4,7},
-		},
-		{
-			{5,7,10},
-			{8,6,8},
-		},
+	expected_outputs := []int{
+		4,
+		1,
 	}
 
-	f := func(i input) [][]int{
-		matrix := restoreMatrix(i.rowSum, i.colSum)
-		rowSums := make([]int, len(i.rowSum))
-		for r:=0; r<len(matrix); r++ {
-			for c:=0; c<len(matrix[r]); c++ {
-				rowSums[r] += matrix[r][c]
-			}
-		}
-		colSums := make([]int, len(i.colSum))
-		for c:=0; c<len(matrix[0]); c++ {
-			for r:=0; r<len(matrix); r++ {
-				colSums[c] += matrix[r][c]
-			}
-		}
-
-		return [][]int{rowSums, colSums}
+	f := func(i input) int {
+		return maximalSquare(i.matrix)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
  }
 
- func TestBuildMatrix(t *testing.T) {
+ func TestDiffWaysToCompute(t *testing.T) {
 	type input struct {
-		k int
-		rowConditions [][]int
-		colConditions [][]int
+		expression string
 	}
 	inputs := []input{
-		{3, [][]int{{1,2},{3,2}}, [][]int{{2,1},{3,2}}},
-		{3, [][]int{{1,2},{2,3},{3,1},{2,3}}, [][]int{{2,1}}},
+		{"2-1-1"},
+		{"2*3-4*5"},
 	}
 
-	expected_outputs := [][][]int{
-		{{3,0,0},{0,0,1},{0,2,0}},
-		{},
+	expected_outputs := [][]int{
+		{0, 2},
+		{-34,-14,-10,-10,10},
 	}
 
-	f := func(i input) [][]int{
-		return buildMatrix(i.k, i.rowConditions, i.colConditions)
+	f := func(i input) []int {
+		return diffWaysToCompute(i.expression)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

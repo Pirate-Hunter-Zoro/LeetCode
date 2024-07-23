@@ -9154,182 +9154,59 @@ func canAchieveCapability(capability int, nums []int, length int) bool {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are given two arrays rowSum and colSum of non-negative integers where rowSum[i] is the sum of the elements in the ith row and colSum[j] is the sum of the elements of the jth column of a 2D matrix. 
-In other words, you do not know the elements of the matrix, but you do know the sums of each row and column.
-
-Find any matrix of non-negative integers of size rowSum.length x colSum.length that satisfies the rowSum and colSum requirements.
-
-Return a 2D array representing any matrix that fulfills the requirements. 
-It's guaranteed that at least one matrix that fulfills the requirements exists.
+Given an m x n binary matrix filled with 0's and 1's, find the largest square containing only 1's and return its area.
 
 Link:
-https://leetcode.com/problems/find-valid-matrix-given-row-and-column-sums/description/?envType=daily-question&envId=2024-07-20
-
-Inspiration:
-The LeetCode hint was helpful!
-And then when that wasn't enough, the LeetCode editorial was very helpful!
+https://leetcode.com/problems/maximal-square/description/
 */
-func restoreMatrix(rowSum []int, colSum []int) [][]int {
-	rowSumsMax := heap.NewCustomMaxHeap[[]int](func(first, second []int) bool {
-		return first[0] > second[0]
-	})
-	rowSumsMin := heap.NewCustomMinHeap[[]int](func(first []int, second []int) bool {
-		return first[0] < second[0]
-	})
-	for idx, v := range rowSum {
-		rowSumsMin.Insert([]int{v, idx})
-		rowSumsMax.Insert([]int{v, idx})
+func maximalSquare(matrix [][]byte) int {
+	sols := make([][]int, len(matrix))
+	one_streaks_along_row_end_here := make([][]int, len(matrix))
+	one_streaks_along_col_end_here := make([][]int, len(matrix))
+	for i:=0; i<len(sols); i++ {
+		sols[i] = make([]int, len(matrix[0]))
+		one_streaks_along_row_end_here[i] = make([]int, len(matrix[0]))
+		one_streaks_along_col_end_here[i] = make([]int, len(matrix[0]))
 	}
-	satisfied_rows := make(map[int]bool)
-
-	colSumsMax := heap.NewCustomMaxHeap[[]int](func(first, second []int) bool {
-		return first[0] > second[0]
-	})
-	colSumsMin := heap.NewCustomMinHeap[[]int](func(first, second []int) bool {
-		return first[0] < second[0]
-	})
-	for idx, v := range colSum {
-		colSumsMin.Insert([]int{v, idx})
-		colSumsMax.Insert([]int{v, idx})
-	}
-	satisfied_cols := make(map[int]bool)
-
-	matrix := make([][]int, len(rowSum))
+	record := 0
 	for i:=0; i<len(matrix); i++ {
-		matrix[i] = make([]int, len(colSum))
-	}
-
-	// Now we satisfy the smallest row/col sum over and over and over again until all rows and all columns are satisfied
-	for len(satisfied_rows) < len(rowSum) || len(satisfied_cols) < len(colSum) {
-		// Empty all heaps until we run into a row/column that is not satisfied
-		_, ok := satisfied_cols[colSumsMax.Peek()[1]]
-		for ok && !colSumsMax.Empty() {
-			colSumsMax.Extract()
-			_, ok = satisfied_cols[colSumsMax.Peek()[1]]
-		}
-		_, ok = satisfied_cols[colSumsMin.Peek()[1]]
-		for ok && !colSumsMin.Empty() {
-			colSumsMin.Extract()
-			_, ok = satisfied_cols[colSumsMin.Peek()[1]]
-		}
-		_, ok = satisfied_cols[rowSumsMax.Peek()[1]]
-		for ok && !rowSumsMax.Empty() {
-			rowSumsMax.Extract()
-			_, ok = satisfied_cols[rowSumsMax.Peek()[1]]
-		}
-		_, ok = satisfied_cols[rowSumsMin.Peek()[1]]
-		for ok && !rowSumsMin.Empty() {
-			rowSumsMin.Extract()
-			_, ok = satisfied_cols[rowSumsMin.Peek()[1]]
-		}
-
-		if !rowSumsMin.Empty() && !colSumsMin.Empty() {
-			if rowSumsMin.Peek()[0] < colSumsMin.Peek()[0] {
-				// Satisfy the next row
-				sum_idx := rowSumsMin.Extract()
-				sum := sum_idx[0]
-				row := sum_idx[1]
-				col := colSumsMax.Peek()[1]
-				matrix[row][col] = sum
-
-				to_modify := colSumsMax.Extract()
-				to_modify[0] -= sum
-				if to_modify[0] == 0 {
-					satisfied_cols[col] = true
-				} else {
-					colSumsMin.Insert(to_modify)
-					colSumsMax.Insert(to_modify)
+		for j:=0; j<len(matrix[i]); j++ {
+			if matrix[i][j] == '1' {
+				one_streaks_along_col_end_here[i][j]++
+				one_streaks_along_row_end_here[i][j]++
+				if i > 0 {
+					one_streaks_along_col_end_here[i][j] += one_streaks_along_col_end_here[i-1][j]
 				}
-
-				// This row sum is achieved - LEAVE IT ALONE
-				satisfied_rows[row] = true
-			} else {
-				// Satisfy the next column
-				sum_idx := colSumsMin.Extract()
-				sum := sum_idx[0]
-				col := sum_idx[1]
-				row := rowSumsMax.Peek()[1]
-				matrix[row][col] = sum
-				
-				to_modify := rowSumsMax.Extract()
-				to_modify[0] -= sum
-				if to_modify[0] == 0 {
-					satisfied_rows[row] = true
-				} else {
-					rowSumsMin.Insert(to_modify)
-					rowSumsMax.Insert(to_modify)
+				if j > 0 {
+					one_streaks_along_row_end_here[i][j] += one_streaks_along_row_end_here[i][j-1]
 				}
-
-				// This col sum is achieved - LEAVE IT ALONE
-				satisfied_cols[col] = true
+				if i > 0 && j > 0 {
+					top_left_square_length := int(math.Sqrt(float64(sols[i-1][j-1])))
+					new_square_length := min(top_left_square_length, min(one_streaks_along_row_end_here[i][j-1], one_streaks_along_col_end_here[i-1][j])) + 1
+					sols[i][j] = new_square_length * new_square_length
+				} else {
+					sols[i][j] = 1
+				}
+				record = max(record, sols[i][j])
 			}
-		} else if !rowSumsMin.Empty() {
-			// Satisfy the next row
-			sum_idx := rowSumsMin.Extract()
-			sum := sum_idx[0]
-			row := sum_idx[1]
-			col := colSumsMax.Peek()[1]
-			matrix[row][col] = sum
-
-			to_modify := colSumsMax.Extract()
-			to_modify[0] -= sum
-			if to_modify[0] == 0 {
-				satisfied_cols[col] = true
-			} else {
-				colSumsMin.Insert(to_modify)
-				colSumsMax.Insert(to_modify)
-			}
-
-			// This row sum is achieved - LEAVE IT ALONE
-			satisfied_rows[row] = true
-		} else {
-			// Satisfy the next column
-			sum_idx := colSumsMin.Extract()
-			sum := sum_idx[0]
-			col := sum_idx[1]
-			row := rowSumsMax.Peek()[1]
-			matrix[row][col] = sum
-			
-			to_modify := rowSumsMax.Extract()
-			to_modify[0] -= sum
-			if to_modify[0] == 0 {
-				satisfied_rows[row] = true
-			} else {
-				rowSumsMin.Insert(to_modify)
-				rowSumsMax.Insert(to_modify)
-			}
-
-			// This col sum is achieved - LEAVE IT ALONE
-			satisfied_cols[col] = true
 		}
 	}
-
-    return matrix
+    return record
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are given a positive integer k. You are also given:
-- a 2D integer array rowConditions of size n where rowConditions[i] = [abovei, belowi], and
-- a 2D integer array colConditions of size m where colConditions[i] = [lefti, righti].
-- The two arrays contain integers from 1 to k.
+Given a string expression of numbers and operators, return all possible results from computing all the different possible ways to group numbers and operators. 
+You may return the answer in any order.
 
-You have to build a k x k matrix that contains each of the numbers from 1 to k exactly once. 
-The remaining cells should have the value 0.
-
-The matrix should also satisfy the following conditions:
-- The number above_i should appear in a row that is strictly above the row at which the number below_i appears for all i from 0 to n - 1.
-- The number left_i should appear in a column that is strictly left of the column at which the number right_i appears for all i from 0 to m - 1.
-
-Return any matrix that satisfies the conditions. 
-If no answer exists, return an empty matrix.
+The test cases are generated such that the output values fit in a 32-bit integer and the number of different results does not exceed 10^4.
 
 Link:
-https://leetcode.com/problems/build-a-matrix-with-conditions/description/?envType=daily-question&envId=2024-07-21
+https://leetcode.com/problems/different-ways-to-add-parentheses/description/
 */
-func buildMatrix(k int, rowConditions [][]int, colConditions [][]int) [][]int {
-    return [][]int{}
+func diffWaysToCompute(expression string) []int {
+	return []int{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
