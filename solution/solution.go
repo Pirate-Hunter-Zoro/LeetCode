@@ -9164,9 +9164,147 @@ It's guaranteed that at least one matrix that fulfills the requirements exists.
 
 Link:
 https://leetcode.com/problems/find-valid-matrix-given-row-and-column-sums/description/?envType=daily-question&envId=2024-07-20
+
+Inspiration:
+The LeetCode hint was helpful!
+And then when that wasn't enough, the LeetCode editorial was very helpful!
 */
 func restoreMatrix(rowSum []int, colSum []int) [][]int {
-    return [][]int{}
+	rowSumsMax := heap.NewCustomMaxHeap[[]int](func(first, second []int) bool {
+		return first[0] > second[0]
+	})
+	rowSumsMin := heap.NewCustomMinHeap[[]int](func(first []int, second []int) bool {
+		return first[0] < second[0]
+	})
+	for idx, v := range rowSum {
+		rowSumsMin.Insert([]int{v, idx})
+		rowSumsMax.Insert([]int{v, idx})
+	}
+	satisfied_rows := make(map[int]bool)
+
+	colSumsMax := heap.NewCustomMaxHeap[[]int](func(first, second []int) bool {
+		return first[0] > second[0]
+	})
+	colSumsMin := heap.NewCustomMinHeap[[]int](func(first, second []int) bool {
+		return first[0] < second[0]
+	})
+	for idx, v := range colSum {
+		colSumsMin.Insert([]int{v, idx})
+		colSumsMax.Insert([]int{v, idx})
+	}
+	satisfied_cols := make(map[int]bool)
+
+	matrix := make([][]int, len(rowSum))
+	for i:=0; i<len(matrix); i++ {
+		matrix[i] = make([]int, len(colSum))
+	}
+
+	// Now we satisfy the smallest row/col sum over and over and over again until all rows and all columns are satisfied
+	for len(satisfied_rows) < len(rowSum) || len(satisfied_cols) < len(colSum) {
+		// Empty all heaps until we run into a row/column that is not satisfied
+		_, ok := satisfied_cols[colSumsMax.Peek()[1]]
+		for ok && !colSumsMax.Empty() {
+			colSumsMax.Extract()
+			_, ok = satisfied_cols[colSumsMax.Peek()[1]]
+		}
+		_, ok = satisfied_cols[colSumsMin.Peek()[1]]
+		for ok && !colSumsMin.Empty() {
+			colSumsMin.Extract()
+			_, ok = satisfied_cols[colSumsMin.Peek()[1]]
+		}
+		_, ok = satisfied_cols[rowSumsMax.Peek()[1]]
+		for ok && !rowSumsMax.Empty() {
+			rowSumsMax.Extract()
+			_, ok = satisfied_cols[rowSumsMax.Peek()[1]]
+		}
+		_, ok = satisfied_cols[rowSumsMin.Peek()[1]]
+		for ok && !rowSumsMin.Empty() {
+			rowSumsMin.Extract()
+			_, ok = satisfied_cols[rowSumsMin.Peek()[1]]
+		}
+
+		if !rowSumsMin.Empty() && !colSumsMin.Empty() {
+			if rowSumsMin.Peek()[0] < colSumsMin.Peek()[0] {
+				// Satisfy the next row
+				sum_idx := rowSumsMin.Extract()
+				sum := sum_idx[0]
+				row := sum_idx[1]
+				col := colSumsMax.Peek()[1]
+				matrix[row][col] = sum
+
+				to_modify := colSumsMax.Extract()
+				to_modify[0] -= sum
+				if to_modify[0] == 0 {
+					satisfied_cols[col] = true
+				} else {
+					colSumsMin.Insert(to_modify)
+					colSumsMax.Insert(to_modify)
+				}
+
+				// This row sum is achieved - LEAVE IT ALONE
+				satisfied_rows[row] = true
+			} else {
+				// Satisfy the next column
+				sum_idx := colSumsMin.Extract()
+				sum := sum_idx[0]
+				col := sum_idx[1]
+				row := rowSumsMax.Peek()[1]
+				matrix[row][col] = sum
+				
+				to_modify := rowSumsMax.Extract()
+				to_modify[0] -= sum
+				if to_modify[0] == 0 {
+					satisfied_rows[row] = true
+				} else {
+					rowSumsMin.Insert(to_modify)
+					rowSumsMax.Insert(to_modify)
+				}
+
+				// This col sum is achieved - LEAVE IT ALONE
+				satisfied_cols[col] = true
+			}
+		} else if !rowSumsMin.Empty() {
+			// Satisfy the next row
+			sum_idx := rowSumsMin.Extract()
+			sum := sum_idx[0]
+			row := sum_idx[1]
+			col := colSumsMax.Peek()[1]
+			matrix[row][col] = sum
+
+			to_modify := colSumsMax.Extract()
+			to_modify[0] -= sum
+			if to_modify[0] == 0 {
+				satisfied_cols[col] = true
+			} else {
+				colSumsMin.Insert(to_modify)
+				colSumsMax.Insert(to_modify)
+			}
+
+			// This row sum is achieved - LEAVE IT ALONE
+			satisfied_rows[row] = true
+		} else {
+			// Satisfy the next column
+			sum_idx := colSumsMin.Extract()
+			sum := sum_idx[0]
+			col := sum_idx[1]
+			row := rowSumsMax.Peek()[1]
+			matrix[row][col] = sum
+			
+			to_modify := rowSumsMax.Extract()
+			to_modify[0] -= sum
+			if to_modify[0] == 0 {
+				satisfied_rows[row] = true
+			} else {
+				rowSumsMin.Insert(to_modify)
+				rowSumsMax.Insert(to_modify)
+			}
+
+			// This col sum is achieved - LEAVE IT ALONE
+			satisfied_cols[col] = true
+		}
+	}
+
+    return matrix
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

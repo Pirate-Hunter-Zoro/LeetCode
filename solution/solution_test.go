@@ -3977,18 +3977,31 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	expected_outputs := [][][]int{
 		{
-			{3,0},
-			{1,7},
+			{3,8},
+			{4,7},
 		},
 		{
-			{0,5,0},
-			{6,1,0},
-			{2,0,8},
+			{5,7,10},
+			{8,6,8},
 		},
 	}
 
 	f := func(i input) [][]int{
-		return restoreMatrix(i.rowSum, i.colSum)
+		matrix := restoreMatrix(i.rowSum, i.colSum)
+		rowSums := make([]int, len(i.rowSum))
+		for r:=0; r<len(matrix); r++ {
+			for c:=0; c<len(matrix[r]); c++ {
+				rowSums[r] += matrix[r][c]
+			}
+		}
+		colSums := make([]int, len(i.colSum))
+		for c:=0; c<len(matrix[0]); c++ {
+			for r:=0; r<len(matrix); r++ {
+				colSums[c] += matrix[r][c]
+			}
+		}
+
+		return [][]int{rowSums, colSums}
 	}
 
 	testResults(t, f, inputs, expected_outputs)
