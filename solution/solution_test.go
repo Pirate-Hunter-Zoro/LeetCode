@@ -4001,7 +4001,120 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	}
 
 	f := func(i input) []int {
-		return diffWaysToCompute(i.expression)
+		nums := diffWaysToCompute(i.expression)
+		sort.SliceStable(nums, func(i, j int) bool {
+			return nums[i] < nums[j]
+		})
+		return nums
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestIsAnagram(t *testing.T) {
+	type input struct {
+		s string
+		t string
+	}
+	inputs := []input{
+		{"anagram", "nagaram"},
+		{"rat", "car"},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+	}
+
+	f := func(i input) bool {
+		return isAnagram(i.s, i.t)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestLengthOfLIS(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{10,9,2,5,3,7,101,18}},
+		{[]int{0,1,0,3,2,3}},
+		{[]int{7,7,7,7,7,7,7}},
+	}
+
+	expected_outputs := []int{
+		4,
+		4,
+		1,
+	}
+
+	f := func(i input) int {
+		return lengthOfLIS(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestNthUglyNumber(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{10},
+		{1},
+	}
+
+	expected_outputs := []int{
+		12,
+		1,
+	}
+
+	f := func(i input) int {
+		return nthUglyNumber(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestNumSquares(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{12},
+		{3},
+	}
+
+	expected_outputs := []int{
+		3,
+		12,
+	}
+
+	f := func(i input) int {
+		return numSquares(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestSortJumbled(t *testing.T) {
+	type input struct {
+		mapping []int
+		nums []int
+	}
+	inputs := []input{
+		{[]int{8,9,4,0,2,1,3,5,7,6}, []int{991,338,38}},
+		{[]int{0,1,2,3,4,5,6,7,8,9}, []int{789,456,123}},
+	}
+
+	expected_outputs := [][]int{
+		{338,38,991},
+		{123,456,789},
+	}
+
+	f := func(i input) []int{
+		return sortJumbled(i.mapping, i.nums)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

@@ -9206,7 +9206,178 @@ Link:
 https://leetcode.com/problems/different-ways-to-add-parentheses/description/
 */
 func diffWaysToCompute(expression string) []int {
-	return []int{}
+	// Create a map of solutions, which stores all possible ways of computing expression[start][end]
+	sols := make(map[int]map[int][]int)
+
+	// Create a list of numbers and operations - note that the operation between nums[i] and nums[i+1] is operations[i]
+	nums := []int{}
+	operations := []byte{}
+	i := 0
+	for i < len(expression) {
+		var number_buffer bytes.Buffer
+		for i < len(expression) && expression[i] != '+' && expression[i] != '-' && expression[i] != '*' {
+			number_buffer.WriteByte(expression[i])
+			i++
+		}
+		num := number_buffer.String()
+		if len(num) > 0 {
+			sols[len(nums)] = make(map[int][]int)
+			number, _ := strconv.Atoi(num)
+			nums = append(nums, number)
+		} else {
+			operations = append(operations, expression[i])
+			i++
+		}
+	}
+
+	return topDownDiffWaysToCompute(0, len(nums)-1, nums, operations, sols)
+}
+
+/*
+Top-down helper method to solve the above problem
+*/
+func topDownDiffWaysToCompute(startNumIdx int, endNumIdx int, nums []int, operations []byte, sols map[int]map[int][]int) []int {
+	_, ok := sols[startNumIdx][endNumIdx]
+	if !ok {
+		// Need to solve this problem
+		if startNumIdx == endNumIdx {
+			sols[startNumIdx][endNumIdx] = []int{nums[startNumIdx]}
+		} else if startNumIdx == endNumIdx - 1 {
+			if operations[startNumIdx] == '-' {
+				sols[startNumIdx][endNumIdx] = []int{nums[startNumIdx] - nums[endNumIdx]}
+			} else if operations[startNumIdx] == '+' {
+				sols[startNumIdx][endNumIdx] = []int{nums[startNumIdx] + nums[endNumIdx]}
+			} else {
+				sols[startNumIdx][endNumIdx] = []int{nums[startNumIdx] * nums[endNumIdx]}
+			}
+		} else {
+			// Pick some operation to do last
+			results := []int{}
+			for operation_idx := startNumIdx; operation_idx < endNumIdx; operation_idx++ {
+				left_results := topDownDiffWaysToCompute(startNumIdx, operation_idx, nums, operations, sols)
+				right_results := topDownDiffWaysToCompute(operation_idx+1, endNumIdx, nums, operations, sols)
+				for _, left_value := range left_results {
+					for _, right_value := range right_results {
+						if operations[operation_idx] == '-' {
+							results = append(results, left_value - right_value)
+						} else if operations[operation_idx] == '+' {
+							results = append(results, left_value + right_value)
+						} else {
+							results = append(results, left_value * right_value)
+						}
+					}
+				}
+			}
+			sols[startNumIdx][endNumIdx] = results
+		}
+	}
+	return sols[startNumIdx][endNumIdx]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given two strings s and t, return true if t is an anagram of s, and false otherwise.
+
+An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+
+Link:
+https://leetcode.com/problems/valid-anagram/description/
+*/
+func isAnagram(s string, t string) bool {
+	// Simply turn both strings into a hash set of characters
+    if len(s) != len(t) {
+		return false
+	} else {
+		s_map := make(map[byte]int)
+		t_map := make(map[byte]int)
+		for i:=0; i<len(s); i++ {
+			_, ok := s_map[s[i]]
+			if !ok {
+				s_map[s[i]] = 1
+			} else {
+				s_map[s[i]]++
+			}
+			_, ok = t_map[t[i]]
+			if !ok {
+				t_map[t[i]] = 1
+			} else {
+				t_map[t[i]]++
+			}
+		}
+		for c, s_count := range s_map {
+			t_count, ok := t_map[c]
+			if (!ok) || (t_count != s_count) {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer array nums, return the length of the longest strictly increasing 
+subsequence.
+
+Link:
+https://leetcode.com/problems/longest-increasing-subsequence/description/
+(See the algorithm package for my source...)
+*/
+func lengthOfLIS(nums []int) int {
+    return algorithm.LongestIncreasingSubsequence(nums)
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+An ugly number is a positive integer whose prime factors are limited to 2, 3, and 5.
+
+Given an integer n, return the nth ugly number.
+
+Link:
+https://leetcode.com/problems/ugly-number-ii/description/
+*/
+func nthUglyNumber(n int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer n, return the least number of perfect square numbers that sum to n.
+
+A perfect square is an integer that is the square of an integer; in other words, it is the product of some integer with itself. 
+For example, 1, 4, 9, and 16 are perfect squares while 3 and 11 are not.
+
+Link:
+https://leetcode.com/problems/perfect-squares/description/
+*/
+func numSquares(n int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given a 0-indexed integer array mapping which represents the mapping rule of a shuffled decimal system. 
+mapping[i] = j means digit i should be mapped to digit j in this system.
+
+The mapped value of an integer is the new integer obtained by replacing each occurrence of digit i in the integer with mapping[i] for all 0 <= i <= 9.
+
+You are also given another integer array nums. 
+Return the array nums sorted in non-decreasing order based on the mapped values of its elements.
+
+Notes:
+- Elements with the same mapped values should appear in the same relative order as in the input.
+- The elements of nums should only be sorted based on their mapped values and not be replaced by them.
+
+Link:
+https://leetcode.com/problems/sort-the-jumbled-numbers/description/?envType=daily-question&envId=2024-07-24
+*/
+func sortJumbled(mapping []int, nums []int) []int {
+    return []int{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
