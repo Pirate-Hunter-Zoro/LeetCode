@@ -9340,7 +9340,61 @@ Link:
 https://leetcode.com/problems/ugly-number-ii/description/
 */
 func nthUglyNumber(n int) int {
-    return 0
+	two_heap := heap.NewMinHeap[int]()
+	two_heap.Insert(2)
+	three_heap := heap.NewMinHeap[int]()
+	three_heap.Insert(3)
+	five_heap := heap.NewMinHeap[int]()
+	five_heap.Insert(5)
+
+	// Note that 1 is not divisible by any prime numbers which are not 2, 3, or 5.
+	// So 1 is an ugly number!
+	val := 1
+	seen := make(map[int]bool)
+	for i:=1; i<n; i++ {
+		// Pick the lowest top value from each heap
+		from_two := two_heap.Peek()
+		from_three := three_heap.Peek()
+		from_five := five_heap.Peek()
+		if from_two < from_three && from_two < from_five {
+			val = two_heap.Extract()
+			_, ok := seen[val * 2]
+			if !ok {
+				seen[val * 2] = true
+				two_heap.Insert(val * 2)
+			}
+			_, ok = seen[val * 3]
+			if !ok {
+				seen[val * 3] = true
+				two_heap.Insert(val * 3)
+			}
+			_, ok = seen[val * 5]
+			if !ok {
+				seen[val * 5] = true
+				two_heap.Insert(val * 5)
+			}
+		} else if from_three < from_two && from_three < from_five {
+			val = three_heap.Extract()
+			_, ok := seen[val * 3]
+			if !ok {
+				seen[val * 3] = true
+				three_heap.Insert(val * 3)
+			}
+			_, ok = seen[val * 5]
+			if !ok {
+				seen[val * 5] = true
+				three_heap.Insert(val * 5)
+			}
+		} else {
+			val = five_heap.Extract()
+			_, ok := seen[val * 5]
+			if !ok {
+				seen[val * 5] = true
+				five_heap.Insert(val * 5)
+			}
+		}
+	}
+    return val
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9355,7 +9409,23 @@ Link:
 https://leetcode.com/problems/perfect-squares/description/
 */
 func numSquares(n int) int {
-    return 0
+	sols := make([]int, n+1)
+	for i:=0; i<len(sols); i++ {
+		sols[i] = math.MaxInt
+	}
+	sols[0] = 0
+	if n > 0 {
+		sols[1] = 1
+	}
+	for i:=2; i<=n; i++ {
+		num := 1
+		for num * num <= i {
+			sols[i] = min(sols[i], 1 + sols[i - num*num])
+			num++
+		}
+	}
+
+    return sols[n]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9377,7 +9447,80 @@ Link:
 https://leetcode.com/problems/sort-the-jumbled-numbers/description/?envType=daily-question&envId=2024-07-24
 */
 func sortJumbled(mapping []int, nums []int) []int {
-    return []int{}
+	nums_map := make(map[int]int)
+
+	// Perform the conversion
+	for _, v := range nums {
+		str_v := strconv.Itoa(v)
+		digits := make([]int, len(str_v))
+		for i:=0; i<len(str_v); i++ {
+			// ASCII offset fix
+			digits[i] = int(str_v[i] - byte(48))
+		}
+		var buffer bytes.Buffer
+		for _, v := range digits {
+			buffer.WriteString(strconv.Itoa(mapping[v]))
+		}
+		value, _ := strconv.Atoi(buffer.String())
+		nums_map[v] = value
+	}
+
+	sort.SliceStable(nums, func(i, j int) bool {
+		if nums_map[nums[i]] != nums_map[nums[j]] {
+			return nums_map[nums[i]] < nums_map[nums[j]]
+		} else {
+			return i < j
+		}
+	})
+    return nums
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an array of integers nums, sort the array in ascending order and return it.
+
+You must solve the problem without using any built-in functions in O(nlog(n)) time complexity and with the smallest space complexity possible.
+
+Link:
+https://leetcode.com/problems/sort-an-array/description/?envType=daily-question&envId=2024-07-25
+*/
+func sortArray(nums []int) []int {
+    return nums
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given n balloons, indexed from 0 to n - 1. 
+Each balloon is painted with a number on it represented by an array nums. 
+You are asked to burst all the balloons.
+
+If you burst the ith balloon, you will get nums[i - 1] * nums[i] * nums[i + 1] coins. 
+If i - 1 or i + 1 goes out of bounds of the array, then treat it as if there is a balloon with a 1 painted on it.
+
+Return the maximum coins you can collect by bursting the balloons wisely.
+
+Link:
+https://leetcode.com/problems/burst-balloons/description/
+*/
+func maxCoins(nums []int) int {
+    return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an m x n integers matrix, return the length of the longest increasing path in matrix.
+
+From each cell, you can either move in four directions: left, right, up, or down. 
+You may not move diagonally or move outside the boundary (i.e., wrap-around is not allowed).
+
+Link:
+https://leetcode.com/problems/longest-increasing-path-in-a-matrix/description/
+*/
+func longestIncreasingPath(matrix [][]int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -4063,11 +4063,13 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	inputs := []input{
 		{10},
 		{1},
+		{11},
 	}
 
 	expected_outputs := []int{
 		12,
 		1,
+		15,
 	}
 
 	f := func(i input) int {
@@ -4088,7 +4090,7 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	expected_outputs := []int{
 		3,
-		12,
+		3,
 	}
 
 	f := func(i input) int {
@@ -4115,6 +4117,77 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	f := func(i input) []int{
 		return sortJumbled(i.mapping, i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestSortArray(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{5,2,3,1}},
+		{[]int{5,1,1,2,0,0}},
+	}
+
+	expected_outputs := [][]int{
+		{1,2,3,5},
+		{0,0,1,1,2,5},
+	}
+
+	f := func(i input) []int {
+		return sortArray(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestMaxCoins(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{3,1,5,8}},
+		{[]int{1,5}},
+	}
+
+	expected_outputs := []int{
+		167,
+		10,
+	}
+
+	f := func(i input) int {
+		return maxCoins(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestLongestIncreasingPath(t *testing.T) {
+	type input struct {
+		matrix [][]int
+	}
+	inputs := []input{
+		{[][]int{
+			{9,9,4},
+			{6,6,8},
+			{2,1,1},
+		}},
+		{[][]int{
+			{3,4,5},
+			{3,2,6},
+			{2,2,1},
+		}},
+	}
+
+	expected_outputs := []int{
+		4,
+		4,
+	}
+
+	f := func(i input) int {
+		return longestIncreasingPath(i.matrix)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
