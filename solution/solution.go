@@ -9505,7 +9505,46 @@ Link:
 https://leetcode.com/problems/burst-balloons/description/
 */
 func maxCoins(nums []int) int {
-    return 0
+	sols := make([][]map[int]map[int]int, len(nums))
+	for i:=0; i<len(nums); i++ {
+		sols[i] = make([]map[int]map[int]int, len(nums))
+		for j:=i; j<len(nums); j++ {
+			sols[i][j] = make(map[int]map[int]int)
+		}
+	}
+    return topDownMaxCoins(1, 0, len(nums)-1, 1, nums, sols)
+}
+
+/*
+Top-down helper method to solve the above burst balloons problem
+*/
+func topDownMaxCoins(left int, left_idx int, right_idx int, right int, nums []int, sols [][]map[int]map[int]int) int {
+	_, ok := sols[left_idx][right_idx][left]
+	if ok {
+		_, ok = sols[left_idx][right_idx][left][right]
+		if ok {
+			return sols[left_idx][right_idx][left][right]
+		}
+	} else {
+		sols[left_idx][right_idx][left] = make(map[int]int)
+	}
+	// Now we need to solve the problem, because we have not already
+	if left_idx == right_idx {
+		sols[left_idx][right_idx][left][right] = left * nums[left_idx] * right
+	} else {
+		// Pick the last balloon to pop
+		// Pop left_idx last
+		record := left * nums[left_idx] * right + topDownMaxCoins(nums[left_idx], left_idx+1, right_idx, right, nums, sols)
+		// Pop right_idx last
+		record = max(record, left * nums[right_idx] * right + topDownMaxCoins(left, left_idx, right_idx-1, nums[right_idx], nums, sols))
+		// Try popping every balloon in between last
+		for last := left_idx+1; last < right_idx; last++ {
+			record = max(record, left * nums[last] * right + topDownMaxCoins(left, left_idx, last-1, nums[last], nums, sols) + topDownMaxCoins(nums[last], last+1, right_idx, right, nums, sols))
+		}
+		sols[left_idx][right_idx][left][right] = record
+	}
+
+	return sols[left_idx][right_idx][left][right]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9520,6 +9559,78 @@ Link:
 https://leetcode.com/problems/longest-increasing-path-in-a-matrix/description/
 */
 func longestIncreasingPath(matrix [][]int) int {
+	cells := [][]int{}
+	for r:=0; r<len(matrix); r++ {
+		for c:=0; c<len(matrix[r]); c++ {
+			cells = append(cells, []int{matrix[r][c], r, c})
+		}
+	}
+	sort.SliceStable(cells, func(i, j int) bool {
+		return cells[i][0] < cells[j][0]
+	})
+
+	path_lengths := make([][]int, len(matrix))
+	for r:=0; r<len(matrix); r++ {
+		path_lengths[r] = make([]int, len(matrix[r]))
+		for c:=0; c<len(matrix[r]); c++ {
+			path_lengths[r][c] = 1
+		}
+	}
+
+	record := 1
+	for _, cell := range cells {
+		v := cell[0]
+		r := cell[1]
+		c := cell[2]
+		if r > 0 {
+			// Look up
+			v_neighbor := matrix[r-1][c]
+			if v_neighbor < v {
+				path_lengths[r][c] = max(path_lengths[r][c], path_lengths[r-1][c] + 1)
+			}
+		}
+		if c > 0 {
+			// Look left
+			v_neighbor := matrix[r][c-1]
+			if v_neighbor < v {
+				path_lengths[r][c] = max(path_lengths[r][c], path_lengths[r][c-1] + 1)
+			}
+		}
+		if r < len(matrix)-1 {
+			// Look down
+			v_neighbor := matrix[r+1][c]
+			if v_neighbor < v {
+				path_lengths[r][c] = max(path_lengths[r][c], path_lengths[r+1][c] + 1)
+			}
+		}
+		if c < len(matrix[r])-1 {
+			// Look right
+			v_neighbor := matrix[r][c+1]
+			if v_neighbor < v {
+				path_lengths[r][c] = max(path_lengths[r][c], path_lengths[r][c+1] + 1)
+			}
+		}
+		record = max(record, path_lengths[r][c])
+	}
+
+    return record
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There are n cities numbered from 0 to n-1. 
+Given the array edges where edges[i] = [from_i, to_i, weight_i] represents a bidirectional and weighted edge between cities from_i and to_i, and given the integer distanceThreshold.
+
+Return the city with the smallest number of cities that are reachable through some path and whose distance is at most distanceThreshold.
+If there are multiple such cities, return the city with the greatest number.
+
+Notice that the distance of a path connecting cities i and j is equal to the sum of the edges' weights along that path.
+
+Link:
+https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/description/?envType=daily-question&envId=2024-07-26
+*/
+func findTheCity(n int, edges [][]int, distanceThreshold int) int {
     return 0
 }
 

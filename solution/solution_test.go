@@ -4192,3 +4192,40 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestFindTheCity(t *testing.T) {
+	type input struct {
+		n int
+		edges [][]int
+		distanceThreshold int
+	}
+	inputs := []input{
+		{4, [][]int{
+			{0,1,3},
+			{1,2,1},
+			{1,3,4},
+			{2,3,1},
+			},
+		4,},
+		{5, [][]int{
+			{0,1,2},
+			{0,4,8},
+			{1,2,3},
+			{1,4,2},
+			{2,3,1},
+			{3,4,1},
+			},
+		2,},
+	}
+
+	expected_outputs := []int{
+		3,
+		0,
+	}
+
+	f := func(i input) int {
+		return findTheCity(i.n, i.edges, i.distanceThreshold)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
