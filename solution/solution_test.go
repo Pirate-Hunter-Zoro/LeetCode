@@ -4229,3 +4229,30 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestMinimumCost(t *testing.T) {
+	type input struct {
+		source string
+		target string
+		original []byte
+		changed []byte
+		cost []int
+	}
+	inputs := []input{
+		{"abcd", "acbe", []byte{'a','b','c','c','e','d'}, []byte{'b','c','b','e','b','e'}, []int{2,5,5,1,2,20}},
+		{"aaaa", "bbbb", []byte{'a','c'}, []byte{'c','b'}, []int{1,2}},
+		{"abcd", "abce", []byte{'a'}, []byte{'e'}, []int{10000}},
+	}
+
+	expected_outputs := []int64{
+		int64(28),
+		int64(12),
+		int64(-1),
+	}
+
+	f := func(i input) int64 {
+		return minimumCost(i.source, i.target, i.original, i.changed, i.cost)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

@@ -9631,7 +9631,83 @@ Link:
 https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/description/?envType=daily-question&envId=2024-07-26
 */
 func findTheCity(n int, edges [][]int, distanceThreshold int) int {
+	counts := make([]int, n)
+	record := math.MaxInt
+
+	neighbors := make([][][]int, n)
+	for i:=0; i<n; i++ {
+		neighbors[i] = [][]int{}
+	}
+	for _, edge := range edges {
+		from := edge[0]
+		to := edge[1]
+		weight := edge[2]
+		neighbors[from] = append(neighbors[from], []int{to, weight})
+		neighbors[to] = append(neighbors[to], []int{from, weight})
+	}
+
+	// Perform breadth-first search from all nodes
+	for source:=0; source<n; source++ {
+		determined := make([]bool, n)
+		distances := make([]int, n)
+		node_heap := heap.NewCustomMinHeap(func(first []int, second []int) bool {
+			return first[1] < second[1] 
+		})
+		node_heap.Insert([]int{source, 0})
+		for !node_heap.Empty() {
+			next_edge := node_heap.Extract()
+			to := next_edge[0]
+			if determined[to] {
+				continue
+			}
+			cost_to_reach := next_edge[1]
+			determined[to] = true
+			distances[to] = cost_to_reach
+			for _, connection := range neighbors[to] {
+				next := connection[0]
+				weight := connection[1]
+				node_heap.Insert([]int{next, distances[to] + weight})
+			}
+		}
+
+		count_within_threshold := 0
+		for _, distance := range distances {
+			if distance <= distanceThreshold {
+				count_within_threshold++
+			}
+		}
+		record = min(record, count_within_threshold)
+		counts[source] = count_within_threshold
+	}
+
+	for i:=n-1; i>=0; i-- {
+		if counts[i] == record {
+			return i
+		}
+	}
     return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given two 0-indexed strings source and target, both of length n and consisting of lowercase English letters. 
+You are also given two 0-indexed character arrays original and changed, and an integer array cost, where cost[i] represents the cost of changing the character original[i] to the character changed[i].
+
+You start with the string source. 
+In one operation, you can pick a character x from the string and change it to the character y at a cost of z if there exists any index j such that cost[j] == z, original[j] == x, and changed[j] == y.
+
+Return the minimum cost to convert the string source to the string target using any number of operations. 
+If it is impossible to convert source to target, return -1.
+
+Note that there may exist indices i, j such that original[j] == original[i] and changed[j] == changed[i].
+
+Link:
+https://leetcode.com/problems/minimum-cost-to-convert-string-i/description/?envType=daily-question&envId=2024-07-27
+*/
+func minimumCost(source string, target string, original []byte, changed []byte, cost []int) int64 {
+	// NOTE - original, changed, and cost define our (NON-BIDIRECTIONAL) graph to perform Djikstra's shortest path algorithm on
+    return int64(0)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
