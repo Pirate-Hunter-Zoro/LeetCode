@@ -9704,10 +9704,100 @@ Note that there may exist indices i, j such that original[j] == original[i] and 
 
 Link:
 https://leetcode.com/problems/minimum-cost-to-convert-string-i/description/?envType=daily-question&envId=2024-07-27
+
+Inspiration:
+The hints were helpful!
+https://www.geeksforgeeks.org/floyd-warshall-algorithm-dp-16/#
 */
 func minimumCost(source string, target string, original []byte, changed []byte, cost []int) int64 {
 	// NOTE - original, changed, and cost define our (NON-BIDIRECTIONAL) graph to perform Djikstra's shortest path algorithm on
-    return int64(0)
+	connections := make(map[byte]map[byte]int64)
+	// We need to shortest path from each character in source to each character in target
+	shortest_paths := make(map[byte]map[byte]int64)
+	chars := []byte{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
+	for _, c := range chars {
+		shortest_paths[c] = make(map[byte]int64)
+		shortest_paths[c][c] = 0
+	}
+	for idx, b1 := range original {
+		b2 := changed[idx]
+		b1_neighbors, ok := connections[b1] 
+		if !ok {
+			connections[b1] = make(map[byte]int64)
+			b1_neighbors = connections[b1]
+		}
+		b1_neighbors[b2] = int64(cost[idx])
+		shortest_paths[b1][b2] = b1_neighbors[b2]
+	}
+
+	// Now we build up dynamically to solve all shortest paths
+	for _, intermediary := range chars {
+		for _, c1 := range chars {
+			if intermediary != c1 {
+				for _, c2 := range chars {
+					if intermediary != c2 && c1 != c2 {
+						// Can c1 reach intermediary and THEN intermediary reach c2?
+						record := int64(math.MaxInt)
+						direct, ok := shortest_paths[c1][c2]
+						if ok {
+							record = direct
+						}
+						c1_intermediary, ok := shortest_paths[c1][intermediary]
+						if ok {
+							intermediary_c2, ok := shortest_paths[intermediary][c2]
+							if ok {
+								record = min(record, c1_intermediary + intermediary_c2)
+							}
+						}
+						if record != int64(math.MaxInt) {
+							shortest_paths[c1][c2] = record
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	total_cost := int64(0)
+	for i:=0; i<len(source); i++ {
+		cost, ok := shortest_paths[source[i]][target[i]]
+		if !ok {
+			return -1
+		} else {
+			total_cost += cost
+		}
+	}
+
+	return int64(total_cost)
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+A city is represented as a bi-directional connected graph with n vertices where each vertex is labeled from 1 to n (inclusive). 
+The edges in the graph are represented as a 2D integer array edges, where each edges[i] = [ui, vi] denotes a bi-directional edge between vertex ui and vertex vi. 
+Every vertex pair is connected by at most one edge, and no vertex has an edge to itself. 
+The time taken to traverse any edge is time minutes.
+
+Each vertex has a traffic signal which changes its color from green to red and vice versa every change minutes. 
+All signals change at the same time. 
+You can enter a vertex at any time, but can leave a vertex only when the signal is green. 
+You cannot wait at a vertex if the signal is green.
+
+The second minimum value is defined as the smallest value strictly larger than the minimum value.
+
+For example the second minimum value of [2, 3, 4] is 3, and the second minimum value of [2, 2, 4] is 4.
+Given n, edges, time, and change, return the second minimum time it will take to go from vertex 1 to vertex n.
+
+Notes:
+- You can go through any vertex any number of times, including 1 and n.
+- You can assume that when the journey starts, all signals have just turned green.
+
+Link:
+https://leetcode.com/problems/second-minimum-time-to-reach-destination/?envType=daily-question&envId=2024-07-28
+*/
+func secondMinimum(n int, edges [][]int, time int, change int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -4242,16 +4242,42 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 		{"abcd", "acbe", []byte{'a','b','c','c','e','d'}, []byte{'b','c','b','e','b','e'}, []int{2,5,5,1,2,20}},
 		{"aaaa", "bbbb", []byte{'a','c'}, []byte{'c','b'}, []int{1,2}},
 		{"abcd", "abce", []byte{'a'}, []byte{'e'}, []int{10000}},
+		{"abadcdadac", "baddbccdac", []byte{'d','c','d','c','b','a'}, []byte{'b','b','c','a','d','d'}, []int{8,5,9,1,10,2}},
 	}
 
 	expected_outputs := []int64{
 		int64(28),
 		int64(12),
 		int64(-1),
+		int64(57),
 	}
 
 	f := func(i input) int64 {
 		return minimumCost(i.source, i.target, i.original, i.changed, i.cost)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestSecondMinimum(t *testing.T) {
+	type input struct {
+		n int
+		edges [][]int
+		time int
+		change int
+	}
+	inputs := []input{
+		{5, [][]int{{1,2},{1,3},{1,4},{3,4},{4,5}}, 3, 5},
+		{2, [][]int{{1,2}}, 3, 2},
+	}
+
+	expected_outputs := []int{
+		13,
+		11,
+	}
+
+	f := func(i input) int {
+		return secondMinimum(i.n, i.edges, i.time, i.change)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
