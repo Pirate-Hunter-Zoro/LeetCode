@@ -9708,78 +9708,67 @@ https://leetcode.com/problems/minimum-cost-to-convert-string-i/description/?envT
 Inspiration:
 The hints were helpful!
 https://www.geeksforgeeks.org/floyd-warshall-algorithm-dp-16/#
+
+PLEA FOR HELP:
+This solution does not work when you submit it on LeetCode, and quite frankly I do not know why.
+I see no difference between this code and the code that is shown in the LeetCode editorial.
+If anyone can find my error, I'd love it if you could let me know!
 */
 func minimumCost(source string, target string, original []byte, changed []byte, cost []int) int64 {
-	// NOTE - original, changed, and cost define our (NON-BIDIRECTIONAL) graph to perform Djikstra's shortest path algorithm on
-	connections := make(map[byte]map[byte]int64)
 	// We need to shortest path from each character in source to each character in target
-	shortest_paths := make(map[byte]map[byte]int64)
-	chars := []byte{'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'}
-	for _, c := range chars {
-		shortest_paths[c] = make(map[byte]int64)
-		shortest_paths[c][c] = 0
+	shortest_paths := make([][]int64, 26)
+	for i:=0; i<26; i++ {
+		shortest_paths[i] = make([]int64, 26)
+        for j:=0; j<26; j++ {
+            if i == j {
+                shortest_paths[i][j] = int64(0)
+            } else {
+                shortest_paths[i][j] = int64(math.MaxInt32)
+            }
+        }
 	}
+	
 	for idx, b1 := range original {
-		b2 := changed[idx]
-		b1_neighbors, ok := connections[b1] 
-		if !ok {
-			connections[b1] = make(map[byte]int64)
-			b1_neighbors = connections[b1]
-		}
-		b1_neighbors[b2] = int64(cost[idx])
-		shortest_paths[b1][b2] = b1_neighbors[b2]
+		c1 := b1 - 'a'
+		c2 := changed[idx] - 'a'
+		edge_weight := cost[idx]
+		shortest_paths[c1][c2] = int64(edge_weight)
 	}
 
 	// Now we build up dynamically to solve all shortest paths
-	for _, intermediary := range chars {
-		for _, c1 := range chars {
-			if intermediary != c1 {
-				for _, c2 := range chars {
-					if intermediary != c2 && c1 != c2 {
-						// Can c1 reach intermediary and THEN intermediary reach c2?
-						record := int64(math.MaxInt)
-						direct, ok := shortest_paths[c1][c2]
-						if ok {
-							record = direct
-						}
-						c1_intermediary, ok := shortest_paths[c1][intermediary]
-						if ok {
-							intermediary_c2, ok := shortest_paths[intermediary][c2]
-							if ok {
-								record = min(record, c1_intermediary + intermediary_c2)
-							}
-						}
-						if record != int64(math.MaxInt) {
-							shortest_paths[c1][c2] = record
-						}
-					}
-				}
+	for j:=0; j<26; j++ {
+		for i:=0; i<26; i++ {
+			for k:=0; k<26; k++ {
+				shortest_paths[i][k] = min(shortest_paths[i][k],
+									shortest_paths[i][j] + shortest_paths[j][k])
 			}
 		}
 	}
 	
 	total_cost := int64(0)
 	for i:=0; i<len(source); i++ {
-		cost, ok := shortest_paths[source[i]][target[i]]
-		if !ok {
+		idx1 := source[i] - 'a'
+		idx2 := target[i] - 'a'
+		path_length := shortest_paths[idx1][idx2]
+		if path_length >= int64(math.MaxInt32/2) { // Not reachable
 			return -1
 		} else {
-			total_cost += cost
+			total_cost += path_length
 		}
 	}
 
-	return int64(total_cost)
+	return total_cost
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
 A city is represented as a bi-directional connected graph with n vertices where each vertex is labeled from 1 to n (inclusive). 
-The edges in the graph are represented as a 2D integer array edges, where each edges[i] = [ui, vi] denotes a bi-directional edge between vertex ui and vertex vi. 
+The edges in the graph are represented as a 2D integer array edges, where each edges[i] = [u_i, v_i] denotes a bi-directional edge between vertex u_i and vertex v_i. 
 Every vertex pair is connected by at most one edge, and no vertex has an edge to itself. 
-The time taken to traverse any edge is time minutes.
+The time taken to traverse any edge is 'time' minutes.
 
-Each vertex has a traffic signal which changes its color from green to red and vice versa every change minutes. 
+Each vertex has a traffic signal which changes its color from green to red and vice versa every 'change' minutes. 
 All signals change at the same time. 
 You can enter a vertex at any time, but can leave a vertex only when the signal is green. 
 You cannot wait at a vertex if the signal is green.
@@ -9797,6 +9786,35 @@ Link:
 https://leetcode.com/problems/second-minimum-time-to-reach-destination/?envType=daily-question&envId=2024-07-28
 */
 func secondMinimum(n int, edges [][]int, time int, change int) int {
+	// First make a connectivity list to represent our graph
+	connections := make([][]int, n)
+	for _, edge := range connections {
+		connections[edge[0]] = append(connections[edge[0]], edge[1])
+		connections[edge[1]] = append(connections[edge[0]], edge[0])
+	}
+
+	// Plan of attack: Perform BFS to find the second longest path reaching reaching the target n
+	node_queue := linked_list.NewQueue[int]()
+	reached_n := 0
+	path_length := 0
+	node_queue.Enqueue(1)
+	for reached_n < 2 {
+		path_length++
+		num_dequeue := node_queue.Length()
+		for i:=0; i<num_dequeue; i++ {
+			next := node_queue.Dequeue()
+			if next == n {
+				reached_n++
+			}
+			for _, neighbor := range connections[next] {
+				node_queue.Enqueue(neighbor)
+			}
+		}
+	}
+
+	// We now know how many edges the second shortest path from 1 to n is
+	// TODO - follow my theoretical algorithm I wrote down and see if it works...
+
     return 0
 }
 
