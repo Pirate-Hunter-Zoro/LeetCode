@@ -9732,7 +9732,7 @@ func minimumCost(source string, target string, original []byte, changed []byte, 
 		c1 := b1 - 'a'
 		c2 := changed[idx] - 'a'
 		edge_weight := cost[idx]
-		shortest_paths[c1][c2] = int64(edge_weight)
+		shortest_paths[c1][c2] = min(shortest_paths[c1][c2], int64(edge_weight))
 	}
 
 	// Now we build up dynamically to solve all shortest paths
@@ -9784,38 +9784,72 @@ Notes:
 
 Link:
 https://leetcode.com/problems/second-minimum-time-to-reach-destination/?envType=daily-question&envId=2024-07-28
+
+Inspiration:
+The LeetCode Editorial for this question was very helpful!
 */
 func secondMinimum(n int, edges [][]int, time int, change int) int {
 	// First make a connectivity list to represent our graph
 	connections := make([][]int, n)
-	for _, edge := range connections {
-		connections[edge[0]] = append(connections[edge[0]], edge[1])
-		connections[edge[1]] = append(connections[edge[0]], edge[0])
+	for _, edge := range edges {
+		connections[edge[0]-1] = append(connections[edge[0]-1], edge[1])
+		connections[edge[1]-1] = append(connections[edge[1]-1], edge[0])
 	}
 
-	// Plan of attack: Perform BFS to find the second longest path reaching reaching the target n
-	node_queue := linked_list.NewQueue[int]()
-	reached_n := 0
-	path_length := 0
-	node_queue.Enqueue(1)
-	for reached_n < 2 {
-		path_length++
-		num_dequeue := node_queue.Length()
-		for i:=0; i<num_dequeue; i++ {
-			next := node_queue.Dequeue()
-			if next == n {
-				reached_n++
-			}
-			for _, neighbor := range connections[next] {
-				node_queue.Enqueue(neighbor)
+	type connection struct {
+		node int
+		cost int
+	}
+
+	// Plan of attack: Perform a modified Djikstra's algorithm to second shortest path reaching reaching the target n
+	shortest := make([]int, n)
+	second_shortest := make([]int, n)
+	seen := make([]int, n)
+	second_shortest[0] = math.MaxInt
+	for i:=1; i<n; i++ {
+		shortest[i] = math.MaxInt
+		second_shortest[i] = math.MaxInt
+	}
+	node_heap := heap.NewCustomMinHeap(func(first connection, second connection) bool {
+		return first.cost < second.cost
+	})
+	node_heap.Insert(connection{1, 0})
+	for !node_heap.Empty() {
+		next := node_heap.Extract()
+		seen[next.node-1]++
+		if seen[next.node-1] == 2 && next.node == n {
+			break
+		}
+		time_to_here := next.cost
+		for _, neighbor := range connections[next.node-1] {
+			if seen[neighbor-1] < 2 {
+				// We can update this next neighbor
+				time_to_neighbor := 0
+				if (time_to_here / change) % 2 == 1 {
+					// We are currently on RED - we have to wait until the next switch occurs
+					time_to_neighbor += change * (time_to_here / change + 1) + time
+					// The total time is the total number of changes that must occur before we can traverse this next edge, PLUS the time it takes to traverse this next edge
+				} else {
+					// We are currently on GREEN - we can just progress onto the next edge to reach neighbor
+					time_to_neighbor += time_to_here + time
+				}
+				// See if we need to update shortest or second shortest
+				if shortest[neighbor-1] > time_to_neighbor {
+					second_shortest[neighbor-1] = shortest[neighbor-1] 
+					shortest[neighbor-1] = time_to_neighbor
+					node_heap.Insert(connection{neighbor, time_to_neighbor})
+				} else if shortest[neighbor-1] < time_to_neighbor && second_shortest[neighbor-1] > time_to_neighbor {
+					// Remember, we need the shortest and second shortest times to be distinct
+					second_shortest[neighbor-1] = time_to_neighbor
+					node_heap.Insert(connection{neighbor, time_to_neighbor})
+				}
+				// If the time to reach this neighbor does no updating on the neighbor's behalf, then don't push the neighbor with its same value onto the heap
 			}
 		}
 	}
 
-	// We now know how many edges the second shortest path from 1 to n is
-	// TODO - follow my theoretical algorithm I wrote down and see if it works...
-
-    return 0
+	// Now just return the second minimum distance associated with node n
+    return second_shortest[n-1]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

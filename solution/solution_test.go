@@ -4269,11 +4269,15 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	inputs := []input{
 		{5, [][]int{{1,2},{1,3},{1,4},{3,4},{4,5}}, 3, 5},
 		{2, [][]int{{1,2}}, 3, 2},
+		{2, [][]int{{1,2}}, 1, 2},
+		{2, [][]int{{1,2}}, 2, 1},
 	}
 
 	expected_outputs := []int{
 		13,
 		11,
+		5,
+		6,
 	}
 
 	f := func(i input) int {
