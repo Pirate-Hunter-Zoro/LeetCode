@@ -9706,8 +9706,7 @@ Link:
 https://leetcode.com/problems/minimum-cost-to-convert-string-i/description/?envType=daily-question&envId=2024-07-27
 
 Inspiration:
-The hints were helpful!
-https://www.geeksforgeeks.org/floyd-warshall-algorithm-dp-16/#
+The LeetCode editorial was helpful!
 
 PLEA FOR HELP:
 This solution does not work when you submit it on LeetCode, and quite frankly I do not know why.
@@ -9720,11 +9719,7 @@ func minimumCost(source string, target string, original []byte, changed []byte, 
 	for i:=0; i<26; i++ {
 		shortest_paths[i] = make([]int64, 26)
         for j:=0; j<26; j++ {
-            if i == j {
-                shortest_paths[i][j] = int64(0)
-            } else {
-                shortest_paths[i][j] = int64(math.MaxInt32)
-            }
+            shortest_paths[i][j] = int64(math.MaxInt32)
         }
 	}
 	
@@ -9747,6 +9742,9 @@ func minimumCost(source string, target string, original []byte, changed []byte, 
 	
 	total_cost := int64(0)
 	for i:=0; i<len(source); i++ {
+		if source[i] == target[i] {
+			continue
+		}
 		idx1 := source[i] - 'a'
 		idx2 := target[i] - 'a'
 		path_length := shortest_paths[idx1][idx2]
@@ -9850,6 +9848,47 @@ func secondMinimum(n int, edges [][]int, time int, change int) int {
 
 	// Now just return the second minimum distance associated with node n
     return second_shortest[n-1]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer n, return an array ans of length n + 1 such that for each i (0 <= i <= n), ans[i] is the number of 1's in the binary representation of i.
+
+Link:
+https://leetcode.com/problems/counting-bits/description/
+*/
+func countBits(n int) []int {
+    return []int{}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer n, break it into the sum of k positive integers, where k >= 2, and maximize the product of those integers.
+
+Return the maximum product you can get.
+
+Link:
+https://leetcode.com/problems/integer-break/description/
+*/
+func integerBreak(n int) int {
+	return 0
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given two strings s and t, return true if s is a subsequence of t, or false otherwise.
+
+A subsequence of a string is a new string that is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. 
+(i.e., "ace" is a subsequence of "abcde" while "aec" is not).
+
+Link:
+https://leetcode.com/problems/is-subsequence/description/
+*/
+func isSubsequence(s string, t string) bool {
+    return false
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

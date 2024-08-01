@@ -4286,3 +4286,67 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestCountBits(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{2},
+		{5},
+	}
+
+	expected_outputs := [][]int{
+		{0,1,1},
+		{0,1,1,2,1,2},
+	}
+
+	f := func(i input) []int {
+		return countBits(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestIntegerBreak(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{2},
+		{10},
+	}
+
+	expected_outputs := []int{
+		1,
+		36,
+	}
+
+	f := func(i input) int {
+		return integerBreak(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestIsSubsequence(t *testing.T) {
+	type input struct {
+		s string
+		t string
+	}
+	inputs := []input{
+		{"abc","ahbgdc"},
+		{"axc","ahbgdc"},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+	}
+	
+	f := func(i input) bool {
+		return isSubsequence(i.s, i.t)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
