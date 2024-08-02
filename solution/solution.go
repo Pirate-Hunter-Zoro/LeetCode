@@ -9859,7 +9859,14 @@ Link:
 https://leetcode.com/problems/counting-bits/description/
 */
 func countBits(n int) []int {
-    return []int{}
+	num_bits := make([]int, n+1)
+	for i:=1; i<=n; i++ {
+		num_bits[i] = num_bits[i >> 1]
+		if i % 2 == 1 {
+			num_bits[i]++
+		}
+	}
+    return num_bits
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9873,8 +9880,36 @@ Link:
 https://leetcode.com/problems/integer-break/description/
 */
 func integerBreak(n int) int {
-	return 0
+	max_product := make([]int, n)
+	max_product[1] = 1
+	return topDownIntegerBreak(n, max_product)
 }
+
+/*
+Top-down helper method for the above problem
+*/
+func topDownIntegerBreak(n int, max_product []int) int {
+	if max_product[n-1] == 0 {
+		// Need to solve this problem
+		max_product[n-1] = max(n-1, topDownIntegerBreak(n-1, max_product))
+		for i:=2; i<n/2; i++ {
+			// Try breaking up one, the other, both, or neither
+			max_product[n-1] = max(max_product[n-1], 
+									max(
+										max(
+											i * (n - i),
+											max(
+												topDownIntegerBreak(i, max_product) * (n-i),
+												i * topDownIntegerBreak(n - i, max_product),
+											),
+										),
+										topDownIntegerBreak(i, max_product) * topDownIntegerBreak(n - i, max_product),
+									),
+								)
+		}
+	}
+	return max_product[n-1]
+} 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
