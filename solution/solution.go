@@ -9881,19 +9881,24 @@ https://leetcode.com/problems/integer-break/description/
 */
 func integerBreak(n int) int {
 	max_product := make([]int, n)
-	max_product[1] = 1
-	return topDownIntegerBreak(n, max_product)
+	max_product[0] = 1
+	record := 0
+	for i:=1; i<=n/2; i++ {
+		record = max(record, topDownIntegerBreak(i, max_product) * topDownIntegerBreak(n-i, max_product))
+	}
+	return record
 }
 
 /*
-Top-down helper method for the above problem
+Top-down helper method for the above problem - note that for an initial n, as seen above, we must split it at least once - here, we do not have to
 */
 func topDownIntegerBreak(n int, max_product []int) int {
 	if max_product[n-1] == 0 {
 		// Need to solve this problem
-		max_product[n-1] = max(n-1, topDownIntegerBreak(n-1, max_product))
-		for i:=2; i<n/2; i++ {
-			// Try breaking up one, the other, both, or neither
+		max_product[n-1] = n // This is allowed to be a potential record
+		// Try every possible initial split
+		for i:=1; i<=n/2; i++ {
+			// For each split, regarding both halves, try breaking up one, the other, both, or neither
 			max_product[n-1] = max(max_product[n-1], 
 									max(
 										max(
@@ -9923,7 +9928,39 @@ Link:
 https://leetcode.com/problems/is-subsequence/description/
 */
 func isSubsequence(s string, t string) bool {
-    return false
+	if t == "" {
+		return s == ""
+	}
+	t_idx := 0
+	s_idx := 0
+	for s_idx < len(s) {
+		if t_idx >= len(t) {
+            return false
+        }
+		if s[s_idx] == t[t_idx] {
+			s_idx++
+			t_idx++
+		} else {
+			t_idx++
+		}
+	}
+    return true
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+A swap is defined as taking two distinct positions in an array and swapping the values in them.
+
+A circular array is defined as an array where we consider the first element and the last element to be adjacent.
+
+Given a binary circular array nums, return the minimum number of swaps required to group all 1's present in the array together at any location.
+
+Link:
+https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together-ii/description/?envType=daily-question&envId=2024-08-02
+*/
+func minSwapsBinary(nums []int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

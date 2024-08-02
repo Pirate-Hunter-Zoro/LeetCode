@@ -4350,3 +4350,26 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestMinSwapsBinary(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{0,1,0,1,1,0,0}},
+		{[]int{0,1,1,1,0,0,1,1,0}},
+		{[]int{1,1,0,0,1}},
+	}
+
+	expected_outputs := []int{
+		1,
+		2,
+		0,
+	}
+
+	f := func(i input) int {
+		return minSwapsBinary(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
