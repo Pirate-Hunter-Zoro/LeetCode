@@ -4359,16 +4359,61 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 		{[]int{0,1,0,1,1,0,0}},
 		{[]int{0,1,1,1,0,0,1,1,0}},
 		{[]int{1,1,0,0,1}},
+		{[]int{1}},
 	}
 
 	expected_outputs := []int{
 		1,
 		2,
 		0,
+		0,
 	}
 
 	f := func(i input) int {
 		return minSwapsBinary(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestCanCross(t *testing.T) {
+	type input struct {
+		stones []int
+	}
+	inputs := []input{
+		{[]int{0,1,3,5,6,8,12,17}},
+		{[]int{0,1,2,3,4,8,9,11}},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+	}
+
+	f := func(i input) bool {
+		return canCross(i.stones)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestSplitArray(t *testing.T) {
+	type input struct {
+		nums []int
+		k int
+	}
+	inputs := []input{
+		{[]int{7,2,5,10,8}, 2},
+		{[]int{1,2,3,4,5}, 2},
+	}
+
+	expected_outputs := []int{
+		18,
+		9,
+	}
+
+	f := func(i input) int {
+		return splitArray(i.nums, i.k)
 	}
 
 	testResults(t, f, inputs, expected_outputs)

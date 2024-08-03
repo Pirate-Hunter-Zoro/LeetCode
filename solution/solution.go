@@ -9960,6 +9960,74 @@ Link:
 https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together-ii/description/?envType=daily-question&envId=2024-08-02
 */
 func minSwapsBinary(nums []int) int {
+	num_ones := 0
+	for i:=0; i<len(nums); i++ {
+		num_ones += nums[i]
+	}
+
+	// Set up an initial array where the right pointer is at zero
+	left_ptr := len(nums)-num_ones+1
+	right_ptr := 0
+	if left_ptr >= len(nums) {
+		left_ptr = 0
+	}
+	current_num_ones := 0
+	for i:=left_ptr; i<len(nums); i++ {
+		current_num_ones += nums[i]
+	}
+	for i:=min(0, left_ptr); i<=right_ptr; i++ {
+		current_num_ones += nums[i]
+	}
+	record := max(0, num_ones - current_num_ones)
+
+	// Now shift this array around and see how many swaps we'll need
+	for right_ptr < len(nums)-1 {
+		current_num_ones -= nums[left_ptr]
+		left_ptr++
+		if left_ptr >= len(nums) {
+			left_ptr = 0
+		}
+		right_ptr++
+		current_num_ones += nums[right_ptr]
+		record = max(0, min(record, num_ones - current_num_ones))
+	}
+
+    return record
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+A frog is crossing a river. 
+The river is divided into some number of units, and at each unit, there may or may not exist a stone. 
+The frog can jump on a stone, but it must not jump into the water.
+
+Given a list of stones positions (in units) in sorted ascending order, determine if the frog can cross the river by landing on the last stone. 
+Initially, the frog is on the first stone and assumes the first jump must be 1 unit.
+
+If the frog's last jump was k units, its next jump must be either k - 1, k, or k + 1 units. 
+The frog can only jump in the forward direction.
+
+Link:
+https://leetcode.com/problems/frog-jump/description/
+*/
+func canCross(stones []int) bool {
+    return false
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an integer array nums and an integer k, split nums into k non-empty subarrays such that the largest sum of any subarray is minimized.
+
+Return the minimized largest sum of the split.
+
+A subarray is a contiguous part of the array.
+
+Link:
+https://leetcode.com/problems/split-array-largest-sum/description/
+*/
+func splitArray(nums []int, k int) int {
     return 0
 }
 
