@@ -4383,10 +4383,12 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	inputs := []input{
 		{[]int{0,1,3,5,6,8,12,17}},
 		{[]int{0,1,2,3,4,8,9,11}},
+		{[]int{0,1,3,6,7}},
 	}
 
 	expected_outputs := []bool{
 		true,
+		false,
 		false,
 	}
 

@@ -10012,7 +10012,53 @@ Link:
 https://leetcode.com/problems/frog-jump/description/
 */
 func canCross(stones []int) bool {
-    return false
+	can_cross := make([]map[int]bool, len(stones))
+	for i:=0; i<len(can_cross); i++ {
+		can_cross[i] = make(map[int]bool)
+	}
+	return topDownCanCross(0, 1, stones, can_cross)
+}
+
+/*
+Helper method to determine if the frog can cross the rest of the way at the given position with the given jump length
+*/
+func topDownCanCross(posn int, jump_length int, stones []int, can_cross []map[int]bool) bool {
+	if stones[posn] + jump_length == stones[len(stones) - 1] {
+		return true
+	} else if jump_length == 0 {
+		return false
+	} else {
+		_, ok := can_cross[posn][jump_length]
+		if !ok {
+			// Need to solve this problem
+			// First make sure this next jump length exists
+			left := posn
+			right := len(can_cross)
+			mid := -1
+			found := false
+			for left < right {
+				mid = (left + right) / 2
+				if stones[mid] == stones[posn] + jump_length {
+					found = true
+					break
+				} else if stones[mid] < stones[posn] + jump_length {
+					// Look right
+					left = mid+1
+				} else {
+					// Look left
+					right = mid
+				}
+			}
+			if !found {
+				// The next stone does not exist
+				can_cross[posn][jump_length] = false
+			} else {
+				// Try all three next jumps
+				can_cross[posn][jump_length] = topDownCanCross(mid, jump_length-1, stones, can_cross) || topDownCanCross(mid, jump_length, stones, can_cross) || topDownCanCross(mid, jump_length+1, stones, can_cross)
+			}
+		}
+		return can_cross[posn][jump_length]
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
