@@ -4420,3 +4420,26 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestMinimumPushes(t *testing.T) {
+	type input struct {
+		word string
+	}
+	inputs := []input{
+		{"abcde"},
+		{"xyzxyzxyzxyz"},
+		{"aabbccddeeffgghhiiiiii"},
+	}
+
+	expected_outputs := []int{
+		5,
+		12,
+		24,
+	}
+
+	f := func(i input) int {
+		return minimumPushes(i.word)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

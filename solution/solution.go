@@ -10072,8 +10072,75 @@ A subarray is a contiguous part of the array.
 
 Link:
 https://leetcode.com/problems/split-array-largest-sum/description/
+
+Inspiration:
+https://leetcode.com/problems/split-array-largest-sum/solutions/5591299/easy-java-solution-beats-100-with-best-explanation/
 */
 func splitArray(nums []int, k int) int {
+	max_val := nums[0]
+	sum := nums[0]
+	for i:=1; i<len(nums); i++ {
+		max_val = max(max_val, nums[i])
+		sum += nums[i]
+	}
+	// Binary search to find the possible sum
+	left := max_val
+	right := sum+1
+	for left < right {
+		mid := (left + right) / 2
+		if isAchievable(mid, nums, k) {
+			right = mid
+		} else {
+			left = mid + 1
+		}
+	}
+
+	return left
+}
+
+/*
+Helper method to determine if, given k subarrays we are allowed to create, we can achieve a maximum subarray sum less than or equal to max_sum
+*/
+func isAchievable(max_sum int, nums []int, k int) bool {
+	curr_sum := 0
+	arrays := 1
+	idx := 0
+	for idx < len(nums) {
+		if curr_sum + nums[idx] > max_sum {
+			arrays++
+			if arrays > k {
+				return false
+			}
+			curr_sum = nums[idx]
+		} else {
+			curr_sum += nums[idx]
+		}
+		idx++
+	}
+	return true
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given a string word containing lowercase English letters.
+
+Telephone keypads have keys mapped with distinct collections of lowercase English letters, which can be used to form words by pushing them. 
+For example, the key 2 is mapped with ["a","b","c"], we need to push the key one time to type "a", two times to type "b", and three times to type "c" .
+
+It is allowed to remap the keys numbered 2 to 9 to distinct collections of letters. 
+The keys can be remapped to any amount of letters, but each letter must be mapped to exactly one key. 
+You need to find the minimum number of times the keys will be pushed to type the string word.
+
+Return the minimum number of pushes needed to type word after remapping the keys.
+
+An example mapping of letters to keys on a telephone keypad is given below. 
+Note that 1, *, #, and 0 do not map to any letters.
+
+Link:
+https://leetcode.com/problems/minimum-number-of-pushes-to-type-word-ii/description/?envType=daily-question&envId=2024-08-06
+*/
+func minimumPushes(word string) int {
     return 0
 }
 
