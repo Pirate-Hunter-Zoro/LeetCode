@@ -10141,7 +10141,196 @@ Link:
 https://leetcode.com/problems/minimum-number-of-pushes-to-type-word-ii/description/?envType=daily-question&envId=2024-08-06
 */
 func minimumPushes(word string) int {
-    return 0
+	// We want to create a (conceptual) mapping of numbers 2-9 to a list of characters
+	num_buttons := 8
+
+	// Sort the different characters in the word by their counts
+	char_counts := make(map[byte]int)
+	chars := []byte{}
+	for i:=0; i<len(word); i++ {
+		_, ok := char_counts[word[i]]
+		if !ok {
+			char_counts[word[i]] = 1
+			chars = append(chars, word[i])
+		} else {
+			char_counts[word[i]]++
+		}
+	}
+
+	// Sort the characters by their frequency (decreasing)
+	sort.SliceStable(chars, func(i, j int) bool {
+		return char_counts[chars[i]] > char_counts[chars[j]]
+	})
+
+	// We can simulate what would happen if we did a round-robin approach to assigning each character to open buttons
+	pushes := 0
+	rounds := 0
+	idx := 0
+	idx_mod := 0
+	for idx < len(chars) {
+		if idx_mod == 0 {
+			rounds++
+		}
+		pushes += char_counts[chars[idx]] * rounds
+		idx++
+		idx_mod++
+		idx_mod = idx_mod % num_buttons
+	}
+
+    return pushes
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Convert a non-negative integer num to its English words representation.
+
+Link:
+https://leetcode.com/problems/integer-to-english-words/description/?envType=daily-question&envId=2024-08-07
+*/
+func numberToWords(num int) string {
+	// Dummy case that screws with the algorithm
+	if num == 0 {
+		return "Zero"
+	}
+
+    // First we need a map of digits to words -> 1-20,30,40,50,60,70,80,90
+	words := make(map[string]string)
+	words["1"] = "One"
+	words["2"] = "Two"
+	words["3"] = "Three"
+	words["4"] = "Four"
+	words["5"] = "Five"
+	words["6"] = "Six"
+	words["7"] = "Seven"
+	words["8"] = "Eight"
+	words["9"] = "Nine"
+	words["10"] = "Ten"
+	words["11"] = "Eleven"
+	words["12"] = "Twelve"
+	words["13"] = "Thirteen"
+	words["14"] = "Fourteen"
+	words["15"] = "Fifteen"
+	words["16"] = "Sixteen"
+	words["17"] = "Seventeen"
+	words["18"] = "Eighteen"
+	words["19"] = "Nineteen"
+	words["20"] = "Twenty"
+	words["30"] = "Thirty"
+	words["40"] = "Forty"
+	words["50"] = "Fifty"
+	words["60"] = "Sixty"
+	words["70"] = "Seventy"
+	words["80"] = "Eighty"
+	words["90"] = "Ninety"
+
+	// Now that we have this initial word map, we need to know given how many digits we have, if we are talking hundreds, thousands, millions, or billions 
+	// We will not go beyond billion based on input constraints
+	values := make(map[int]string)
+	values[3] = "Hundred"
+	values[4] = "Thousand"
+	values[7] = "Million"
+	values[10] = "Billion"
+
+	// Let's also just remember the parsings we have created
+	parsings := make(map[string]string)
+
+	return topDownNumberToWords(strconv.Itoa(num), words, values, parsings)
+}
+
+/*
+Top-down helper method to assist with the above function
+*/
+func topDownNumberToWords(num_string string, words map[string]string, values map[int]string, parsings map[string]string) string {
+	_, ok := parsings[num_string]
+	if !ok {
+		// Need to solve this problem
+		// First check and make sure it is not all zeroes
+		val, _ := strconv.Atoi(num_string)
+		var new bytes.Buffer
+		if val == 0 {
+			return ""
+		} else {
+			i:=0
+			for num_string[i] == '0' {
+				i++
+			}
+			new.WriteString(num_string[i:])
+		}
+		new_num_string := new.String()
+
+		// Otherwise
+		var result bytes.Buffer
+		num_digits := len(new_num_string)
+		if num_digits == 1 {
+			result.WriteString(words[new_num_string])
+		} else if num_digits == 2 {
+			to_return, ok := words[new_num_string]
+			if !ok {
+				// 24, 47, 58, etc.
+				var zeroed bytes.Buffer
+				zeroed.WriteByte(new_num_string[0])
+				zeroed.WriteByte('0')
+				result.WriteString(words[zeroed.String()])
+				result.WriteString(" ")
+				result.WriteString(words[new_num_string[1:]])
+			} else {
+				result.WriteString(to_return)
+			} 
+		} else {
+			place_value, ok := values[num_digits]
+			if !ok {
+				// Based off input constraints, this could be in the ten thousand, hundred thousand, ten million, or hundred million place value
+				if num_digits % 3 == 2 {
+					// Ten thousand/million place
+					result.WriteString(topDownNumberToWords(new_num_string[0:2], words, values, parsings))
+					result.WriteString(" ")
+					result.WriteString(values[num_digits-1])
+					remaining := topDownNumberToWords(new_num_string[2:], words, values, parsings)
+					if remaining != "" {
+						result.WriteString(" ")
+						result.WriteString(remaining)
+					}
+				} else {
+					// Hundred thousand/million place
+					result.WriteString(topDownNumberToWords(new_num_string[0:3], words, values, parsings))
+					result.WriteString(" ")
+					result.WriteString(values[num_digits-2])
+					remaining := topDownNumberToWords(new_num_string[3:], words, values, parsings)
+					if remaining != "" {
+						result.WriteString(" ")
+						result.WriteString(remaining)
+					}
+				} 
+			} else {
+				result.WriteString(words[new_num_string[0:1]])
+				result.WriteString(" ")
+				result.WriteString(place_value)
+				remaining := topDownNumberToWords(new_num_string[1:], words, values, parsings)
+				if remaining != "" {
+					result.WriteString(" ")
+					result.WriteString(remaining)
+				}
+			}
+		}
+
+		parsings[num_string] = result.String()
+	}
+	return parsings[num_string]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an array of strings words (without duplicates), return all the concatenated words in the given list of words.
+
+A concatenated word is defined as a string that is comprised entirely of at least two shorter words (not necessarily distinct) in the given array.
+
+Link:
+https://leetcode.com/problems/concatenated-words/description/
+*/
+func findAllConcatenatedWordsInADict(words []string) []string {
+    return []string{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

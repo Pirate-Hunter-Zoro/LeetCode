@@ -4443,3 +4443,59 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestNumberToWords(t *testing.T) {
+	type input struct {
+		num int
+	}
+	inputs := []input{
+		{123},
+		{12345},
+		{1234567},
+		{0},
+		{100},
+		{1056},
+		{25942},
+	}
+
+	expected_outputs := []string{
+		"One Hundred Twenty Three",
+		"Twelve Thousand Three Hundred Forty Five",
+		"One Million Two Hundred Thirty Four Thousand Five Hundred Sixty Seven",
+		"Zero",
+		"One Hundred",
+		"One Thousand Fifty Six",
+		"Twenty Five Thousand Nine Hundred Forty Two",
+	}
+
+	f := func(i input) string {
+		return numberToWords(i.num)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestFindAllConcatenatedWordsInADict(t *testing.T) {
+	type input struct {
+		words []string
+	}
+	inputs := []input{
+		{[]string{"cat","cats","catsdogcats","dog","dogcatsdog","hippopotamuses","rat","ratcatdogcat"}},
+		{[]string{"cat","dog","catdog"}},
+	}
+
+	expected_outputs := [][]string{
+		{"catsdogcats","dogcatsdog","ratcatdogcat"},
+		{"catdog"},
+	}
+
+	f := func(i input) []string {
+		words := findAllConcatenatedWordsInADict(i.words)
+		sort.SliceStable(words, func(i, j int) bool {
+			return words[i] < words[j]
+		})
+		return words
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
