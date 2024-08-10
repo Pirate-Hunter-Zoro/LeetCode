@@ -4499,3 +4499,26 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestRegionsBySlashes(t *testing.T) {
+	type input struct {
+		grid []string
+	}
+	inputs := []input{
+		{[]string{" /","/ "}},
+		{[]string{" /","  "}},
+		{[]string{"/\\","\\/"}},
+	}
+
+	expected_outputs := []int{
+		2,
+		1,
+		5,
+	}
+
+	f := func(i input) int {
+		return regionsBySlashes(i.grid)
+	}
+	
+	testResults(t, f, inputs, expected_outputs)
+ }

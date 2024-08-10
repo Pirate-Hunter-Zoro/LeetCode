@@ -10330,7 +10330,75 @@ Link:
 https://leetcode.com/problems/concatenated-words/description/
 */
 func findAllConcatenatedWordsInADict(words []string) []string {
-    return []string{}
+	// Clearly we will want to sort the words by their length - any shorter word CANNOT be a concatenation of a longer word
+	sort.SliceStable(words, func(i, j int) bool {
+		return len(words[i]) < len(words[j])
+	})
+
+	seen_words := make(map[string]bool)
+	seen_concatenations := make(map[string]bool)
+	result := []string{}
+	for _, word := range words {
+		if isConcatenation(word, seen_words, seen_concatenations) {
+			result = append(result, word)
+		}
+		seen_words[word] = true
+	}
+	 
+	return result
+}
+
+/*
+Helper method for the above function
+*/
+func isConcatenation(word string, seen_words map[string]bool, seen_concatenations map[string]bool) bool {
+	_, ok := seen_words[word]
+	if ok {
+		return true
+	}
+	if word == "" {
+		return true
+	}
+	_, ok = seen_concatenations[word]
+	if !ok {
+		seen_concatenations[word] = false
+		_, ok = seen_words[word]
+		if ok {
+			seen_concatenations[word] = true
+		}
+		for i:=0; i<len(word); i++ {
+			so_far := word[:i+1]
+			_, ok := seen_words[so_far]
+			if ok || isConcatenation(so_far, seen_words, seen_concatenations) {
+				if i < len(word) - 1 {
+					seen_concatenations[word] = seen_concatenations[word] || isConcatenation(word[i+1:], seen_words, seen_concatenations)
+					if seen_concatenations[word] {
+						break
+					}
+				} else {
+					seen_concatenations[word] = true
+				}
+			}
+		}
+	}
+	return seen_concatenations[word]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+An n x n grid is composed of 1 x 1 squares where each 1 x 1 square consists of a '/', '\', or blank space ' '. 
+These characters divide the square into contiguous regions.
+
+Given the grid grid represented as a string array, return the number of regions.
+
+Note that backslash characters are escaped, so a '\' is represented as '\\'.
+
+Link:
+https://leetcode.com/problems/regions-cut-by-slashes/description/?envType=daily-question&envId=2024-08-10
+*/
+func regionsBySlashes(grid []string) int {
+	return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
