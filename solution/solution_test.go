@@ -4500,24 +4500,24 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
  }
 
- func TestRegionsBySlashes(t *testing.T) {
+ func TestRecoverFromPreorder(t *testing.T) {
 	type input struct {
-		grid []string
+		traversal string
 	}
 	inputs := []input{
-		{[]string{" /","/ "}},
-		{[]string{" /","  "}},
-		{[]string{"/\\","\\/"}},
+		{"1-2--3--4-5--6--7"},
+		{"1-2--3---4-5--6---7"},
+		{"1-401--349---90--88"},
 	}
 
-	expected_outputs := []int{
-		2,
-		1,
-		5,
+	expected_outputs := []*binary_tree.TreeNode{
+		binary_tree.NewTree([]int{1,2,5,3,4,6,7}),
+		binary_tree.NewTree([]int{1,2,5,3,binary_tree.NULL,6,binary_tree.NULL,4,binary_tree.NULL,7}),
+		binary_tree.NewTree([]int{1,401,binary_tree.NULL,349,88,90}),
 	}
 
-	f := func(i input) int {
-		return regionsBySlashes(i.grid)
+	f := func(i input) *binary_tree.TreeNode {
+		return recoverFromPreorder(i.traversal)
 	}
 	
 	testResults(t, f, inputs, expected_outputs)

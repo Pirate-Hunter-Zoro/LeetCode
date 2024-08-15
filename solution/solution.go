@@ -10387,18 +10387,21 @@ func isConcatenation(word string, seen_words map[string]bool, seen_concatenation
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-An n x n grid is composed of 1 x 1 squares where each 1 x 1 square consists of a '/', '\', or blank space ' '. 
-These characters divide the square into contiguous regions.
+We run a preorder depth-first search (DFS) on the root of a binary tree.
 
-Given the grid grid represented as a string array, return the number of regions.
+At each node in this traversal, we output D dashes (where D is the depth of this node), then we output the value of this node.  
+If the depth of a node is D, the depth of its immediate child is D + 1.  
+The depth of the root node is 0.
 
-Note that backslash characters are escaped, so a '\' is represented as '\\'.
+If a node has only one child, that child is guaranteed to be the left child.
+
+Given the output traversal of this traversal, recover the tree and return its root.
 
 Link:
-https://leetcode.com/problems/regions-cut-by-slashes/description/?envType=daily-question&envId=2024-08-10
+https://leetcode.com/problems/recover-a-tree-from-preorder-traversal/description/
 */
-func regionsBySlashes(grid []string) int {
-	return 0
+func recoverFromPreorder(traversal string) *binary_tree.TreeNode {
+    return nil
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
