@@ -4522,3 +4522,26 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestNumOfWays(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{2,1,3}},
+		{[]int{3,4,5,1,2}},
+		{[]int{1,2,3}},
+	}
+
+	expected_outputs := []int{
+		1,
+		5,
+		0,
+	}
+
+	f := func(i input) int {
+		return numOfWays(i.nums)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

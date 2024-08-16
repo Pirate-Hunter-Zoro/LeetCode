@@ -10401,7 +10401,79 @@ Link:
 https://leetcode.com/problems/recover-a-tree-from-preorder-traversal/description/
 */
 func recoverFromPreorder(traversal string) *binary_tree.TreeNode {
-    return nil
+	if len(traversal) == 1 {
+		v, _ := strconv.Atoi(traversal[0:1])
+		return &binary_tree.TreeNode{Val: v}
+	} else {
+		i:=1
+		for traversal[i] != '-' {
+			i++
+		}
+		v, _ := strconv.Atoi(traversal[:i])
+		head := &binary_tree.TreeNode{Val: v}
+		level_queue := make(map[int]*linked_list.Queue[*binary_tree.TreeNode])
+		level_queue[0] = linked_list.NewQueue[*binary_tree.TreeNode]()
+		level_queue[0].Enqueue(head)
+		for i<len(traversal) {
+			// Read in the next node
+			level := 0
+			for traversal[i] == '-' {
+				i++
+				level++
+			}
+			digit_start := i
+			for i < len(traversal) && traversal[i] != '-' {
+				i++
+			}
+			v, _ = strconv.Atoi(traversal[digit_start:i])
+			next_node := &binary_tree.TreeNode{Val: v}
+			for l := range level_queue {
+				if l >= level {
+					// Clear out all those queues because they don't have children that we'll run into since we're right of them now
+					delete(level_queue, l)
+				}
+			}
+
+			// Update the parent
+			parent := level_queue[level-1].Peek()
+			if parent.Left == nil {
+				parent.Left = next_node
+			} else {
+				parent.Right = next_node
+				level_queue[level-1].Dequeue()
+			}
+
+			// Now enqueue this current node
+			existing_queue, ok := level_queue[level]
+			if !ok {
+				level_queue[level] = linked_list.NewQueue[*binary_tree.TreeNode]()
+				existing_queue = level_queue[level]
+			}
+			existing_queue.Enqueue(next_node)
+		}
+
+		return head
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given an array nums that represents a permutation of integers from 1 to n. 
+We are going to construct a binary search tree (BST) by inserting the elements of nums in order into an initially empty BST. 
+Find the number of different ways to reorder nums so that the constructed BST is identical to that formed from the original array nums.
+
+For example, given nums = [2,1,3], we will have 2 as the root, 1 as a left child, and 3 as a right child. 
+The array [2,3,1] also yields the same BST but [3,2,1] yields a different BST.
+Return the number of ways to reorder nums such that the BST formed is identical to the original BST formed from nums.
+
+Since the answer may be very large, return it modulo 10^9 + 7.
+
+Link:
+https://leetcode.com/problems/number-of-ways-to-reorder-array-to-get-same-bst/description/
+*/
+func numOfWays(nums []int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

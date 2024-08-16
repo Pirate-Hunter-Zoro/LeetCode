@@ -30,6 +30,10 @@ func (q *Queue[T]) Dequeue() T {
 	return v
 }
 
+func (q *Queue[T]) Peek() T {
+	return q.values_head.Val
+}
+
 func (q *Queue[T]) Empty() bool {
 	return q.length == 0
 }
