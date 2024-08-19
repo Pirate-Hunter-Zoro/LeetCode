@@ -4545,3 +4545,24 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestMinSteps(t *testing.T) {
+	type input struct {
+		n int
+	}
+	inputs := []input{
+		{3},
+		{1},
+	}
+
+	expected_outputs := []int{
+		3,
+		0,
+	}
+
+	f := func(i input) int {
+		return minSteps(i.n)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

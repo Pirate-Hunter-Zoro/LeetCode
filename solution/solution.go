@@ -10471,9 +10471,114 @@ Since the answer may be very large, return it modulo 10^9 + 7.
 
 Link:
 https://leetcode.com/problems/number-of-ways-to-reorder-array-to-get-same-bst/description/
+
+Inspiration:
+The LeetCode hint was helpful!
+And then the editorial was further helpful...
 */
 func numOfWays(nums []int) int {
-    return 0
+    greater := []int{}
+	less := []int{}
+	for i:=1; i<len(nums); i++ {
+		if nums[i] > nums[0] {
+			greater = append(greater, nums[i])
+		} else {
+			less = append(less, nums[i])
+		}
+	}
+	// Subtract 1 from our final answer because we want the count of REORDERINGS
+	return modulo.ModularSubtract(recNumOfWays(greater, less), 1)
+}
+
+/*
+Helper method for the above function
+*/
+func recNumOfWays(greater []int, less []int) int {
+	if len(greater) == 0 {
+		if len(less) <= 2 {
+			return 1
+		} else {
+			less_greater := []int{}
+			less_less := []int{}
+			for i:=1; i<len(less); i++ {
+				if less[i] > less[0] {
+					less_greater = append(less_greater, less[i])
+				} else {
+					less_less = append(less_less, less[i])
+				}
+			}
+			return recNumOfWays(less_greater, less_less)
+		}
+	} else if len(less) == 0 {
+		if len(greater) <= 2 {
+			return 1
+		} else {
+			greater_greater := []int{}
+			greater_less := []int{}
+			for i:=1; i<len(greater); i++ {
+				if greater[i] > greater[0] {
+					greater_greater = append(greater_greater, greater[i])
+				} else {
+					greater_less = append(greater_less, greater[i])
+				}
+			}
+			return recNumOfWays(greater_greater, greater_less)
+		}
+	} else {
+		// Divide and conquer the list of lesser values
+		less_count := 0
+		if len(less) <= 2 {
+			less_count++
+		} else {
+			less_greater := []int{}
+			less_less := []int{}
+			for i:=1; i<len(less); i++ {
+				if less[i] > less[0] {
+					less_greater = append(less_greater, less[i])
+				} else {
+					less_less = append(less_less, less[i])
+				}
+			}
+			less_count = modulo.ModularAdd(less_count, recNumOfWays(less_greater, less_less))
+		}
+
+		// Divide and conquer the list of greater values
+		greater_count := 0
+		if len(greater) <= 2 {
+			greater_count++
+		} else {
+			greater_greater := []int{}
+			greater_less := []int{}
+			for i:=1; i<len(greater); i++ {
+				if greater[i] > greater[0] {
+					greater_greater = append(greater_greater, greater[i])
+				} else {
+					greater_less = append(greater_less, greater[i])
+				}
+			}
+			greater_count = modulo.ModularAdd(greater_count, recNumOfWays(greater_greater, greater_less))
+		}
+
+		// Merge the two calulations together - we have len(less) + len(greater) cells, and we will choose ANY len(less) of them to be the cells that hold the (relative order preserved) lesser values than the root node
+		return modulo.ModularMultiply(less_count, modulo.ModularMultiply(greater_count, combinations.ChooseMod(len(greater) + len(less), len(less))))
+	}
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There is only one character 'A' on the screen of a notepad. You can perform one of two operations on this notepad for each step:
+- Copy All: You can copy all the characters present on the screen (a partial copy is not allowed).
+- Paste: You can paste the characters which are copied last time.
+
+Given an integer n, return the minimum number of operations to get the character 'A' exactly n times on the screen.
+
+Link:
+https://leetcode.com/problems/2-keys-keyboard/description/?envType=daily-question&envId=2024-08-19
+*/
+func minSteps(n int) int {
+	return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
