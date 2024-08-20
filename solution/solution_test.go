@@ -4566,3 +4566,24 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestMakesquare(t *testing.T) {
+	type input struct {
+		matchsticks []int
+	}
+	inputs := []input{
+		{[]int{1,1,2,2,2}},
+		{[]int{3,3,3,3,4}},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+	}
+
+	f := func(i input) bool {
+		return makesquare(i.matchsticks)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

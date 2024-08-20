@@ -10578,7 +10578,81 @@ Link:
 https://leetcode.com/problems/2-keys-keyboard/description/?envType=daily-question&envId=2024-08-19
 */
 func minSteps(n int) int {
-	return 0
+	// Given how many 'A' characters are present, and how many are copied, what is the least number of moves required to reach 'n' characters?
+	sols := make(map[int]map[int]int)
+	return topDownMinSteps(1, 0, sols, n)
+}
+
+/*
+Top-down helper method to solve the above problem
+*/
+func topDownMinSteps(present int, copied int, sols map[int]map[int]int, goal int) int {
+	_, ok := sols[present]
+	if !ok {
+		sols[present] = make(map[int]int)
+	}
+	_, ok = sols[present][copied]
+	if !ok {
+		// Need to solve this problem
+		if present == goal {
+			sols[present][copied] = 0
+		} else if present + copied == goal {
+			// Then just paste
+			sols[present][copied] = 1
+		} else if present + copied > goal {
+			// Then you're screwed
+			sols[present][copied] = -1
+		} else if copied == 0 {
+			// GOT to copy
+			copied_result := topDownMinSteps(present, present, sols, goal)
+			if copied_result != -1 {
+				sols[present][copied] = 1 + copied_result
+			} else {
+				sols[present][copied] = -1
+			}
+		} else if copied == present {
+			// No point in copying again
+			paste_result := topDownMinSteps(present * 2, copied, sols, goal)
+			if paste_result == -1 {
+				sols[present][copied] = -1
+			} else {
+				sols[present][copied] = 1 + paste_result
+			}
+		} else {
+			record := math.MaxInt
+			// Try copying or pasting
+			paste_result := topDownMinSteps(present + copied, copied, sols, goal)
+			if paste_result != -1 {
+				record = min(record, 1 + paste_result)
+			}
+			copy_result := topDownMinSteps(present, present, sols, goal)
+			if copy_result != -1 {
+				record = min(record, 1 + copy_result)
+			}
+			if record != math.MaxInt {
+				sols[present][copied] = record
+			} else {
+				sols[present][copied] = -1
+			}
+		}
+	}
+	return sols[present][copied]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an integer array matchsticks where matchsticks[i] is the length of the ith matchstick. 
+You want to use all the matchsticks to make one square. 
+You should not break any stick, but you can link them up, and each matchstick must be used exactly one time.
+
+Return true if you can make this square and false otherwise.
+
+Link:
+https://leetcode.com/problems/matchsticks-to-square/description/
+*/
+func makesquare(matchsticks []int) bool {
+    return false
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
