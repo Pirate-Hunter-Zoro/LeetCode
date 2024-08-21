@@ -10650,9 +10650,90 @@ Return true if you can make this square and false otherwise.
 
 Link:
 https://leetcode.com/problems/matchsticks-to-square/description/
+
+Inspiration:
+The LeetCode editorial!
 */
 func makesquare(matchsticks []int) bool {
-    return false
+	// Sorting in decreasing order apparently speeds things up because we reach negative conclusions earlier
+	// YOU WILL TIME OUT WITHOUT DOING THIS
+	sort.SliceStable(matchsticks, func(i, j int) bool {
+		return matchsticks[i] > matchsticks[j]
+	})
+
+	// For a given set of side lengths and number of matchsticks placed, is achieving equal square sides possible?
+	sols := make([]map[string]bool, len(matchsticks)+1)
+	for i:=0; i<len(sols); i++ {
+		sols[i] = make(map[string]bool)
+	}
+
+	total := 0
+	for _, v := range matchsticks {
+		total += v
+	}
+	if total % 4 != 0 {
+		return false
+	}
+	side_length := total / 4
+
+	side_lengths := "0 0 0 0"
+	placed := 0
+	return canAchieve(placed, side_lengths, side_length, matchsticks, sols)
+}
+ 
+/*
+Recursive helper method for the above problem
+*/
+func canAchieve(placed int, side_lengths string, side_length int, matchsticks []int, sols []map[string]bool) bool {
+	_, ok := sols[placed][side_lengths]
+	if !ok {
+		// Need to solve this problem
+		sides_strings := strings.Split(side_lengths, " ")
+		side_ints := make([]int, len(sides_strings))
+		for idx, v := range sides_strings {
+			val, _ := strconv.Atoi(v)
+			side_ints[idx] = val
+		}
+		if placed == len(matchsticks) {
+			sols[placed][side_lengths] = side_ints[0] == side_ints[1] && side_ints[0] == side_ints[2] && side_ints[0] == side_ints[3]
+		} else {
+			sols[placed][side_lengths] = false
+			for i:=0; i<len(side_ints); i++ {
+				side_ints_copy := []int{}
+				side_ints_copy = append(side_ints_copy, side_ints...)
+				side_ints_copy[i] += matchsticks[placed]
+				if side_ints_copy[i] <= side_length {
+					// Still hope
+					var builder bytes.Buffer
+					for j:=0; j<len(side_ints_copy)-1; j++ {
+						builder.WriteString(strconv.Itoa(side_ints_copy[j]))
+						builder.WriteString(" ")
+					}
+					builder.WriteString(strconv.Itoa(side_ints_copy[len(side_ints_copy)-1]))
+					if canAchieve(placed+1, builder.String(), side_length, matchsticks, sols) {
+						sols[placed][side_lengths] = true
+						break
+					}
+				}
+			}
+		}
+	}
+	return sols[placed][side_lengths]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+There is a strange printer with the following two special properties:
+- The printer can only print a sequence of the same character each time.
+- At each turn, the printer can print new characters starting from and ending at any place and will cover the original existing characters.
+- Given a string s, return the minimum number of turns the printer needed to print it.
+
+Link:
+https://leetcode.com/problems/strange-printer/description/?envType=daily-question&envId=2024-08-21
+*/
+func strangePrinter(s string) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

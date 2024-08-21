@@ -4587,3 +4587,24 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestStrangePrinter(t *testing.T) {
+	type input struct {
+		s string
+	}
+	inputs := []input{
+		{"aaabbb"},
+		{"aba"},
+	}
+
+	expected_outputs := []int{
+		2,
+		2,
+	}
+
+	f := func(i input) int {
+		return strangePrinter(i.s)
+	}
+	
+	testResults(t, f, inputs, expected_outputs)
+ }
