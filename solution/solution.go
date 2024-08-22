@@ -10731,8 +10731,65 @@ There is a strange printer with the following two special properties:
 
 Link:
 https://leetcode.com/problems/strange-printer/description/?envType=daily-question&envId=2024-08-21
+
+Inspiration:
+The LeetCode Editorial was super helpful!
 */
 func strangePrinter(s string) int {
+	var buffer bytes.Buffer
+	// Eliminate repeat consecutive characters
+	buffer.WriteByte(s[0])
+	for i:=1; i<len(s); i++ {
+		if s[i] != s[i-1] {
+			buffer.WriteByte(s[i])
+		}
+	}
+	reduced := buffer.String()
+	// Answer the question, for a given start and end, what is the fewest number of print operations needed to print that string?
+	sols := make(map[int]map[int]int)
+	for i:=0; i<=len(reduced); i++ {
+		sols[i] = make(map[int]int)
+	}
+    return topDownStrangePrinter(reduced, 0, len(reduced)-1, sols)
+}
+
+/*
+Top-down helper method for the above problem - 's' has no consecutive characters identical
+*/
+func topDownStrangePrinter(s string, start int, end int, sols map[int]map[int]int) int {
+	_, ok := sols[start][end]
+	if !ok {
+		// Need to solve this problem
+		if start > end { // Empty string
+			sols[start][end] = 0
+		} else {
+			record := 1 + topDownStrangePrinter(s, start+1, end, sols)
+			for i:=start+1; i<=end; i++ {
+				if s[i] == s[start] {
+					// Try splitting here and s[i] is STAYING as is, but now we need to cover in between 'start' and 'i-1', AND in between 'i+1' and 'end'
+					record = min(record, topDownStrangePrinter(s, start, i-1, sols) + topDownStrangePrinter(s, i+1, end, sols))
+				}
+			}
+			record = min(record, 1 + topDownStrangePrinter(s, start, end-1, sols))
+			sols[start][end] = record
+		}
+	}
+	return sols[start][end]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an array of binary strings strs and two integers m and n.
+
+Return the size of the largest subset of strs such that there are at most m 0's and n 1's in the subset.
+
+A set x is a subset of a set y if all elements of x are also elements of y.
+
+Link:
+https://leetcode.com/problems/ones-and-zeroes/description/
+*/
+func findMaxForm(strs []string, m int, n int) int {
     return 0
 }
 
