@@ -10788,9 +10788,82 @@ A set x is a subset of a set y if all elements of x are also elements of y.
 
 Link:
 https://leetcode.com/problems/ones-and-zeroes/description/
+
+Inspiration:
+The LeetCode discussions gave some helpful tidbits!
 */
 func findMaxForm(strs []string, m int, n int) int {
-    return 0
+	counts := make([][]int, len(strs))
+	for idx, s := range strs {
+		zeros := 0
+		ones := 0
+		for i:=0; i<len(s); i++ {
+			if s[i] == '0' {
+				zeros++
+			} else {
+				ones++
+			}
+		}
+		counts[idx] = []int{zeros, ones}
+	}
+
+	// For a given number of 0's left and 1's left, and an index at or beyond which we are allowed to pick, what's the best we can do?
+	sols := make([][]map[int]int, m+1)
+	for i:=0; i<=m; i++ {
+		sols[i] = make([]map[int]int, n+1)
+		for j:=0; j<=n; j++ {
+			sols[i][j] = make(map[int]int)
+		}
+	}
+    return topDownFindMaxForm(counts, 0, m, n, sols)
+}
+
+/*
+Top-down helper method for above problem
+*/
+func topDownFindMaxForm(counts [][]int, idx int, zeros int, ones int, sols [][]map[int]int) int {
+	_, ok := sols[zeros][ones][idx] 
+	if !ok {
+		// Need to solve this problem
+		if idx == len(counts) {
+			sols[zeros][ones][idx] = 0
+		} else {
+			if counts[idx][0] > zeros || counts[idx][1] > ones {
+				sols[zeros][ones][idx] = topDownFindMaxForm(counts, idx+1, zeros, ones, sols)
+			} else {
+				// Pick or don't pick
+				record := topDownFindMaxForm(counts, idx+1, zeros, ones, sols)
+				record = max(record, 1 + topDownFindMaxForm(counts, idx+1, zeros - counts[idx][0], ones - counts[idx][1], sols))
+				sols[zeros][ones][idx] = record
+			}
+		}
+	}
+	return sols[zeros][ones][idx]
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given n BST (binary search tree) root nodes for n separate BSTs stored in an array trees (0-indexed). 
+Each BST in trees has at most 3 nodes, and no two roots have the same value. 
+In one operation, you can:
+- Select two distinct indices i and j such that the value stored at one of the leaves of trees[i] is equal to the root value of trees[j].
+- Replace the leaf node in trees[i] with trees[j].
+- Remove trees[j] from trees.
+
+Return the root of the resulting BST if it is possible to form a valid BST after performing n - 1 operations, or null if it is impossible to create a valid BST.
+
+A BST (binary search tree) is a binary tree where each node satisfies the following property:
+- Every node in the node's left subtree has a value strictly less than the node's value.
+- Every node in the node's right subtree has a value strictly greater than the node's value.
+
+A leaf is a node that has no children.
+
+Link:
+https://leetcode.com/problems/merge-bsts-to-create-single-bst/description/
+*/
+func canMerge(trees []*binary_tree.TreeNode) *binary_tree.TreeNode {
+    return nil
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

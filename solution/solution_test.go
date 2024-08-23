@@ -4631,3 +4631,36 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestCanMerge(t *testing.T) {
+	type input struct {
+		trees []*binary_tree.TreeNode
+	}
+	inputs := []input{
+		{[]*binary_tree.TreeNode{
+			binary_tree.NewTree([]int{2,1}),
+			binary_tree.NewTree([]int{3,2,5}),
+			binary_tree.NewTree([]int{5,4}),
+		}},
+		{[]*binary_tree.TreeNode{
+			binary_tree.NewTree([]int{5,3,8}),
+			binary_tree.NewTree([]int{3,2,6}),
+		}},
+		{[]*binary_tree.TreeNode{
+			binary_tree.NewTree([]int{5,4}),
+			binary_tree.NewTree([]int{3}),
+		}},
+	}
+
+	expected_outputs := []*binary_tree.TreeNode{
+		binary_tree.NewTree([]int{3,2,5,1,binary_tree.NULL,4}),
+		nil,
+		nil,
+	}
+
+	f := func(i input) *binary_tree.TreeNode {
+		return canMerge(i.trees)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
