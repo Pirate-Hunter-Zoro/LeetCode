@@ -4632,6 +4632,50 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
  }
 
+ func TestIsValidBST(t *testing.T) {
+	type input struct {
+		root *binary_tree.TreeNode
+	}
+	inputs := []input{
+		{binary_tree.NewTree([]int{2,1,3})},
+		{binary_tree.NewTree([]int{5,1,4,binary_tree.NULL,binary_tree.NULL,3,6})},
+	}
+
+	expected_outputs := []bool{
+		true,
+		false,
+	}
+
+	f := func(i input) bool {
+		return isValidBST(i.root)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestCreateBinaryTree(t *testing.T) {
+	type input struct {
+		descriptions [][]int
+	}
+	inputs := []input{
+		{[][]int{{20,15,1},{20,17,0},{50,20,1},{50,80,0},{80,19,1}}},
+		{[][]int{{1,2,1},{2,3,0},{3,4,1}}},
+		{[][]int{{39,70,1},{13,39,1},{85,74,1},{74,13,1},{38,82,1},{82,85,1}}},
+	}
+
+	expected_outputs := []*binary_tree.TreeNode{
+		binary_tree.NewTree([]int{50,20,80,15,17,19}),
+		binary_tree.NewTree([]int{1,2,binary_tree.NULL,binary_tree.NULL,3,4}),
+		binary_tree.NewTree([]int{38, 82, binary_tree.NULL, 85, binary_tree.NULL, 74, binary_tree.NULL, 13, binary_tree.NULL, 39, binary_tree.NULL, 70}),
+	}
+
+	f := func(i input) *binary_tree.TreeNode {
+		return createBinaryTree(i.descriptions)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
  func TestCanMerge(t *testing.T) {
 	type input struct {
 		trees []*binary_tree.TreeNode

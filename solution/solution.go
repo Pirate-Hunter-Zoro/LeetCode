@@ -10844,6 +10844,101 @@ func topDownFindMaxForm(counts [][]int, idx int, zeros int, ones int, sols [][]m
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
+Given the root of a binary tree, determine if it is a valid binary search tree (BST).
+
+A valid BST is defined as follows:
+- The left subtree of a node contains only nodes with keys less than the node's key.
+- The right subtree of a node contains only nodes with keys greater than the node's key.
+- Both the left and right subtrees must also be binary search trees.
+*/
+func isValidBST(root *binary_tree.TreeNode) bool {
+	if root.Left != nil && !recIsValidBST(root.Left, root.Val, math.MinInt) {
+		return false
+	}
+	if root.Right != nil && !recIsValidBST(root.Right, math.MaxInt, root.Val) {
+		return false
+	}
+    return true
+}
+
+/*
+Helper method for the above function
+*/
+func recIsValidBST(root *binary_tree.TreeNode, stay_below int, stay_above int) bool {
+	if root.Val >= stay_below || root.Val <= stay_above {
+		return false
+	} else {
+		if root.Left != nil && !recIsValidBST(root.Left, root.Val, stay_above) {
+			return false
+		}
+		if root.Right != nil && !recIsValidBST(root.Right, stay_below, root.Val) {
+			return false
+		}
+		return true
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given n BST (binary search tree) root nodes for n separate BSTs stored in an array trees (0-indexed). 
+Each BST in trees has at most 3 nodes, and no two roots have the same value. 
+In one operation, you can:
+- Select two distinct indices i and j such that the value stored at one of the leaves of trees[i] is equal to the root value of trees[j].
+- Replace the leaf node in trees[i] with trees[j].
+- Remove trees[j] from trees.
+
+Return the root of the resulting BST if it is possible to form a valid BST after performing n - 1 operations, or null if it is impossible to create a valid BST.
+
+A BST (binary search tree) is a binary tree where each node satisfies the following property:
+- Every node in the node's left subtree has a value strictly less than the node's value.
+- Every node in the node's right subtree has a value strictly greater than the node's value.
+
+A leaf is a node that has no children.
+
+Link:
+https://leetcode.com/problems/merge-bsts-to-create-single-bst/description/
+*/
+func createBinaryTree(descriptions [][]int) *binary_tree.TreeNode {
+    nodes := make(map[int]*binary_tree.TreeNode)
+	has_parent := make(map[*binary_tree.TreeNode]bool)
+	for _, node_pair := range descriptions {
+		parent_id := node_pair[0]
+		child_id := node_pair[1]
+		left := node_pair[2] == 1
+		_, ok := nodes[parent_id]
+		if !ok {
+			nodes[parent_id] = &binary_tree.TreeNode{Val: parent_id}
+			_, ok = nodes[parent_id] 
+			if !ok {
+				// This might change down the road
+				has_parent[nodes[parent_id]] = false
+			}
+		}
+		_, ok = nodes[child_id]
+		if !ok {
+			nodes[child_id] = &binary_tree.TreeNode{Val: node_pair[1]}
+		}
+		has_parent[nodes[child_id]] = true
+		if left {
+			nodes[parent_id].Left = nodes[child_id]
+		} else {
+			nodes[parent_id].Right = nodes[child_id]
+		}
+	}
+
+	for i:=0; i<len(descriptions); i++ {
+		if !has_parent[nodes[descriptions[i][0]]] {
+			return nodes[descriptions[i][0]]
+		}
+	}
+	// By having a valid input, we will never reach here
+	return nil
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
 You are given n BST (binary search tree) root nodes for n separate BSTs stored in an array trees (0-indexed). 
 Each BST in trees has at most 3 nodes, and no two roots have the same value. 
 In one operation, you can:
@@ -10863,6 +10958,8 @@ Link:
 https://leetcode.com/problems/merge-bsts-to-create-single-bst/description/
 */
 func canMerge(trees []*binary_tree.TreeNode) *binary_tree.TreeNode {
+	
+
     return nil
 }
 
