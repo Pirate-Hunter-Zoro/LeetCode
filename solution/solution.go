@@ -10956,11 +10956,129 @@ A leaf is a node that has no children.
 
 Link:
 https://leetcode.com/problems/merge-bsts-to-create-single-bst/description/
+
+Inspiration:
+The discussion posts and the LeetCode hints were very helpful!
 */
 func canMerge(trees []*binary_tree.TreeNode) *binary_tree.TreeNode {
-	
+	// To start off...
+	// Make a list of connections that we know we must have
+	descriptions := [][]int{}
+	unique_vals := make(map[int]bool)
+	for _, root := range trees {
+		unique_vals[root.Val] = true
+		if root.Left != nil {
+			unique_vals[root.Left.Val] = true
+			descriptions = append(descriptions, []int{root.Val, root.Left.Val, 1})
+		}
+		if root.Right != nil {
+			unique_vals[root.Right.Val] = true
+			descriptions = append(descriptions, []int{root.Val, root.Right.Val, 0})
+		}
+	}
 
+	// Each root could become the child of certain other roots depending on if those roots have a child of matching value
+	root_values := make(map[int]bool)
+	potential_parents := make(map[int][][]int) // Store a 2D array where each entry stores the parent value and whether this would be the left (1) or right (0) child
+	for _, r := range trees {
+		root_values[r.Val] = true
+		potential_parents[r.Val] = [][]int{}
+	}
+	// HOWEVER, note that if one value shows up as a leaf more than once, you CANNOT make a binary tree out of that
+	for _, r := range trees {
+		if r.Left != nil {
+			_, ok := root_values[r.Left.Val]
+			if ok {
+				potential_parents[r.Left.Val] = append(potential_parents[r.Left.Val], []int{r.Val, 1})
+				if len(potential_parents[r.Left.Val]) > 1 {
+					return nil
+				}
+			}
+		}
+		if r.Right != nil {
+			_, ok := root_values[r.Right.Val]
+			if ok {
+				potential_parents[r.Right.Val] = append(potential_parents[r.Right.Val], []int{r.Val, 0})
+				if len(potential_parents[r.Right.Val]) > 1 {
+					return nil
+				}
+			}
+		}
+	}
+
+	// Now each root node has a list of potential parents that is exactly one element long - i.e. each root knows who its parent should be
+	// There should be only EXACTLY one node that has no potential parents - if any more than one node have no potential parents, we have no possible tree
+	// Furthermore, each node should be a parent at MOST twice
+	no_parents_count := 0
+	have_left_child := make(map[int]bool)
+	have_right_child := make(map[int]bool)
+	for child_id, parents := range potential_parents {
+		if len(parents) == 0 {
+			no_parents_count++
+		} else {
+			parent_id := parents[0][0]
+			is_left := parents[0][1] == 1
+			if is_left {
+				_, ok := have_left_child[parent_id]
+				if ok {
+					// Not going to work
+					return nil
+				}
+				have_left_child[parent_id] = true
+				descriptions = append(descriptions, []int{parent_id, child_id, 1})
+			} else {
+				_, ok := have_right_child[parent_id]
+				if ok {
+					// Not going to work
+					return nil
+				}
+				have_right_child[parent_id] = true
+				descriptions = append(descriptions, []int{parent_id, child_id, 0})
+			}
+		}
+	}
+	if no_parents_count != 1 {
+		return nil
+	}
+
+	root := createBinaryTree(descriptions)
+	if root != nil && isValidBST(root) && countNodes(root) == len(unique_vals){
+		return root
+	} else if len(descriptions) == 0 && len(trees) == 1 {
+		return trees[0]
+	}
     return nil
+}
+
+/*
+Helper method to count the number of nodes in a binary tree
+*/
+func countNodes(root *binary_tree.TreeNode) int {
+	if root.Left == nil && root.Right == nil {
+		return 1
+	} else if root.Left == nil {
+		return 1 + countNodes(root.Right)
+	} else if root.Right == nil {
+		return 1 + countNodes(root.Left)
+	} else {
+		return 1 + countNodes(root.Left) + countNodes(root.Right)
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an integer array nums. Two players are playing a game with this array: player 1 and player 2.
+
+Player 1 and player 2 take turns, with player 1 starting first. Both players start the game with a score of 0. At each turn, the player takes one of the numbers from either end of the array (i.e., nums[0] or nums[nums.length - 1]) which reduces the size of the array by 1. The player adds the chosen number to their score. The game ends when there are no more elements in the array.
+
+Return true if Player 1 can win the game. If the scores of both players are equal, then player 1 is still the winner, and you should also return true. You may assume that both players are playing optimally.
+
+Link:
+https://leetcode.com/problems/predict-the-winner/description/
+*/
+func predictTheWinner(nums []int) bool {
+    return false
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

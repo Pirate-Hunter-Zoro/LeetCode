@@ -4694,16 +4694,53 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 			binary_tree.NewTree([]int{5,4}),
 			binary_tree.NewTree([]int{3}),
 		}},
+		{[]*binary_tree.TreeNode{
+			binary_tree.NewTree([]int{1,binary_tree.NULL,3}),
+			binary_tree.NewTree([]int{3,1}),
+			binary_tree.NewTree([]int{4,2}),
+		}},
+		{[]*binary_tree.TreeNode{
+			binary_tree.NewTree([]int{3,2}),
+			binary_tree.NewTree([]int{1}),
+			binary_tree.NewTree([]int{2, binary_tree.NULL, 3}),
+		}},
+		{[]*binary_tree.TreeNode{
+			{Val:7},
+		}},
 	}
 
 	expected_outputs := []*binary_tree.TreeNode{
 		binary_tree.NewTree([]int{3,2,5,1,binary_tree.NULL,4}),
 		nil,
 		nil,
+		nil,
+		nil,
+		{Val: 7},
 	}
 
 	f := func(i input) *binary_tree.TreeNode {
 		return canMerge(i.trees)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestPredictTheWinner(t *testing.T) {
+	type input struct {
+		nums []int
+	}
+	inputs := []input{
+		{[]int{1,5,2}},
+		{[]int{1,5,233,7}},
+	}
+
+	expected_outputs := []bool{
+		false,
+		true,
+	}
+
+	f := func(i input) bool {
+		return predictTheWinner(i.nums)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
