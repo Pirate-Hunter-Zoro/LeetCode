@@ -4745,3 +4745,30 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestMaxProbability(t *testing.T) {
+	type input struct {
+		n int
+		edges [][]int
+		succProb []float64
+		start_node int
+		end_node int
+	}
+	inputs := []input{
+		{3, [][]int{{0,1},{1,2},{0,2}}, []float64{0.5,0.5,0.2}, 0, 2},
+		{3, [][]int{{0,1},{1,2},{0,2}}, []float64{0.5,0.5,0.3}, 0, 2},
+		{3, [][]int{{0,1}}, []float64{0.5}, 0, 2},
+	}
+
+	expected_outputs := []float64{
+		0.25,
+		0.3,
+		0,
+	}
+
+	f := func(i input) float64 {
+		return maxProbability(i.n, i.edges, i.succProb, i.start_node, i.end_node)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
