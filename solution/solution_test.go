@@ -4772,3 +4772,39 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestCountSubIslands(t *testing.T) {
+	type input struct {
+		grid1 [][]int
+		grid2 [][]int
+	}
+	inputs := []input{
+		{
+			[][]int{
+				{1,1,1,0,0},{0,1,1,1,1},{0,0,0,0,0},{1,0,0,0,0},{1,1,0,1,1},
+			},
+			[][]int{
+				{1,1,1,0,0},{0,0,1,1,1},{0,1,0,0,0},{1,0,1,1,0},{0,1,0,1,0},
+			},
+		},
+		{
+			[][]int{
+				{1,0,1,0,1},{1,1,1,1,1},{0,0,0,0,0},{1,1,1,1,1},{1,0,1,0,1},
+			},
+			[][]int{
+				{0,0,0,0,0},{1,1,1,1,1},{0,1,0,1,0},{0,1,0,1,0},{1,0,0,0,1},
+			},
+		},
+	}
+
+	expected_outputs := []int{
+		3,
+		2,
+	}
+
+	f := func(i input) int {
+		return countSubIslands(i.grid1, i.grid2)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

@@ -11120,7 +11120,67 @@ Link:
 https://leetcode.com/problems/path-with-maximum-probability/description/?envType=daily-question&envId=2024-08-27
 */
 func maxProbability(n int, edges [][]int, succProb []float64, start_node int, end_node int) float64 {
+	type connection struct {
+		to_id int
+		p_success float64
+	}
+	graph := make([][]connection, n)
+	for i:=0; i<n; i++ {
+		graph[i] = []connection{}
+	}
+	for idx, edge := range edges {
+		first := edge[0]
+		second := edge[1]
+		probability := succProb[idx]
+
+		// First node POV
+		graph[first] = append(graph[first], connection{second, probability})
+
+		// Second node POV
+		graph[second] = append(graph[second], connection{first, probability})
+	}
+
+	connection_heap := heap.NewCustomMaxHeap(func(a connection, b connection) bool {
+		return a.p_success > b.p_success
+	})
+	connection_heap.Insert(connection{start_node, float64(1)})
+	visited := make([]bool, n)
+	for !connection_heap.Empty() {
+		next := connection_heap.Extract()
+		id := next.to_id
+		visited[id] = true
+		p_success := next.p_success
+		if id == end_node {
+			return p_success
+		} else {
+			for _, neighbor := range graph[id] {
+				if !visited[neighbor.to_id] {
+					next_p_success := p_success * neighbor.p_success
+					connection_heap.Insert(connection{neighbor.to_id, next_p_success})
+				}
+			}
+		}
+	}
+
     return float64(0)
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given two m x n binary matrices grid1 and grid2 containing only 0's (representing water) and 1's (representing land). 
+An island is a group of 1's connected 4-directionally (horizontal or vertical). 
+Any cells outside of the grid are considered water cells.
+
+An island in grid2 is considered a sub-island if there is an island in grid1 that contains all the cells that make up this island in grid2.
+
+Return the number of islands in grid2 that are considered sub-islands.
+
+Link:
+https://leetcode.com/problems/count-sub-islands/description/?envType=daily-question&envId=2024-08-28
+*/
+func countSubIslands(grid1 [][]int, grid2 [][]int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
