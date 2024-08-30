@@ -4808,3 +4808,34 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestModifiedGraphEdges(t *testing.T) {
+	type input struct {
+		n int
+		edges [][]int
+		source int
+		destination int
+		target int
+	}
+	inputs := []input{
+		{5, [][]int{{4,1,-1},{2,0,-1},{0,3,-1},{4,3,-1}}, 0, 1, 5},
+		{3, [][]int{{0,1,-1},{0,2,5}}, 0, 2, 6},
+		{4, [][]int{{1,0,4},{1,2,3},{2,3,5},{0,3,-1}}, 0, 2, 6},
+	}
+
+	expected_outputs := [][][]int{
+		{
+			{4,1,1},{2,0,1},{0,3,3},{4,3,1},
+		},
+		{},
+		{
+			{1,0,4},{1,2,3},{2,3,5},{0,3,1},
+		},
+	}
+
+	f := func(i input) [][]int {
+		return modifiedGraphEdges(i.n, i.edges, i.source, i.destination, i.target)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

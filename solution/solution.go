@@ -11180,7 +11180,125 @@ Link:
 https://leetcode.com/problems/count-sub-islands/description/?envType=daily-question&envId=2024-08-28
 */
 func countSubIslands(grid1 [][]int, grid2 [][]int) int {
-    return 0
+	// Handle the first grid
+	node_tracker_grid_1 := disjointset.NewSetOfSets[int]()
+	part_of_land_grid_1 := make(map[int]bool)
+	for r_idx, row := range grid1 {
+		for c, cell_value := range row {
+			if cell_value == 1 {
+				posn := len(grid1[0]) * r_idx + c
+				part_of_land_grid_1[posn] = true
+				node_tracker_grid_1.MakeNode(posn)
+				// Join with island neighbors
+				if r_idx > 0 {
+					// Look up
+					if grid1[r_idx-1][c] == 1 {
+						top_posn := posn - len(grid1[0])
+						node_tracker_grid_1.GetNode(posn).Join(node_tracker_grid_1.GetNode(top_posn))
+					}
+				}
+				if c > 0 {
+					// Look left
+					if grid1[r_idx][c-1] == 1 {
+						left_posn := posn - 1
+						node_tracker_grid_1.GetNode(posn).Join(node_tracker_grid_1.GetNode(left_posn))
+					}
+				}
+			}
+		}
+	}
+	grid1children := make(map[int]map[int]bool)
+	for posn := range part_of_land_grid_1 {
+		parent_id := node_tracker_grid_1.GetNode(posn).RootValue()
+		_, ok := grid1children[parent_id]
+		if !ok {
+			grid1children[parent_id] = make(map[int]bool)
+		}
+		grid1children[parent_id][posn] = true
+	}
+
+	// Handle the second grid
+	node_tracker_grid_2 := disjointset.NewSetOfSets[int]()
+	part_of_land_grid_2 := make(map[int]bool)
+	for r_idx, row := range grid2 {
+		for c, cell_value := range row {
+			if cell_value == 1 {
+				posn := len(grid2[0]) * r_idx + c
+				part_of_land_grid_2[posn] = true
+				node_tracker_grid_2.MakeNode(posn)
+				// Join with island neighbors
+				if r_idx > 0 {
+					// Look up
+					if grid2[r_idx-1][c] == 1 {
+						top_posn := posn - len(grid2[0])
+						node_tracker_grid_2.GetNode(posn).Join(node_tracker_grid_2.GetNode(top_posn))
+					}
+				}
+				if c > 0 {
+					// Look left
+					if grid2[r_idx][c-1] == 1 {
+						left_posn := posn - 1
+						node_tracker_grid_2.GetNode(posn).Join(node_tracker_grid_2.GetNode(left_posn))
+					}
+				}
+			}
+		}
+	}
+	grid2children := make(map[int]map[int]bool)
+	for posn := range part_of_land_grid_2 {
+		parent_id := node_tracker_grid_2.GetNode(posn).RootValue()
+		_, ok := grid2children[parent_id]
+		if !ok {
+			grid2children[parent_id] = make(map[int]bool)
+		}
+		grid2children[parent_id][posn] = true
+	}
+
+	// Look at every single parent ID from the second grid - it corresponds to an island
+	// In our node tracker from the first grid, look at its corresponding parent id, and see if every child of the id from the SECOND grid is contained in the parent id's children from the first grid
+	nested_islands := 0
+	for island_parent_id_grid2 := range grid2children {
+		// Was this even land in the first grid?
+		grid1_node := node_tracker_grid_1.GetNode(island_parent_id_grid2)
+		if grid1_node != nil {
+			island_contained := true
+			island_parent_id_grid1 := grid1_node.RootValue()
+			for child := range grid2children[island_parent_id_grid2] {
+				_, ok := grid1children[island_parent_id_grid1][child]
+				// Is this chunk of the island in grid2 part of the same island in grid1
+				if !ok {
+					island_contained = false
+					break
+				}
+			}
+			if island_contained {
+				nested_islands++
+			}
+		}
+	}
+
+    return nested_islands
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given an undirected weighted connected graph containing n nodes labeled from 0 to n - 1, and an integer array edges where edges[i] = [ai, bi, wi] indicates that there is an edge between nodes a_i and b_i with weight w_i.
+
+Some edges have a weight of -1 (wi = -1), while others have a positive weight (wi > 0).
+
+Your task is to modify all edges with a weight of -1 by assigning them positive integer values in the range [1, 2 * 109] so that the shortest distance between the nodes source and destination becomes equal to an integer target. 
+If there are multiple modifications that make the shortest distance between source and destination equal to target, any of them will be considered correct.
+
+Return an array containing all edges (even unmodified ones) in any order if it is possible to make the shortest distance from source to destination equal to target, or an empty array if it's impossible.
+
+Note: You are not allowed to modify the weights of edges with initial positive weights.
+
+Link:
+https://leetcode.com/problems/modify-graph-edge-weights/description/?envType=daily-question&envId=2024-08-30
+*/
+func modifiedGraphEdges(n int, edges [][]int, source int, destination int, target int) [][]int {
+    return [][]int{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
