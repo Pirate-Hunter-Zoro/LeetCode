@@ -11296,9 +11296,143 @@ Note: You are not allowed to modify the weights of edges with initial positive w
 
 Link:
 https://leetcode.com/problems/modify-graph-edge-weights/description/?envType=daily-question&envId=2024-08-30
+
+Inspiration:
+The LeetCode hints and the following link: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/#
 */
 func modifiedGraphEdges(n int, edges [][]int, source int, destination int, target int) [][]int {
-    return [][]int{}
+	// Set up the graph
+	connectivity_list := make([][][]int, n)
+	for i:=0; i<n; i++ {
+		connectivity_list[i] = [][]int{}
+	}
+	used_changeable := make(map[int]map[int]bool)
+	for _, edge := range edges {
+		node_1 := edge[0]
+		node_2 := edge[1]
+		weight := edge[2]
+		if weight == -1 {
+			_, ok := used_changeable[node_1]
+			if !ok {
+				used_changeable[node_1] = make(map[int]bool)
+			}
+			_, ok = used_changeable[node_2]
+			if !ok {
+				used_changeable[node_2] = make(map[int]bool)
+			}
+			used_changeable[node_1][node_2] = false
+			used_changeable[node_2][node_1] = false
+		} else {
+			connectivity_list[node_1] = append(connectivity_list[node_1], []int{node_2, weight})
+			connectivity_list[node_2] = append(connectivity_list[node_2], []int{node_1, weight})
+		}
+	}
+
+	// Firstly, see if there is a path without any of the changeable edges.
+	visited := make([]bool, n)
+	connection_heap := heap.NewCustomMinHeap(func(first []int, second []int) bool {
+		return first[1] < second[1]
+	})
+	connection_heap.Insert([]int{source, 0})
+	cost := math.MaxInt
+	for !connection_heap.Empty() {
+		next := connection_heap.Extract()
+		visited[next[0]] = true
+		if next[0] == destination {
+			cost = next[1]
+			break
+		} else {
+			for _, neighbor := range connectivity_list[next[0]] {
+				if !visited[neighbor[0]] {
+					connection_heap.Insert([]int{neighbor[0], next[1] + neighbor[1]})
+				}
+			}
+		}
+	}
+	if cost < target {
+		// If there is and its length is LOWER than target, this task is impossible.
+		return [][]int{}
+	} else if cost == target {
+		// If its length is EQUAL to target, then just make all of the -1 edges equal 1 - they won't be used anyway.
+		new_edges := [][]int{}
+		for _, edge := range edges {
+			if edge[2] != -1 {
+				new_edges = append(new_edges, edge)
+			} else {
+				edge[2] = 1
+				new_edges = append(new_edges, edge)
+			}
+		}
+		return new_edges
+	} else {
+		// If there is no path or that path's length is GREATER than target:
+		// The second thing we're going to do is create a graph where all the -1 edges are length 1, and keep track of which ones we use as we search for the shortest path from source to destination in this new graph
+		for first, connections := range used_changeable {
+			for second := range connections {
+				connectivity_list[first] = append(connectivity_list[first], []int{second, 1})
+				connectivity_list[second] = append(connectivity_list[second], []int{first, 1})
+			}
+		}
+		// Perform Djikstra's algorithm to find the shortest path from source to destination, but this time make sure that we keep track of the edges we use
+		visited = make([]bool, n)
+		connection_heap = heap.NewCustomMinHeap(func(first []int, second []int) bool {
+			return first[1] < second[1]
+		})
+		// TODO: https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/#
+		connection_heap.Insert([]int{source, 0})
+		cost := math.MaxInt
+		for !connection_heap.Empty() {
+			next := connection_heap.Extract()
+			visited[next[0]] = true
+			if next[0] == destination {
+				cost = next[1]
+				break
+			} else {
+				for _, neighbor := range connectivity_list[next[0]] {
+					if !visited[neighbor[0]] {
+						connection_heap.Insert([]int{neighbor[0], next[1] + neighbor[1]})
+					}
+				}
+			}
+		}
+		if cost > target {
+			// If the shortest path is ABOVE target, this task is impossible.
+			return [][]int{}
+		} else if cost == target {
+			// If the shortest path EQUALS target, then we are done - making all the -1 edges have with 1 works.
+			new_edges := [][]int{}
+			for _, edge := range edges {
+				if edge[2] != -1 {
+					new_edges = append(new_edges, edge)
+				} else {
+					edge[2] = 1
+					new_edges = append(new_edges, edge)
+				}
+			}
+			return new_edges
+		} else {
+			// Make one of the used changeable edge's cost be (1 + target - cost)
+			new_edges := [][]int{}
+			changed_changeable := false
+			for _, edge := range edges {
+				if edge[2] != -1 {
+					new_edges = append(new_edges, edge)
+				} else {
+					if !changed_changeable && used_changeable[edge[0]][edge[1]] {
+						edge[2] = 1 + target - cost
+						changed_changeable = true
+					} else if used_changeable[edge[0]][edge[1]] {
+						edge[2] = 1
+					} else {
+						// We did NOT use this changeable edge, so make it's weight big since we changed one of the edges we did use's weight
+						edge[2] = target
+					}
+					new_edges = append(new_edges, edge)
+				}
+			}
+			return new_edges
+		}
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
