@@ -4829,3 +4829,29 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 
 	testResults(t, f, inputs, expected_outputs)
  }
+
+ func TestFindCriticalAndPseudoCriticalEdges(t *testing.T) {
+	type input struct {
+		n int
+		edges [][]int
+	}
+	inputs := []input{
+		{5, [][]int{{0,1,1},{1,2,1},{2,3,2},{0,3,2},{0,4,3},{3,4,3},{1,4,6}}},
+		{4, [][]int{{0,1,1},{1,2,1},{2,3,1},{0,3,1}}},
+	}
+
+	expected_outputs := [][][]int{
+		{
+			{0,1},{2,3,4,5},
+		},
+		{
+			{},{0,1,2,3},
+		},
+	}
+
+	f := func(i input) [][]int {
+		return findCriticalAndPseudoCriticalEdges(i.n, i.edges)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }

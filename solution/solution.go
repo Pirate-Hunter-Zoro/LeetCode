@@ -11291,7 +11291,55 @@ Link:
 https://leetcode.com/problems/longest-consecutive-sequence/description/
 */
 func longestConsecutive(nums []int) int {
-    return 0
+	present := make(map[int]bool)
+	for _, v := range nums {
+		present[v] = true
+	}
+	record := 0
+	for _, v := range nums {
+		_, ok := present[v]
+		if ok {
+			delete(present, v)
+			length := 1
+			lower := v-1
+			_, ok = present[lower]
+			for ok {
+				length++
+				delete(present, lower)
+				lower--
+				_, ok = present[lower]
+			}
+			upper := v+1
+			_, ok = present[upper]
+			for ok {
+				length++
+				delete(present, upper)
+				upper++
+				_, ok = present[upper]
+			}
+			record = max(record, length)
+		}
+	}
+    return record
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+Given a weighted undirected connected graph with n vertices numbered from 0 to n - 1, and an array edges where edges[i] = [a_i, b_i, weight_i] represents a bidirectional and weighted edge between nodes a_i and b_i. 
+A minimum spanning tree (MST) is a subset of the graph's edges that connects all vertices without cycles and with the minimum possible total edge weight.
+
+Find all the critical and pseudo-critical edges in the given graph's minimum spanning tree (MST). 
+An MST edge whose deletion from the graph would cause the MST weight to increase is called a critical edge. 
+On the other hand, a pseudo-critical edge is that which can appear in some MSTs but not all.
+
+Note that you can return the indices of the edges in any order.
+
+Link:
+https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/?envType=problem-list-v2&envId=minimum-spanning-tree
+*/
+func findCriticalAndPseudoCriticalEdges(n int, edges [][]int) [][]int {
+    return [][]int{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
