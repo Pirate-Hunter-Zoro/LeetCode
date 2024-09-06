@@ -4809,36 +4809,22 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	testResults(t, f, inputs, expected_outputs)
  }
 
- func TestModifiedGraphEdges(t *testing.T) {
+ func TestLongestConsecutive(t *testing.T) {
 	type input struct {
-		n int
-		edges [][]int
-		source int
-		destination int
-		target int
+		nums []int
 	}
 	inputs := []input{
-		{5, [][]int{{4,1,-1},{2,0,-1},{0,3,-1},{4,3,-1}}, 0, 1, 5},
-		{3, [][]int{{0,1,-1},{0,2,5}}, 0, 2, 6},
-		{4, [][]int{{1,0,4},{1,2,3},{2,3,5},{0,3,-1}}, 0, 2, 6},
-		{4, [][]int{{3,0,-1},{1,2,-1},{2,3,-1},{1,3,9},{2,0,5}}, 0, 1, 7},
+		{[]int{100,4,200,1,3,2}},
+		{[]int{0,3,7,2,5,8,4,6,0,1}},
 	}
 
-	expected_outputs := [][][]int{
-		{
-			{4,1,3},{2,0,5},{0,3,1},{4,3,1},
-		},
-		{},
-		{
-			{1,0,4},{1,2,3},{2,3,5},{0,3,1},
-		},
-		{
-			{3,0,7},{1,2,2},{2,3,7},{1,3,9},{2,0,5},
-		},
+	expected_outputs := []int{
+		4,
+		9,
 	}
 
-	f := func(i input) [][]int {
-		return modifiedGraphEdges(i.n, i.edges, i.source, i.destination, i.target)
+	f := func(i input) int {
+		return longestConsecutive(i.nums)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
