@@ -11337,6 +11337,9 @@ Note that you can return the indices of the edges in any order.
 
 Link:
 https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/?envType=problem-list-v2&envId=minimum-spanning-tree
+
+Inspiration:
+The LeetCode hints!
 */
 func findCriticalAndPseudoCriticalEdges(n int, edges [][]int) [][]int {
 	edge_heap := heap.NewCustomMinHeap(func(i, j int) bool {
@@ -11350,6 +11353,7 @@ func findCriticalAndPseudoCriticalEdges(n int, edges [][]int) [][]int {
 	node_factory := disjointset.NewSetOfSets[int]()
 	mst_weight := 0
 	edges_used := make(map[int]bool)
+	all_edges_used := make(map[int]bool)
 	for len(edges_used) < n-1 {
 		next_edge_idx := edge_heap.Extract()
 		next_edge := edges[next_edge_idx]
@@ -11363,14 +11367,144 @@ func findCriticalAndPseudoCriticalEdges(n int, edges [][]int) [][]int {
 			node_factory.GetNode(from).Join(node_factory.GetNode(to))
 			mst_weight += weight
 			edges_used[next_edge_idx] = true
+			all_edges_used[next_edge_idx] = true
 		}
 	}
 
 	// Now go through each edge and remove it, and see if the next resulting MST has a greater weight
 	// If it does, that edge we removed is a critical edge
-	
+	critical := []int{}
+	pseudo_critical := []int{}
+	for edge := range edges_used {
+		new_mst_weight := 0
+		new_node_factory := disjointset.NewSetOfSets[int]()
+		new_edges_used := make(map[int]bool)
+		new_edge_heap := heap.NewCustomMinHeap(func(i, j int) bool {
+			return edges[i][2] < edges[j][2]
+		})
+		for i := range edges {
+			if i != edge {
+				// Do not include the edge we omit
+				new_edge_heap.Insert(i)
+			}
+		}
+		// Create a new minimum spanning tree barring this edge
+		for len(new_edges_used) < n-1 && !new_edge_heap.Empty() {
+			next_edge_idx := new_edge_heap.Extract()
+			next_edge := edges[next_edge_idx]
+			from := next_edge[0]
+			to := next_edge[1]
+			weight := next_edge[2]
+			new_node_factory.MakeNode(from)
+			new_node_factory.MakeNode(to)
+			if new_node_factory.GetNode(from).RootValue() != new_node_factory.GetNode(to).RootValue() {
+				// To avoid cycle creation
+				new_node_factory.GetNode(from).Join(new_node_factory.GetNode(to))
+				new_mst_weight += weight
+				new_edges_used[next_edge_idx] = true
+			}
+		}
+		// Did we successfully create a new tree?
+		if len(new_edges_used) == n - 1 {
+			if new_mst_weight == mst_weight {
+				// Pseudo-critical, because this new MST has the same weight
+				pseudo_critical = append(pseudo_critical, edge)
+				// All of the NEW edges that appear in this tree are pseudo-critical
+				for new_edge_used := range new_edges_used {
+					_, ok := all_edges_used[new_edge_used]
+					if !ok {
+						pseudo_critical = append(pseudo_critical, new_edge_used)
+						all_edges_used[new_edge_used] = true
+					}
+				}
+			} else {
+				// Critical, because this new MST has greater weight
+				critical = append(critical, edge)
+			}
+		} else {
+			// Then that edge was CERTAINLY critical
+			critical = append(critical, edge)
+		}
+	}
 
-    return [][]int{}
+	// There's an edge case - for instance if all there exists a minimum spanning tree and NONE of its edges showed up in the ORIGINAL MST
+	for i:=0; i<len(edges); i++ {
+		_, ok := all_edges_used[i]
+		if !ok {
+			// Force us to use this new edge
+			start_edge := edges[i]
+			new_mst_weight := start_edge[2]
+			new_node_factory := disjointset.NewSetOfSets[int]()
+			new_node_factory.MakeNode(start_edge[0])
+			new_node_factory.MakeNode(start_edge[1])
+			new_node_factory.GetNode(start_edge[0]).Join(new_node_factory.GetNode(start_edge[1]))
+			new_edges_used := make(map[int]bool)
+			new_edges_used[i] = true
+			new_edge_heap := heap.NewCustomMinHeap(func(i, j int) bool {
+				return edges[i][2] < edges[j][2]
+			})
+			for j := range edges {
+				if j != i {
+					// Do not include the edge we started with
+					new_edge_heap.Insert(j)
+				}
+			}
+			// Create a new minimum spanning tree barring this edge
+			for len(new_edges_used) < n-1 && !new_edge_heap.Empty() {
+				next_edge_idx := new_edge_heap.Extract()
+				next_edge := edges[next_edge_idx]
+				from := next_edge[0]
+				to := next_edge[1]
+				weight := next_edge[2]
+				new_node_factory.MakeNode(from)
+				new_node_factory.MakeNode(to)
+				if new_node_factory.GetNode(from).RootValue() != new_node_factory.GetNode(to).RootValue() {
+					// To avoid cycle creation
+					new_node_factory.GetNode(from).Join(new_node_factory.GetNode(to))
+					new_mst_weight += weight
+					new_edges_used[next_edge_idx] = true
+				}
+			}
+			// Did we successfully create a new minimum spanning tree?
+			if len(new_edges_used) == n - 1 && new_mst_weight == mst_weight {
+				// All of the NEW edges that appear in this tree are pseudo-critical
+				for new_edge_used := range new_edges_used {
+					_, ok := all_edges_used[new_edge_used]
+					if !ok {
+						pseudo_critical = append(pseudo_critical, new_edge_used)
+						all_edges_used[new_edge_used] = true
+					}
+				} 
+			}
+		}
+	}
+
+    sort.SliceStable(critical, func(i, j int) bool {
+		return critical[i] < critical[j]
+	})
+	sort.SliceStable(pseudo_critical, func(i, j int) bool {
+		return pseudo_critical[i] < pseudo_critical[j]
+	})
+
+	return [][]int{critical, pseudo_critical}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+You are given a 0-indexed 2D integer array grid of size m x n. 
+Each cell has one of two values:
+- 0 represents an empty cell,
+- 1 represents an obstacle that may be removed.
+- You can move up, down, left, or right from and to an empty cell.
+
+Return the minimum number of obstacles to remove so you can move from the upper left corner (0, 0) to the lower right corner (m - 1, n - 1).
+
+Link:
+https://leetcode.com/problems/minimum-obstacle-removal-to-reach-corner/description/
+*/
+func minimumObstacles(grid [][]int) int {
+    return 0
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

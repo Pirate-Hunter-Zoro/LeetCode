@@ -4838,6 +4838,7 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 	inputs := []input{
 		{5, [][]int{{0,1,1},{1,2,1},{2,3,2},{0,3,2},{0,4,3},{3,4,3},{1,4,6}}},
 		{4, [][]int{{0,1,1},{1,2,1},{2,3,1},{0,3,1}}},
+		{4, [][]int{{0,1,1},{0,3,1},{0,2,1},{1,2,1},{1,3,1},{2,3,1}}},
 	}
 
 	expected_outputs := [][][]int{
@@ -4847,10 +4848,38 @@ func TestSurvivedRobotsHealths(t *testing.T) {
 		{
 			{},{0,1,2,3},
 		},
+		{
+			{},{0,1,2,3,4,5},
+		},
 	}
 
 	f := func(i input) [][]int {
 		return findCriticalAndPseudoCriticalEdges(i.n, i.edges)
+	}
+
+	testResults(t, f, inputs, expected_outputs)
+ }
+
+ func TestMinimumObstacles(t *testing.T) {
+	type input struct {
+		grid [][]int
+	}
+	inputs := []input{
+		{[][]int{
+			{0,1,1},{1,1,0},{1,1,0},
+		}},
+		{[][]int{
+			{0,1,0,0,0},{0,1,0,1,0},{0,0,0,1,0},
+		}},
+	}
+
+	expected_outputs := []int{
+		2,
+		0,
+	}
+
+	f := func(i input) int {
+		return minimumObstacles(i.grid)
 	}
 
 	testResults(t, f, inputs, expected_outputs)
