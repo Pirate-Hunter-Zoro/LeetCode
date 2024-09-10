@@ -11339,6 +11339,37 @@ Link:
 https://leetcode.com/problems/find-critical-and-pseudo-critical-edges-in-minimum-spanning-tree/?envType=problem-list-v2&envId=minimum-spanning-tree
 */
 func findCriticalAndPseudoCriticalEdges(n int, edges [][]int) [][]int {
+	edge_heap := heap.NewCustomMinHeap(func(i, j int) bool {
+		return edges[i][2] < edges[j][2]
+	})
+	for i := range edges {
+		edge_heap.Insert(i)
+	}
+
+	// We need to make one minimum spanning tree - that minimum spanning tree will automatically contain all critical edges
+	node_factory := disjointset.NewSetOfSets[int]()
+	mst_weight := 0
+	edges_used := make(map[int]bool)
+	for len(edges_used) < n-1 {
+		next_edge_idx := edge_heap.Extract()
+		next_edge := edges[next_edge_idx]
+		from := next_edge[0]
+		to := next_edge[1]
+		weight := next_edge[2]
+		node_factory.MakeNode(from)
+		node_factory.MakeNode(to)
+		if node_factory.GetNode(from).RootValue() != node_factory.GetNode(to).RootValue() {
+			// To avoid cycle creation
+			node_factory.GetNode(from).Join(node_factory.GetNode(to))
+			mst_weight += weight
+			edges_used[next_edge_idx] = true
+		}
+	}
+
+	// Now go through each edge and remove it, and see if the next resulting MST has a greater weight
+	// If it does, that edge we removed is a critical edge
+	
+
     return [][]int{}
 }
 
