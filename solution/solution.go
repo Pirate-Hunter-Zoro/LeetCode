@@ -9691,76 +9691,6 @@ func findTheCity(n int, edges [][]int, distanceThreshold int) int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are given two 0-indexed strings source and target, both of length n and consisting of lowercase English letters. 
-You are also given two 0-indexed character arrays original and changed, and an integer array cost, where cost[i] represents the cost of changing the character original[i] to the character changed[i].
-
-You start with the string source. 
-In one operation, you can pick a character x from the string and change it to the character y at a cost of z if there exists any index j such that cost[j] == z, original[j] == x, and changed[j] == y.
-
-Return the minimum cost to convert the string source to the string target using any number of operations. 
-If it is impossible to convert source to target, return -1.
-
-Note that there may exist indices i, j such that original[j] == original[i] and changed[j] == changed[i].
-
-Link:
-https://leetcode.com/problems/minimum-cost-to-convert-string-i/description/?envType=daily-question&envId=2024-07-27
-
-Inspiration:
-The LeetCode editorial was helpful!
-
-PLEA FOR HELP:
-This solution does not work when you submit it on LeetCode, and quite frankly I do not know why.
-I see no difference between this code and the code that is shown in the LeetCode editorial.
-If anyone can find my error, I'd love it if you could let me know!
-*/
-func minimumCost(source string, target string, original []byte, changed []byte, cost []int) int64 {
-	// We need to shortest path from each character in source to each character in target
-	shortest_paths := make([][]int64, 26)
-	for i:=0; i<26; i++ {
-		shortest_paths[i] = make([]int64, 26)
-        for j:=0; j<26; j++ {
-            shortest_paths[i][j] = int64(math.MaxInt32)
-        }
-	}
-	
-	for idx, b1 := range original {
-		c1 := b1 - 'a'
-		c2 := changed[idx] - 'a'
-		edge_weight := cost[idx]
-		shortest_paths[c1][c2] = min(shortest_paths[c1][c2], int64(edge_weight))
-	}
-
-	// Now we build up dynamically to solve all shortest paths
-	for j:=0; j<26; j++ {
-		for i:=0; i<26; i++ {
-			for k:=0; k<26; k++ {
-				shortest_paths[i][k] = min(shortest_paths[i][k],
-									shortest_paths[i][j] + shortest_paths[j][k])
-			}
-		}
-	}
-	
-	total_cost := int64(0)
-	for i:=0; i<len(source); i++ {
-		if source[i] == target[i] {
-			continue
-		}
-		idx1 := source[i] - 'a'
-		idx2 := target[i] - 'a'
-		path_length := shortest_paths[idx1][idx2]
-		if path_length >= int64(math.MaxInt32/2) { // Not reachable
-			return -1
-		} else {
-			total_cost += path_length
-		}
-	}
-
-	return total_cost
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/*
 A city is represented as a bi-directional connected graph with n vertices where each vertex is labeled from 1 to n (inclusive). 
 The edges in the graph are represented as a 2D integer array edges, where each edges[i] = [u_i, v_i] denotes a bi-directional edge between vertex u_i and vertex v_i. 
 Every vertex pair is connected by at most one edge, and no vertex has an edge to itself. 
@@ -11502,9 +11432,95 @@ Return the minimum number of obstacles to remove so you can move from the upper 
 
 Link:
 https://leetcode.com/problems/minimum-obstacle-removal-to-reach-corner/description/
+
+Inspiration:
+The LeetCode hints were helpful!
+Also this link:
+https://www.geeksforgeeks.org/0-1-bfs-shortest-path-binary-graph/#
+And this one:
+https://leetcode.com/problems/minimum-obstacle-removal-to-reach-corner/solutions/5734771/bfs-shortest-path-with-detailed-explanation-breadth-first-search-c-java-python/
 */
 func minimumObstacles(grid [][]int) int {
-    return 0
+	rows := len(grid)
+	cols := len(grid[0])
+	// This is a graph problem - make a jagged array where each node has a list of connections - each connection stores the other node id and the cost
+	graph := make([][][]int, rows*cols)
+	for i:=0; i<rows; i++ {
+		for j:=0; j<cols; j++ {
+			id := i*cols + j
+			graph[id] = [][]int{}
+			// Look left
+			if j > 0 {
+				left := id-1
+				if grid[i][j-1] == 0 {
+					// Cost to reach left neighbor is 0
+					graph[id] = append(graph[id], []int{left, 0})
+				} else {
+					// Cost to reach left neighbor is 1
+					graph[id] = append(graph[id], []int{left, 1})
+				}
+			}
+			// Look right
+			if j < cols-1 {
+				right := id+1
+				if grid[i][j+1] == 0 {
+					graph[id] = append(graph[id], []int{right, 0})
+				} else {
+					graph[id] = append(graph[id], []int{right, 1})
+				}
+			}
+			// Look up
+			if i > 0 {
+				top := id - cols
+				if grid[i-1][j] == 0 {
+					graph[id] = append(graph[id], []int{top, 0})
+				} else {
+					graph[id] = append(graph[id], []int{top, 1})
+				}
+			}
+			// Look down
+			if i < rows-1 {
+				bottom := id + cols
+				if grid[i+1][j] == 0 {
+					graph[id] = append(graph[id], []int{bottom, 0})
+				} else {
+					graph[id] = append(graph[id], []int{bottom, 1})
+				}
+			}
+		}
+	}
+
+	// We are now ready to perform 0-1 BFS
+	distances := make([]int, len(graph))
+	for i:=1; i<len(distances); i++ {
+		distances[i] = math.MaxInt
+	}
+	deque := linked_list.NewDeque[[]int]()
+	deque.PushFront([]int{0, 0}) // node id, cost
+	for !deque.Empty() {
+		next := deque.GetNext()
+		id := next[0]
+		cost := next[1]
+		distances[id] = cost
+		for _, connection := range graph[id] {
+			next_id := connection[0]
+			edge_weight := connection[1]
+			// Only enqueue this next node if its cost will improve
+			if edge_weight == 0 {
+				if cost < distances[next_id] {
+					// Push to front
+					deque.PushFront([]int{next_id, cost})
+				}
+			} else {
+				next_cost := cost + 1
+				if next_cost < distances[next_id] {
+					// Push to back
+					deque.EnqueueBack([]int{next_id, next_cost})
+				}
+			}
+		}
+	}
+	return distances[len(graph)-1]
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
