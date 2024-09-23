@@ -11422,105 +11422,23 @@ func findCriticalAndPseudoCriticalEdges(n int, edges [][]int) [][]int {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
-You are given a 0-indexed 2D integer array grid of size m x n. 
-Each cell has one of two values:
-- 0 represents an empty cell,
-- 1 represents an obstacle that may be removed.
-- You can move up, down, left, or right from and to an empty cell.
+There is an undirected tree with n nodes labeled from 0 to n - 1. 
+You are given the integer n and a 2D integer array edges of length n - 1, where edges[i] = [u_i, v_i, w_i] indicates that there is an edge between nodes u_i and v_i with weight w_i in the tree.
 
-Return the minimum number of obstacles to remove so you can move from the upper left corner (0, 0) to the lower right corner (m - 1, n - 1).
+You are also given a 2D integer array queries of length m, where queries[i] = [a_i, b_i]. 
+For each query, find the minimum number of operations required to make the weight of every edge on the path from a_i to b_i equal. 
+In one operation, you can choose any edge of the tree and change its weight to any value.
+
+Note that:
+- Queries are independent of each other, meaning that the tree returns to its initial state on each new query.
+- The path from a_i to b_i is a sequence of distinct nodes starting with node a_i and ending with node b_i such that every two adjacent nodes in the sequence share an edge in the tree.
+- Return an array answer of length m where answer[i] is the answer to the ith query.
 
 Link:
-https://leetcode.com/problems/minimum-obstacle-removal-to-reach-corner/description/
-
-Inspiration:
-The LeetCode hints were helpful!
-Also this link:
-https://www.geeksforgeeks.org/0-1-bfs-shortest-path-binary-graph/#
-And this one:
-https://leetcode.com/problems/minimum-obstacle-removal-to-reach-corner/solutions/5734771/bfs-shortest-path-with-detailed-explanation-breadth-first-search-c-java-python/
+https://leetcode.com/problems/minimum-edge-weight-equilibrium-queries-in-a-tree/description/
 */
-func minimumObstacles(grid [][]int) int {
-	rows := len(grid)
-	cols := len(grid[0])
-	// This is a graph problem - make a jagged array where each node has a list of connections - each connection stores the other node id and the cost
-	graph := make([][][]int, rows*cols)
-	for i:=0; i<rows; i++ {
-		for j:=0; j<cols; j++ {
-			id := i*cols + j
-			graph[id] = [][]int{}
-			// Look left
-			if j > 0 {
-				left := id-1
-				if grid[i][j-1] == 0 {
-					// Cost to reach left neighbor is 0
-					graph[id] = append(graph[id], []int{left, 0})
-				} else {
-					// Cost to reach left neighbor is 1
-					graph[id] = append(graph[id], []int{left, 1})
-				}
-			}
-			// Look right
-			if j < cols-1 {
-				right := id+1
-				if grid[i][j+1] == 0 {
-					graph[id] = append(graph[id], []int{right, 0})
-				} else {
-					graph[id] = append(graph[id], []int{right, 1})
-				}
-			}
-			// Look up
-			if i > 0 {
-				top := id - cols
-				if grid[i-1][j] == 0 {
-					graph[id] = append(graph[id], []int{top, 0})
-				} else {
-					graph[id] = append(graph[id], []int{top, 1})
-				}
-			}
-			// Look down
-			if i < rows-1 {
-				bottom := id + cols
-				if grid[i+1][j] == 0 {
-					graph[id] = append(graph[id], []int{bottom, 0})
-				} else {
-					graph[id] = append(graph[id], []int{bottom, 1})
-				}
-			}
-		}
-	}
-
-	// We are now ready to perform 0-1 BFS
-	distances := make([]int, len(graph))
-	for i:=1; i<len(distances); i++ {
-		distances[i] = math.MaxInt
-	}
-	deque := linked_list.NewDeque[[]int]()
-	deque.PushFront([]int{0, 0}) // node id, cost
-	for !deque.Empty() {
-		next := deque.GetNext()
-		id := next[0]
-		cost := next[1]
-		distances[id] = cost
-		for _, connection := range graph[id] {
-			next_id := connection[0]
-			edge_weight := connection[1]
-			// Only enqueue this next node if its cost will improve
-			if edge_weight == 0 {
-				if cost < distances[next_id] {
-					// Push to front
-					deque.PushFront([]int{next_id, cost})
-				}
-			} else {
-				next_cost := cost + 1
-				if next_cost < distances[next_id] {
-					// Push to back
-					deque.EnqueueBack([]int{next_id, next_cost})
-				}
-			}
-		}
-	}
-	return distances[len(graph)-1]
+func minOperationsQueries(n int, edges [][]int, queries [][]int) []int {
+    return []int{}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
